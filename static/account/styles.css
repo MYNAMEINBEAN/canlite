@@ -1,0 +1,121 @@
+/* General Styling */
+* {
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, "segoe ui", roboto, oxygen, ubuntu, cantarell, "fira sans", "droid sans", "helvetica neue", Arial, sans-serif;
+    font-size: 16px;
+}
+
+body {
+    background-color: #435165;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+/* Container */
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+/* Main Box */
+.middle-box {
+    background-color: #ffffff;
+    padding: 40px;
+    border-radius: 16px;
+    box-shadow: 0 0 9px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    transform: translateY(-10%);
+    max-width: 400px;
+    width: 100%;
+}
+
+/* Info Box */
+.info-box {
+    background-color: #e7f1ff;
+    padding: 20px;
+    margin: 15px 0;
+    border-radius: 12px;
+}
+
+/* Text Styling */
+.label {
+    font-size: 20px;
+    font-weight: bold;
+    color: #5b6574;
+    margin-bottom: 10px;
+}
+
+.date, .balance {
+    font-size: 24px;
+    margin: 0;
+    color: #333;
+}
+
+/* Button Container */
+.button-box {
+    margin-top: 20px;
+}
+
+/* Button Styling */
+.refresh-button {
+    background-color: #3274d6;
+    color: white;
+    padding: 15px;
+    border: none;
+    border-radius: 8px;
+    font-size: 18px;
+    cursor: pointer;
+    width: 100%;
+    font-weight: bold;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.2s;
+}
+
+.refresh-button:hover {
+    background-color: #2868c7;
+}
+
+/* Message Box */
+.message-box {
+    background-color: #ffffff; /* White background */
+    padding: 20px;
+    margin-top: 20px; /* Space above the message box */
+    border-radius: 16px; /* Rounded corners */
+    box-shadow: 0 0 9px rgba(0, 0, 0, 0.3); /* Subtle shadow */
+    max-width: 400px; /* Width matching the main box */
+    text-align: left; /* Align text to the left */
+    color: #5b6574; /* Matching text color */
+}
+
+.message-box h2 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 20px; /* Heading font size */
+    color: #3274d6; /* Heading color to match buttons */
+    text-align: center; /* Center the heading text */
+}
+
+.message-box ul {
+    padding-left: 20px; /* Space between bullet points and text */
+    list-style: none; /* Remove default bullet points */
+}
+
+.message-box ul li {
+    margin-bottom: 10px; /* Space between list items */
+    padding-left: 15px;
+    position: relative;
+}
+
+.message-box ul li::before {
+    content: '•'; /* Custom bullet point */
+    position: absolute;
+    left: 0;
+    color: #3274d6; /* Bullet color to match theme */
+    font-size: 20px; /* Bullet size */
+    line-height: 20px; /* Align bullet with text */
+}

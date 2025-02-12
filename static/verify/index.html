@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" href="/logo.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Email Verification</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", Arial, sans-serif;
+      font-size: 16px;
+    }
+    body {
+      background-color: #435165;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+    .container {
+      width: 400px;
+      background-color: #ffffff;
+      box-shadow: 0 0 9px 0 rgba(0, 0, 0, 0.3);
+      margin: 100px auto;
+      padding: 20px;
+      border-radius: 5px;
+    }
+    h1 {
+      text-align: center;
+      color: #5b6574;
+      font-size: 24px;
+      padding: 20px 0;
+      border-bottom: 1px solid #dee0e4;
+    }
+    .instructions {
+      text-align: center;
+      margin: 20px 0;
+      color: #5b6574;
+    }
+    .buttons {
+      display: flex;
+      justify-content: space-around;
+    }
+    .buttons button {
+      width: 48%;
+      padding: 15px;
+      background-color: #3274d6;
+      color: #ffffff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background-color 0.2s;
+    }
+    .buttons button:hover {
+      background-color: #2868c7;
+    }
+    .hidden-section {
+      display: none;
+      margin-top: 20px;
+    }
+    .hidden-section label {
+      display: block;
+      margin-bottom: 10px;
+      font-size: 14px;
+      color: #5b6574;
+    }
+    .hidden-section input[type="email"] {
+      width: calc(100% - 30px);
+      padding: 10px;
+      border: 1px solid #dee0e4;
+      border-radius: 5px;
+    }
+    .hidden-section input[type="submit"] {
+      width: 100%;
+      padding: 15px;
+      margin-top: 20px;
+      background-color: #3274d6;
+      border: 0;
+      cursor: pointer;
+      font-weight: bold;
+      color: #ffffff;
+      transition: background-color 0.2s;
+    }
+    .hidden-section input[type="submit"]:hover {
+      background-color: #2868c7;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+
+<div class="container">
+  <h1>Email Verification</h1>
+  <div class="instructions">
+    Please click the button to verify your email or delete your account.
+  </div>
+  <div class="buttons">
+    <button id="verifyBtn">Verify Email</button>
+    <button id="deleteBtn">Delete Account</button>
+  </div>
+
+  <form class="hidden-section" id="emailForm">
+    <label for="code">Enter the code sent to you email:</label>
+    <input type="email" id="code" name="code" placeholder="Enter your email" required>
+    <input type="submit" value="Submit">
+  </form>
+</div>
+
+<script>
+  // Toggle the email verification section visibility when clicking 'Verify Email'
+  document.getElementById('verifyBtn').addEventListener('click', function() {
+    document.getElementById('emailForm').style.display = 'block';
+  });
+
+  // Simulating web requests
+  document.getElementById('deleteBtn').addEventListener('click', function() {
+    alert('Delete account request sent!');
+  });
+
+  document.getElementById('emailForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+    alert('Email verification request sent for ' + document.getElementById('code').value);
+  });
+</script>
+
+</body>
+</html>

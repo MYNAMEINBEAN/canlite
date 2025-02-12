@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CanLite</title>
+  <meta name="description" content="Access CanLite for a secure, free unblocker and web proxy, plus an extensive collection of unblocked games for school and leisure! Enjoy fast, anonymous access to popular games and websites." />
+  <meta name="keywords" content="CanLite, web proxy, unblocker, unblocked games, secure browsing, anonymous access, school games" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+
+  <!-- Google Fonts and Material Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+  <link rel="stylesheet" href="landing/style.css" />
+  <link rel="stylesheet" href="login/style.css" />
+
+  <!-- External Scripts -->
+  <script defer data-domain="trueanalytics.online" src="https://trueanalytics.online/js/script.js"></script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1655414789495559" crossorigin="anonymous"></script>
+  <script id="aclib" type="text/javascript" src="//acscdn.com/script/aclib.js"></script>
+</head>
+<body>
+
+<div id="authModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <!-- Tab Navigation -->
+    <div class="modal-tabs">
+      <button id="loginTab" class="active">Login</button>
+      <button id="registerTab">Register</button>
+    </div>
+    <!-- Login Form -->
+    <div id="loginForm" class="auth-form">
+      <h2>Login</h2>
+      <form>
+        <label for="loginEmail">Email</label>
+        <input type="email" id="loginEmail" placeholder="Enter your email" required>
+        <label for="loginPassword">Password</label>
+        <input type="password" id="loginPassword" placeholder="Enter your password" required>
+        <button type="submit">Login</button>
+      </form>
+    </div>
+    <!-- Register Form -->
+    <div id="registerForm" class="auth-form" style="display: none;">
+      <h2>Register</h2>
+      <form>
+        <label for="registerEmail">Email</label>
+        <input type="email" id="registerEmail" placeholder="Enter your email" required>
+        <label for="registerPassword">Password</label>
+        <input type="password" id="registerPassword" placeholder="Enter your password" required>
+        <button type="submit">Register</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Global Particle Background Container -->
+<div id="particles-js"></div>
+
+<div class="wrapper">
+  <!-- Header & Navigation -->
+  <header>
+    <div class="nav">
+      <div class="logo" onclick="window.location.href='/'">
+        <img src="/logo.png" alt="Logo">
+        <h3>CanLite</h3>
+      </div>
+      <ul class="nav-items">
+        <li><a href="/"><span class="material-symbols-outlined">home</span> Home</a></li>
+        <li><a href="/games"><span class="material-symbols-outlined">stadia_controller</span> Games</a></li>
+        <li><a href="/proxe"><span class="material-symbols-outlined">language</span> Proxe</a></li>
+        <li><a href="/partners"><span class="material-symbols-outlined">person</span>Partners</a></li>
+        <li><a id="loginModalBtn"><span id="loginSpan" class="material-symbols-outlined">login</span>Login / Register</a></li>
+      </ul>
+      <div class="time" id="time-clock"></div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main>
+    <!-- Hero Section -->
+    <section class="hero">
+      <h1>Welcome to CanLite</h1>
+      <h4>Your Ultimate Web Proxy & Unblocked Games Hub.</h4>
+      <h5>Use our new account system to store your data across link!</h5>
+      <p id="app"></p>
+      <a class="button" href="/games">Play Now!</a>
+      <a class="button" href="/proxe">Search Now!</a>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features">
+      <h2>Our Top Features</h2>
+      <div class="feature-grid">
+        <div class="feature-box">
+          <h3>Web Proxy</h3>
+          <p>Enjoy our web proxy (credits to technitium network) which lets you look up anything without being blocked.</p>
+        </div>
+        <div class="feature-box">
+          <h3>Backup Links</h3>
+          <p>One link gets blocked? Join the discord for access to hundreds more!</p>
+        </div>
+        <div class="feature-box">
+          <h3>Unblocked Games</h3>
+          <p>Access a wide range of games, bypassing restrictions effortlessly.</p>
+        </div>
+        <div class="feature-box">
+          <h3>Bypass Filters</h3>
+          <p>Bypass all web content filters to be able to play games online, and search the web without any restrictions.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="how-it-works">
+      <h2>How It Works</h2>
+      <div class="how-grid">
+        <div class="how-step">
+          <span class="material-symbols-outlined">explore</span>
+          <h3>Visit CanLite</h3>
+          <p>Navigate to our website and explore our secure services.</p>
+        </div>
+        <div class="how-step">
+          <span class="material-symbols-outlined">security</span>
+          <h3>Choose a Service</h3>
+          <p>Select from our web proxy or game library to get started.</p>
+        </div>
+        <div class="how-step">
+          <span class="material-symbols-outlined">thumb_up</span>
+          <h3>Enjoy Anonymity</h3>
+          <p>Browse or play without restrictions, completely anonymously.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="testimonials">
+      <h2>What Our Users Say</h2>
+      <div class="testimonial-grid">
+        <div class="testimonial">
+          <p>"Now I can play games in class instead of paying attention!"</p>
+          <div class="author">- Alex</div>
+        </div>
+        <div class="testimonial">
+          <p>"This is so much faster than the other proxies out there."</p>
+          <div class="author">- Jamie</div>
+        </div>
+        <div class="testimonial">
+          <p>"I really like that there are hundreds of backup links!"</p>
+          <div class="author">- Morgan</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Community Section -->
+    <section class="community">
+      <h2>Join Our Community</h2>
+      <p>Connect with fellow users on Discord, get links, and stay updated with the latest news.</p>
+      <a class="button" href="https://discord.com/invite/46gkEU5kpP" target="_blank">Join our Discord</a>
+    </section>
+  </main>
+</div>
+
+<div class="seo-block">
+  <h2>CanLite - The Best Web Proxy for Unblocking Videos</h2>
+  <p>CanLite is your #1 choice for unblocking videos and accessing restricted content. Whether you're at school, work, or traveling, our proxy lets you bypass censorship and browse freely. With a secure, encrypted connection, CanLite ensures fast and anonymous browsing.</p>
+
+  <h3>Why Use CanLite?</h3>
+  <ul>
+    <li>Fast & secure proxy for unrestricted access</li>
+    <li>Bypass school, work, and regional restrictions</li>
+    <li>Optimized for video streaming and smooth playback</li>
+    <li>Completely anonymous browsing with no logs</li>
+    <li>Works on mobile, desktop, and all modern browsers</li>
+  </ul>
+
+  <h3>Unblock Any Site With CanLite</h3>
+  <p>Need to access blocked content? CanLite supports all major platforms, including YouTube, TikTok, Netflix, and more. Unlike VPNs, our web proxy works instantly with no downloads required. Just visit CanLite and start browsing anonymously!</p>
+
+  <h3>How CanLite Works</h3>
+  <p>CanLite uses advanced proxy technology to reroute your connection through a high-speed server, masking your IP and allowing unrestricted access. Our service is designed to bypass firewalls while maintaining the highest level of privacy.</p>
+
+  <h3>Start Browsing with CanLite Today!</h3>
+  <p>Enjoy a free, fast, and reliable web proxy for unblocking videos. Say goodbye to restrictions and experience true internet freedom with CanLite.</p>
+</div>
+
+<!-- Footer -->
+<footer>
+  <div class="footer-links">
+    <a href="/privacy">Privacy Policy</a>
+    <a href="mailto:canlite24@outlook.com">Email Us</a>
+    <a href="https://discord.com/invite/46gkEU5kpP" target="_blank">Join our Discord</a>
+    <a href="/about">About Us</a>
+  </div>
+  <div>&copy; <span id="year"></span> CanLite. All rights reserved.</div>
+</footer>
+
+<!-- External and Inline Scripts -->
+<script src="landing/time.js"></script>
+<script src="https://unpkg.com/typewriter-effect@latest/dist/core.js"></script>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="landing/index.js"></script>
+<script src="login/index.js"></script>
+</body>
+</html>

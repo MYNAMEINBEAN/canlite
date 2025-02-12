@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/logo.svg">
+  <title>Video PlayerAd</title>
+  <script src="https://imasdk.googleapis.com/js/sdkloader/ima3.js"></script>
+  <script src="https://unpkg.com/@glomex/vast-ima-player@1/dist/vast-ima-player.umd.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", Arial, sans-serif;
+      font-size: 16px;
+    }
+    body {
+      background-color: #435165;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      flex-direction: column;
+    }
+    .player-container {
+      width: 600px;
+      background-color: #ffffff;
+      box-shadow: 0 0 9px 0 rgba(0, 0, 0, 0.3);
+      margin: 50px auto;
+      padding: 20px;
+      border-radius: 5px;
+      position: relative;
+    }
+    #mediaElement {
+      width: 100%;
+      height: 100%;
+    }
+    #adContainer {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 100%;
+      height: 100%;
+      transform: translate(-50%, -50%);
+      pointer-events: none; /* Ensures ad container doesn't block video controls */
+    }
+    .controls {
+      text-align: center;
+      margin-top: 20px;
+    }
+    .controls button {
+      background-color: #3274d6;
+      color: #ffffff;
+      border: none;
+      padding: 10px 20px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background-color 0.2s;
+    }
+    .controls button:hover {
+      background-color: #2868c7;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script>
+    alert('In order to keep the service free, watch a short ad without skipping for an hour of using the proxy. This might take a while to load.')
+  </script>
+</head>
+<body>
+<div class="player-container" id="videoContainer">
+  <video id="mediaElement" controls playsinline poster="https://glomex.github.io/vast-ima-player/big-buck-bunny.png" preload="none">
+    <source type="video/mp4" src="https://glomex.github.io/vast-ima-player/big-buck-bunny.mp4">
+  </video>
+  <div id="adContainer"></div> <!-- Ad container placed absolutely and centered over the video -->
+</div>
+
+<div class="controls">
+  <button id="playAd">Click Me</button>
+</div>
+
+<script>
+  function done() {
+    axios.post('https://api.' + window.localStorage.getItem('loc') + '/ad', {
+      token: window.localStorage.getItem('token'),
+      email: window.localStorage.getItem('email')
+    })
+      .then(function(responseAxios) {
+        if (responseAxios.status === 200) {
+          window.location.href = '/'
+        } else {
+          alert(responseAxios);
+        }
+      })
+      .catch(function(error) {
+        console.log(error);
+      });
+    }
+  
+  var adsRenderingSettings = new google.ima.AdsRenderingSettings();
+  var imaPlayer = new vastImaPlayer.Player(
+      google.ima,
+      document.getElementById('mediaElement'),
+      document.getElementById('adContainer'),
+      adsRenderingSettings
+  );
+  document.getElementById('playAd').addEventListener('click', function() {
+    var playAdsRequest = new google.ima.AdsRequest();
+    playAdsRequest.adTagUrl = 'https://handmadetip.com/d/mhFPzad.GqNGvLZvG/Uq/GePm/9wuBZOUslRktPAThU/2cNeDvki5WN-jJget/NRTvYt0/OFTbkj2qOgSpZRs/anWe1fpYd/Dg0axe';
+    imaPlayer.playAds(playAdsRequest);
+    setTimeout(done, 15000);
+  });
+
+  imaPlayer.addEventListener("AdComplete", (event) => {
+    const adPodInfo = event.detail.ad.getAdPodInfo();
+    console.log("ad complete", adPodInfo);
+
+
+    axios.post('https://api.' + window.localStorage.getItem('loc') + '/ad', {
+      token: window.localStorage.getItem('token'),
+      email: window.localStorage.getItem('email')
+    })
+        .then(function(responseAxios) {
+          if (responseAxios.status === 200) {
+            window.location.href = '/landing'
+          } else {
+            alert(responseAxios);
+          }
+        })
+        .catch(function(error) {
+          console.log(error);
+        });
+  });
+
+</script>
+</body>
+</html>

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="/logo.svg">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="container">
+    <div class="middle-box">
+        <div class="info-box">
+            <p class="label" id="Exp label">Plan expires at:</p>
+            <p class="date" id="Expiry date">January 1st 1970, 00:00:00</p>
+        </div>
+        <div class="info-box">
+            <p class="label">Current Balance:</p>
+            <p class="balance" id="Balance">$0</p>
+        </div>
+        <div class="button-box">
+            <button class="refresh-button" onclick="location.href='/balance';">Deposit to Balance</button>
+        </div>
+    </div>
+    <div class="message-box">
+        <h2>Subscription Details</h2>
+        <ul>
+            <li>Monthly plan costs $5</li>
+            <li>Bitcoin is the only accepted payment method</li>
+            <li>Subscriptions renew automatically</li>
+            <li>Deposited funds are non-refundable</li>
+            <li>A subscription is required to access the website</li>
+        </ul>
+    </div>
+</div>
+<script src="index.js" ></script>
+</body>
+</html>
