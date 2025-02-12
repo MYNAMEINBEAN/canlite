@@ -1,0 +1,12 @@
+{
+    on_demand_tls {
+        ask      http://localhost:4000/validate-domain
+    }
+}
+
+:443 {
+    tls {
+        on_demand
+    }
+    reverse_proxy localhost:9091
+}
