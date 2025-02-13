@@ -33,8 +33,7 @@ app.use(session({
     cookie: { secure: true }
 }));
 app.use(express.json({limit: '50mb'}));
-app.use(express.urlencoded({limit: '50mb'}));
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 app.get('/uv/sw.js', (req, res) => {
     res.set('Service-Worker-Allowed', '/~/uv/');
@@ -177,6 +176,16 @@ server.on("upgrade", (req, socket, head) => {
         socket.end();
     }
 });
+
+app.use((err, req, res, next) => {
+    console.error('Error encountered:', err);
+    if (err.message === 'aborted' || err.code === 'ECONNRESET') {
+        console.warn('Request was aborted by the client.');
+        return; // Connection is likely already closed
+    }
+    res.status(500).send('Internal Server Error');
+});
+
 
 // app.error((req, res) => {
 //     res.status(404);

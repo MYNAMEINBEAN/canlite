@@ -25,9 +25,7 @@ const Home = function () {
     ];
     this.current = 0;
     this.currentHasURL = false;
-    this.searchEngine =
-        localStorage.getItem("@nano/searchEngine") ||
-        "https://www.google.com/search?q=%s";
+    this.searchEngine = "https://duckduckgo.com/?q=%s&ia=web";
     this.cloakTitle = localStorage.getItem("@nano/cloak/title") || "";
     this.cloakIcon = localStorage.getItem("@nano/cloak/icon") || "";
 
