@@ -25,9 +25,6 @@ Welcome to CanLite, the ultimate hub for seamless web access and gaming. Designe
 - **Tailwind CSS** – Styled using [Tailwind CSS](https://tailwindcss.com/) from Tailwind Labs.
 - **Icons** – Integrated with [Feather Icons](https://feathericons.com/) and [Material Symbols](https://fonts.google.com/icons) for a clean visual experience.
 
-### Additional Enhancements
-- **Optimized with chemical.js** – Utilizes [chemical.js](https://github.com/Nebelung/chemical.js) from Nebelung for efficient backend scripting.
-
 ## Setup & Installation
 
 CanLite is built using Node.js, pnpm, and PostgreSQL. To set up the project, follow these steps:
@@ -51,6 +48,9 @@ CanLite is built using Node.js, pnpm, and PostgreSQL. To set up the project, fol
    ```
 
 Ensure that PostgreSQL is properly configured before running the application.
+
+## Deployment
+CanLite is deployed at **[canlite.org](https://canlite.org)** on a **CrunchBits VPS**. Join our **[Discord server](https://discord.gg/46gkEU5kpP)** for updates, support, and unblocked links.
 
 ## Credits
 - **Technitium Network** – For the *Nano* proxy technology.
