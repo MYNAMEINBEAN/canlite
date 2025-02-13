@@ -1,55 +1,66 @@
-# nano.
+# CanLite
 
-A minimalist web proxy built to be simple yet powerful.
-
-Winner of the 2024 Proxathon.
+Welcome to CanLite, the ultimate hub for seamless web access and gaming. Designed with speed, security, and aesthetics in mind, CanLite redefines how users interact with proxies and web games.
 
 ## Features
 
--   Minimal design
--   Easy to use
--   Tabbed interface
--   Support for many popular sites
+### Advanced Web Proxy
+- **Powered by Nano** – Built on [Technitium Network](https://technitium.com/) *Nano* proxy for blazing-fast, lightweight, and secure browsing.
+- **Unblock Anything** – Bypass restrictions effortlessly while maintaining anonymity.
+- **Minimal Latency** – Optimized for performance with intelligent routing.
+- **Dark-Themed UI** – A sleek, modern interface for a premium user experience.
+- **Built on Ultraviolet** – Utilizes [Ultraviolet](https://github.com/titaniumnetwork-dev/Ultraviolet) from Titanium Network for superior proxy performance.
 
-## Setup
+### Massive Game Collection
+- **Curated by 3kh0** – Featuring an extensive game library from [3kh0's assets](https://gitlab.com/3kh0/3kh0-assets).
+- **Instant Load Times** – No waiting; just play.
+- **Smooth Animations & UI** – Enhanced with 3kh0's CSS for a polished look.
+- **Cloud Saves** – Pick up where you left off, no matter the device.
+- **Built with dreamland.js** – Uses [dreamland.js](https://github.com/MercuryWorkshop/dreamland.js) from MercuryWorkshop for game-related enhancements.
 
-> [!TIP]
-> Run `pnpm install` to install the required dependencies.
+### Sleek, Modern Design
+- **Dark Mode by Default** – Stylish and easy on the eyes.
+- **Adaptive Layout** – Works seamlessly on both desktop and mobile.
+- **User-Centric UX** – Navigation is intuitive and smooth.
+- **Tailwind CSS** – Styled using [Tailwind CSS](https://tailwindcss.com/) from Tailwind Labs.
+- **Icons** – Integrated with [Feather Icons](https://feathericons.com/) and [Material Symbols](https://fonts.google.com/icons) for a clean visual experience.
 
-**Start**
+### Additional Enhancements
+- **Optimized with chemical.js** – Utilizes [chemical.js](https://github.com/Nebelung/chemical.js) from Nebelung for efficient backend scripting.
 
-Run `pnpm start` to start the server. If no build folder is found, the app will build before starting.
+## Setup & Installation
 
-**Build**
+CanLite is built using Node.js, pnpm, and PostgreSQL. To set up the project, follow these steps:
 
-Run `pnpm run build` to build the app for production into the `dist` folder.
+1. Clone the repository:
+   ```sh
+   git clone https://github.com/your-repo/canlite.git
+   cd canlite
+   ```
+2. Install dependencies using pnpm:
+   ```sh
+   pnpm install
+   ```
+3. Build the project:
+   ```sh
+   pnpm run build
+   ```
+4. Start the server:
+   ```sh
+   node index.js
+   ```
 
-**Build Static**
-
-Run `pnpm run build-static` to build the app for production into the `dist` folder. This is for static hosting on Github Pages etc. Make sure to change the Wisp server in `/index.html` to an external one.
-
-**Development**
-
-Run `pnpm run dev` to run the app in development mode.
-
-## Developers
-
-[Leaflet](https://github.com/leafletdev)
-
-[Nebelung](https://github.com/Nebelung-Dev)
+Ensure that PostgreSQL is properly configured before running the application.
 
 ## Credits
+- **Technitium Network** – For the *Nano* proxy technology.
+- **Titanium Network** – For [Ultraviolet](https://github.com/titaniumnetwork-dev/Ultraviolet).
+- **3kh0** – For the game assets and game page CSS.
+- **MercuryWorkshop** – For [dreamland.js](https://github.com/MercuryWorkshop/dreamland.js).
+- **Tailwind Labs** – For [Tailwind CSS](https://tailwindcss.com/).
+- **Feather Icons & Material Symbols** – For icons.
 
-Ultraviolet - Titanium Network
+## Experience CanLite Today
+CanLite is designed to provide a fast, secure, and user-friendly experience for web browsing and gaming. With a modern interface, robust proxy technology, and a diverse collection of games, it delivers a seamless experience for users who need unrestricted access to content. Whether you are looking for a way to bypass network restrictions or just want to enjoy a great selection of browser games, CanLite has you covered.
 
-dreamland.js - MercuryWorkshop
-
-chemicaljs - Nebelung
-
-Tailwind CSS - Tailwind Labs
-
-Icons - Feather Icons & Material Symbols
-
-## License
-
-nano uses the AGPL-3.0 license.
+Visit CanLite today and explore a new level of online accessibility and entertainment.
