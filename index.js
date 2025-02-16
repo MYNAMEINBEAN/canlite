@@ -17,16 +17,16 @@ const __dirname = dirname(__filename);
 const app = express();
 const bareServer = createBareServer("/b/");
 app.disable("x-powered-by");
-// let redisClient = createClient()
-// redisClient.connect().catch(console.error)
-// let redisStore = new RedisStore({
-//     client: redisClient,
-//     prefix: "myapp:",
-// })
+let redisClient = createClient()
+redisClient.connect().catch(console.error)
+let redisStore = new RedisStore({
+    client: redisClient,
+    prefix: "myapp:",
+})
 app.set('trust proxy', 1)
 
 app.use(session({
-    // store: redisStore,
+    store: redisStore,
     secret: 'eokhpokpowkpiyhtrdjpokghpoijerpgokrptogh',
     resave: false,
     saveUninitialized: false,
@@ -177,15 +177,15 @@ server.on("upgrade", (req, socket, head) => {
     }
 });
 
+// Error-handling middleware (add after your routes)
 app.use((err, req, res, next) => {
-    console.error('Error encountered:', err);
-    if (err.message === 'aborted' || err.code === 'ECONNRESET') {
-        console.warn('Request was aborted by the client.');
-        return; // Connection is likely already closed
+    if (err && err.type === 'request.aborted') {
+        console.warn('Request was aborted by the client:', err);
+        // Optionally, send a specific response or simply return
+        return;
     }
-    res.status(500).send('Internal Server Error');
+    next(err);
 });
-
 
 // app.error((req, res) => {
 //     res.status(404);
