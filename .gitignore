@@ -22,3 +22,5 @@ dist-ssr
 *.sln
 
 .env
+static/ads.js
+/static/games/cdn

@@ -17,16 +17,16 @@ const __dirname = dirname(__filename);
 const app = express();
 const bareServer = createBareServer("/b/");
 app.disable("x-powered-by");
-let redisClient = createClient()
-redisClient.connect().catch(console.error)
-let redisStore = new RedisStore({
-    client: redisClient,
-    prefix: "myapp:",
-})
+// let redisClient = createClient()
+// redisClient.connect().catch(console.error)
+// let redisStore = new RedisStore({
+//     client: redisClient,
+//     prefix: "myapp:",
+// })
 app.set('trust proxy', 1)
 
 app.use(session({
-    store: redisStore,
+    // store: redisStore,
     secret: 'eokhpokpowkpiyhtrdjpokghpoijerpgokrptogh',
     resave: false,
     saveUninitialized: false,
