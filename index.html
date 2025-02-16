@@ -17,6 +17,24 @@
                 })
         }
     </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Construct the canonical URL dynamically
+            const baseUrl = "https://canlite.org";
+            const currentPath = window.location.pathname;
+            const currentSearch = window.location.search;
+            const canonicalUrl = baseUrl + currentPath + currentSearch;
+
+            // Check if a canonical link already exists
+            let link = document.querySelector("link[rel='canonical']");
+            if (!link) {
+                link = document.createElement("link");
+                link.setAttribute("rel", "canonical");
+                document.head.appendChild(link);
+            }
+            link.setAttribute("href", canonicalUrl);
+        });
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="Access CanLite for a secure, free web unbl0cker and an extensive collection of unbl0cked gam3s for school! Enjoy fast, anonymous access to popular games and websites, bipassing restrictions safely on any network." />
     <script defer data-domain="trueanalytics.online" src="https://trueanalytics.online/js/script.js"></script>
