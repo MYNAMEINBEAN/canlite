@@ -1,22 +1,20 @@
 const pool = require('../db');
+const dotenv = require("dotenv");
+
+dotenv.config();
 
 const verifyUser = async (req, res, next) => {
-    const { email, token } = req.body;
 
     try {
-        if (!email || !token) {
+        if (!req.session.token) {
             return res.status(401).json({ error: 'Unauthorized' });
         }
 
         // Fetch user token and refresh time
-        const result = await pool.query('SELECT token, refresh FROM users WHERE email = $1', [email]);
+        const result = await pool.query('SELECT token, email FROM users WHERE token = $1', [req.session.token]);
 
-        if (result.rowCount === 0 || result.rows[0].token !== token) {
+        if (result.rowCount === 0 || result.rows[0].email !== process.env.ADMIN_EMAIL) {
             return res.status(403).json({ error: 'Invalid token' });
-        }
-
-        if (result.rows[0].refresh < Date.now() / 1000) {
-            return res.status(403).json({ error: 'Token expired' });
         }
 
         next(); // User is verified, proceed to next route handler

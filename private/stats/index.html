@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>API Request Stats</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+    th { background-color: #4CAF50; color: white; }
+    canvas { max-width: 800px; margin-top: 20px; }
+  </style>
+</head>
+<body>
+<h2>API Request Stats (Last 30 Days)</h2>
+<table id="stats-table">
+  <thead>
+  <tr id="date-header"><th>Domain</th></tr>
+  </thead>
+  <tbody id="stats-body"></tbody>
+</table>
+<canvas id="chart"></canvas>
+
+<script>
+  async function fetchStats() {
+    const res = await fetch("/api/stats");
+    const { stats, days } = await res.json();
+
+    // Build table
+    const tableHeader = document.getElementById("date-header");
+    const tableBody = document.getElementById("stats-body");
+    tableHeader.innerHTML = "<th>Domain</th>";
+    days.forEach(day => tableHeader.innerHTML += `<th>${day}</th>`);
+    tableBody.innerHTML = "";
+
+    let datasets = [];
+
+    Object.keys(stats).forEach(domain => {
+      const row = document.createElement("tr");
+      row.innerHTML = `<td>${domain}</td>`;
+      let data = [];
+
+      days.forEach(day => {
+        let count = stats[domain][day] || 0;
+        row.innerHTML += `<td>${count}</td>`;
+        data.push(count);
+      });
+
+      tableBody.appendChild(row);
+      datasets.push({ label: domain, data, borderWidth: 2, fill: false });
+    });
+
+    // Render Chart
+    new Chart(document.getElementById("chart"), {
+      type: "line",
+      data: { labels: days, datasets },
+      options: { responsive: true, scales: { y: { beginAtZero: true } } }
+    });
+  }
+
+  fetchStats();
+</script>
+</body>
+</html>

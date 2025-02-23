@@ -1,13 +1,40 @@
 import express from "express";
 import crypto from 'crypto';
 import pool from './db.js';
+import verifyUser from "./middleware/auth.js";
+import {createClient} from "redis";
+import moment from "moment";
 
+let redisClientAPI = createClient();
+redisClientAPI.connect().catch(console.error)
 const router = express.Router();
 
 // Utility function to generate random strings
 const generateRandomString = (length) => {
     return crypto.randomBytes(length).toString('hex').slice(0, length);
 };
+
+router.post("/stats", verifyUser, async (req, res) => {
+    try {
+        const domains = await redisClientAPI.sMembers("tracked_domains");
+        const days = [...Array(30)].map((_, i) =>
+            moment().subtract(i, "days").format("YYYY-MM-DD")
+        );
+
+        let stats = {};
+        for (let domain of domains) {
+            stats[domain] = {};
+            for (let day of days) {
+                const key = `api_requests:${domain}:${day}`;
+                stats[domain][day] = (await redisClient.get(key)) || 0;
+            }
+        }
+
+        res.json({ stats, days });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
 
 // LOGIN Route
 router.post('/login', async (req, res) => {
@@ -119,5 +146,28 @@ router.post('/saveGameData', async (req, res) => {
         res.status(500).json({ error: 'Server Error' });
     }
 });
+
+app.get("/stats", verifyUser, async (req, res) => {
+    try {
+        const domains = await redisClient.sMembers("tracked_domains");
+        const days = [...Array(30)].map((_, i) =>
+            moment().subtract(i, "days").format("YYYY-MM-DD")
+        );
+
+        let stats = {};
+        for (let domain of domains) {
+            stats[domain] = {};
+            for (let day of days) {
+                const key = `api_requests:${domain}:${day}`;
+                stats[domain][day] = (await redisClient.get(key)) || 0;
+            }
+        }
+
+        res.json({ stats, days });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 
 export default router;

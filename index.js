@@ -11,13 +11,14 @@ import * as http from "node:http";
 import * as https from "node:https";
 import {createClient} from "redis"
 import apiRoutes from './api.js';
+import verifyUser from "./middleware/auth.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const app = express();
 const bareServer = createBareServer("/b/");
 app.disable("x-powered-by");
-let redisClient = createClient()
+let redisClient = createClient();
 redisClient.connect().catch(console.error)
 let redisStore = new RedisStore({
     client: redisClient,
@@ -27,7 +28,7 @@ app.set('trust proxy', 1)
 
 app.use(session({
     store: redisStore,
-    secret: 'eokhpokpowkpiyhtrdjpokghpoijerpgokrptogh',
+    secret: process.env.EXPRESSJS_SECRET,
     resave: false,
     saveUninitialized: false,
     cookie: { secure: true }
@@ -54,6 +55,10 @@ app.get('/~/uv/uv/uv.handler.js', (req, res) => {
 
 app.get('/validate-domain', (req, res) => {
     res.status(200).send('OK');
+});
+
+app.get('/stats', verifyUser, (req, res) => {
+    res.sendFile(path.join(__dirname + '/private/stats/index.html'));
 });
 
 app.get('/app/:route/:file', function(req , res){
@@ -151,9 +156,15 @@ app.use(express.static(__dirname + '/static'))
 
 const server = http.createServer();
 
-server.on("request", (req, res) => {
+server.on("request", async (req, res) => {
     try {
         if (bareServer.shouldRoute(req)) {
+            const domain = req.get("host");
+            const date = moment().format("YYYY-MM-DD");
+            const key = `api_requests:${domain}:${date}`;
+
+            await redisClient.incr(key);
+            await redisClient.sAdd("tracked_domains", domain); // Store unique domains
             bareServer.routeRequest(req, res);
         } else {
             app(req, res);
@@ -164,9 +175,15 @@ server.on("request", (req, res) => {
     }
 });
 
-server.on("upgrade", (req, socket, head) => {
+server.on("upgrade", async (req, socket, head) => {
     try {
         if (bareServer.shouldRoute(req)) {
+            const domain = req.get("host");
+            const date = moment().format("YYYY-MM-DD");
+            const key = `api_requests:${domain}:${date}`;
+
+            await redisClient.incr(key);
+            await redisClient.sAdd("tracked_domains", domain); // Store unique domains
             bareServer.routeUpgrade(req, socket, head);
         } else {
             socket.end();

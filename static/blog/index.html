@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CanLite Blog</title>
+    <style>
+        :root {
+            --secondary-color: #c491f4;
+            --tertiary-color: #20B2AA;
+            --bg-color: #000;
+            --text-color: #FFF;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Arial', sans-serif;
+        }
+
+        header {
+            padding: 2rem;
+            text-align: center;
+            background-color: #1a1a1a; /* Slightly lighter than bg-color for better contrast */
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            color: var(--secondary-color);
+            margin-bottom: 1rem;
+        }
+
+        nav {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            padding: 1rem;
+            background-color: #1a1a1a; /* Slightly lighter than bg-color for better contrast */
+        }
+
+        nav a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 1.1rem;
+            transition: color 0.3s ease;
+        }
+
+        nav a:hover {
+            color: var(--secondary-color);
+        }
+
+        .hero-section {
+            padding: 4rem 2rem;
+            text-align: center;
+        }
+
+        .hero-section h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero-section p {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background-color: var(--tertiary-color);
+            color: var(--bg-color);
+            text-decoration: none;
+            font-weight: bold;
+            margin-top: 2rem;
+            transition: transform 0.3s ease;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+        }
+
+        .blog-posts {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            padding: 4rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .blog-post {
+            background-color: #1a1a1a; /* Slightly lighter than bg-color for better contrast */
+            border-radius: 5px;
+            padding: 2rem;
+            transition: transform 0.3s ease;
+        }
+
+        .blog-post:hover {
+            transform: translateY(-5px);
+        }
+
+        .blog-post img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+        }
+
+        .blog-post h3 {
+            color: var(--secondary-color);
+            margin-bottom: 1rem;
+        }
+
+        .blog-post p {
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .read-more {
+            display: inline-block;
+            padding: 0.8rem 1.5rem;
+            background-color: var(--secondary-color);
+            color: var(--bg-color);
+            text-decoration: none;
+            border-radius: 3px;
+            transition: transform 0.3s ease;
+        }
+
+        .read-more:hover {
+            transform: translateY(-2px);
+        }
+
+        footer {
+            padding: 4rem 2rem;
+            text-align: center;
+            background-color: #1a1a1a; /* Slightly lighter than bg-color for better contrast */
+        }
+
+        .social-links {
+            margin-bottom: 1.5rem;
+        }
+
+        .social-links a {
+            color: var(--secondary-color);
+            margin: 0 1rem;
+            font-size: 1.2rem;
+            text-decoration: none;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero-section h2 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1>CanLite</h1>
+</header>
+
+<section class="hero-section">
+    <h2>Welcome to CanLite</h2>
+    <p>Welcome to a web proxy made by students for students. CanLite boasts hundreds of games, and an expertly designed web proxy with unlimited bandwidth.</p>
+    <a href="https://canlite.org" class="cta-button">Use now</a>
+</section>
+
+<section class="blog-posts">
+    <!-- Blog Post 1 -->
+    <div class="blog-post">
+        <img src="https://source.unsplash.com/random/800x600?led-lighting" alt="LED Lighting">
+        <h3>Top LED Lighting Solutions for Your Home</h3>
+        <p>Discover the best LED lighting solutions to enhance your home's ambiance and energy efficiency.</p>
+        <a href="#" class="read-more">Read More</a>
+    </div>
+
+    <!-- Blog Post 2 -->
+    <div class="blog-post">
+        <img src="https://source.unsplash.com/random/800x600?industrial-lighting" alt="Industrial Lighting">
+        <h3>Industrial Lighting Innovations in 2024</h3>
+        <p>Explore the latest advancements in industrial lighting technology and their applications.</p>
+        <a href="#" class="read-more">Read More</a>
+    </div>
+
+    <!-- Blog Post 3 -->
+    <div class="blog-post">
+        <img src="https://source.unsplash.com/random/800x600?smart-lighting" alt="Smart Lighting">
+        <h3>How Smart Lighting Can Transform Your Space</h3>
+        <p>Learn how integrating smart lighting systems can revolutionize your living and working spaces.</p>
+        <a href="#" class="read-more">Read More</a>
+    </div>
+</section>
+
+<footer>
+    <div class="social-links">
+        <a href="https://www.instagram.com/canlite24/">Instagram</a>
+    </div>
+    <p>&copy; 2025 CanLite. All rights reserved.</p>
+</footer>
+</body>
+</html>
