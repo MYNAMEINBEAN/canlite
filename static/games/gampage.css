@@ -336,7 +336,7 @@
 
 /* General improvements for smaller screens */
 @media screen and (max-width: 1377px) {
-    .ad {
-        height: auto;
+    .ad1 {
+        margin-top: auto;
     }
 }
