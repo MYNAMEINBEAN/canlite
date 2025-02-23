@@ -147,27 +147,4 @@ router.post('/saveGameData', async (req, res) => {
     }
 });
 
-app.get("/stats", verifyUser, async (req, res) => {
-    try {
-        const domains = await redisClient.sMembers("tracked_domains");
-        const days = [...Array(30)].map((_, i) =>
-            moment().subtract(i, "days").format("YYYY-MM-DD")
-        );
-
-        let stats = {};
-        for (let domain of domains) {
-            stats[domain] = {};
-            for (let day of days) {
-                const key = `api_requests:${domain}:${day}`;
-                stats[domain][day] = (await redisClient.get(key)) || 0;
-            }
-        }
-
-        res.json({ stats, days });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});
-
-
 export default router;
