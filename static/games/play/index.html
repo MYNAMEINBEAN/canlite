@@ -12,6 +12,7 @@
     <script defer data-domain="trueanalytics.online" src="https://trueanalytics.online/js/script.js"></script>
     <script src="../partner/index.js"></script>
     <link rel="stylesheet" href="../../login/style.css" />
+    <script id="aclib" type="text/javascript" src="../../ads.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             // Construct the canonical URL dynamically
@@ -30,12 +31,6 @@
             link.setAttribute("href", canonicalUrl);
         });
         if(window.location.hostname != "canlite.org") {
-            var script = document.createElement('script');
-            script.onload = function () {
-                //do stuff with the script
-            };
-            script.href = window.location.hostname + "/ads.js";
-            document.head.appendChild(script);
             aclib.runAutoTag({zoneId: 'yhqj50takh'});
         }
     </script>
