@@ -265,7 +265,7 @@
     display: flex;
     justify-content: center; /* Center horizontally */
     align-items: center; /* Center vertically */
-    margin-top: 27vw;
+    margin-top: auto;
     margin-left: 15vw;
 }
 
