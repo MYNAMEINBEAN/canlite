@@ -2,117 +2,39 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1655414789495559" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
-    <meta name="description" content="Play GAME_NAME online, free, unblocked on CanLite!">
     <title>GAME_NAME</title>
     <link id="favicon" rel="icon" href="/jsload/favicon.js" type="image/x-icon">
-    <script defer data-domain="trueanalytics.online" src="https://trueanalytics.online/js/script.js"></script>
-    <script src="../partner/index.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../styles.css">
     <link rel="stylesheet" href="../gampage.css">
-    <link href="../games.css" rel="stylesheet" type="text/css" />
-    <link href="../style.css" rel="stylesheet" type="text/css" />
-    <link href="../nav.css" rel="stylesheet" type="text/css" />
-    <link rel="stylesheet" href="../../login/style.css" />
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            // Construct the canonical URL dynamically
-            const baseUrl = "https://canlite.org";
-            const currentPath = window.location.pathname;
-            const currentSearch = window.location.search;
-            const canonicalUrl = baseUrl + currentPath + currentSearch;
-
-            // Check if a canonical link already exists
-            let link = document.querySelector("link[rel='canonical']");
-            if (!link) {
-                link = document.createElement("link");
-                link.setAttribute("rel", "canonical");
-                document.head.appendChild(link);
-            }
-            link.setAttribute("href", canonicalUrl);
-        });
-    </script>
+    <script defer data-domain="trueanalytics.online" src="https://trueanalytics.online/js/script.js"></script>
+    <script src="../partner/index.js"></script>
 </head>
 <body>
-<div id="authModal" class="modal">
-    <div class="modal-content">
-        <span class="close">&times;</span>
-        <!-- Tab Navigation -->
-        <div class="modal-tabs">
-            <button id="loginTab" class="active">Login</button>
-            <button id="registerTab">Register</button>
-        </div>
-        <!-- Login Form -->
-        <div id="loginForm" class="auth-form">
-            <h2>Login</h2>
-            <form>
-                <label for="loginEmail">Email</label>
-                <input type="email" id="loginEmail" placeholder="Enter your email" required>
-                <label for="loginPassword">Password</label>
-                <input type="password" id="loginPassword" placeholder="Enter your password" required>
-                <button type="submit">Login</button>
-            </form>
-        </div>
-        <!-- Register Form -->
-        <div id="registerForm" class="auth-form" style="display: none;">
-            <h2>Register</h2>
-            <form>
-                <label for="registerEmail">Email</label>
-                <input type="email" id="registerEmail" placeholder="Enter your email" required>
-                <label for="registerPassword">Password</label>
-                <input type="password" id="registerPassword" placeholder="Enter your password" required>
-                <button type="submit">Register</button>
-            </form>
-        </div>
-    </div>
-</div>
-<div class="nav">
+
+<nav class="nav">
     <div class="logo" onclick="window.open('/', '_self')">
-        <img src="/logo.png">
+        <img src="/logo.png" alt="CanLite Logo">
         <h3>CanLite</h3>
     </div>
-    <div class="nav-items">
-        <li><a href="/"><span class="material-symbols-outlined">home</span> Home</a></li>
-        <li><a href="/games"><span class="material-symbols-outlined">stadia_controller</span> Games</a></li>
-        <li><a href="/proxe"><span class="material-symbols-outlined">language</span> Proxe</a></li>
-        <li><a href="/partners"><span class="material-symbols-outlined">person</span>Partners</a></li>
-        <li><a id="loginModalBtn"><span id="loginSpan" class="material-symbols-outlined">login</span>Login / Register</a></li>
-        <!--      <li><a href="/settings"><span class="material-symbols-outlined">settings</span> Settings</a></li>-->
-    </div>
-    <div class="time" id="time-clock"></div>
-</div>
+    <ul class="nav-items">
+        <li><a href="/">Home</a></li>
+        <li><a href="/games">Games</a></li>
+        <li><a href="/proxe">Proxy</a></li>
+        <li><a href="/partners">Partners</a></li>
+        <li><a id="loginModalBtn">Login / Register</a></li>
+    </ul>
+</nav>
 
 <div class="embed-container">
-    <iframe id="site-iframe" src=""></iframe>
+    <iframe id="site-iframe" src="" loading="lazy"></iframe>
     <div class="bottom-div">
         <div class="buttons-container">
             <img id="refresh-btn" src="../refresh.png" alt="Refresh">
             <img id="fullscreen-btn" src="../fullscreen2.png" alt="Fullscreen">
         </div>
-    </div>
-</div>
-
-<!-- Ad and image START -->
-
-
-<div class="ad">
-    <div class="adTXT">Advertisement</div>
-    <div class="script-container" style="width:18.2vw; height:18.2vw;">
-        <ins class="adsbygoogle"
-             style="display:block;"
-             data-ad-client="ca-pub-1655414789495559"
-             data-ad-slot="8885226602"
-             data-ad-format="auto"
-             data-full-width-responsive="true"
-        ></ins>
-        <script>
-            window.onload = function () {
-                (adsbygoogle = window.adsbygoogle || []).push({});
-            };
-        </script>
     </div>
 </div>
 
@@ -123,8 +45,6 @@
     </div>
 </div>
 
-
-
 <div class="desc">
     <h2 class="desc-title">Description</h2>
     <p>Description Coming Soon.</p>
@@ -133,24 +53,22 @@
     <h2 class="desc-title">Keybinds</h2>
     <p>W,A,S,D, Arrow keys</p>
     <h2 class="desc-title">Devices</h2>
-    <p>Desktop, </p>
+    <p>Desktop</p>
     <h2 class="desc-title">Languages</h2>
-    <p>English, any other.</p>
+    <p>English</p>
     <h2 class="desc-title">Latest Update</h2>
     <p>August 13, 2024</p>
 </div>
+
+<footer>
+    <p>&copy; <span id="year"></span> CanLite. All rights reserved.</p>
+</footer>
 
 <script>
     document.getElementById('fullscreen-btn').addEventListener('click', function() {
         const iframe = document.getElementById('site-iframe');
         if (iframe.requestFullscreen) {
             iframe.requestFullscreen();
-        } else if (iframe.mozRequestFullScreen) { // Firefox
-            iframe.mozRequestFullScreen();
-        } else if (iframe.webkitRequestFullscreen) { // Chrome, Safari and Opera
-            iframe.webkitRequestFullscreen();
-        } else if (iframe.msRequestFullscreen) { // IE/Edge
-            iframe.msRequestFullscreen();
         }
     });
 
@@ -159,96 +77,20 @@
         iframe.src = iframe.src;
     });
 
-    const gamecdn = "cdn/";
-    const gameUrl = '../' + gamecdn + window.location.pathname.split("/")[3].split("?")[0] + "/index.html";
-
-    var iframe = document.getElementById("site-iframe");
-    iframe.src = gameUrl;
-    iframe.onload = function () {
-        iframe.style.display = "block";
-        document.querySelector(".loading-screen").style.display = "none";
-    };
-
-    if(localStorage.getItem('token')) {
-        window.addEventListener("storage", () => {
-            const localStorageData = { ...localStorage }; // Clone localStorage as an object
-            delete localStorageData.token;
-            let token = localStorage.getItem('token');
-            fetch("https://" + window.location.hostname + `/api/saveGameData`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ token, localStorageData }),
-            })
-                .then(response => response.json())
-                .then(data => console.log("LocalStorage data saved:", data))
-                .catch(error => console.error("Error saving localStorage data:", error));
-        });
-    }
-</script>
-
-<!--particlejs start -->
-<div id="particles-js"></div>
-<script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
-<script src="../script.js"></script>
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-
-<!--particlejs end -->
-
-<div></div>
-
-<!-- AdForGames.com code begin -->
-<!-- AdForGames.com code end -->
-<br>
-<br>
-<footer style="
-  background-color: rgba(0, 0, 0, 0.8);
-  padding: 20px 10px;
-  text-align: center;
-  color: #FFFFFF;
-  box-shadow: 0 -2px 5px rgba(255, 87, 51, 0.8);
-  position: relative; /* Ensures it stays at the bottom of the screen */
-  bottom: 0;
-  left: 0;
-  width: 100%; /* Prevent horizontal overflow */
-  z-index: 10;
-  box-sizing: border-box; /* Includes padding in width calculation */
-  overflow: hidden; /* Hides any overflow from box-shadow or content */
-  margin: 0; /* Avoid unintended margin causing overflow */
-">
-  <div style="
-    display: flex; 
-    flex-wrap: wrap; 
-    justify-content: center; 
-    gap: 10px; 
-    margin-bottom: 15px;
-  ">
-    <a href="/privacy" style="
-      color: #c491f4; 
-      text-decoration: none; 
-      transition: color 0.4s;
-    ">Privacy Policy</a>
-    <a href="mailto:canlite24@outlook.com" style="
-      color: #c491f4; 
-      text-decoration: none; 
-      transition: color 0.4s;
-    ">Email Us</a>
-    <a href="https://discord.com/invite/46gkEU5kpP" target="_blank" style="
-      color: #c491f4; 
-      text-decoration: none; 
-      transition: color 0.4s;
-    ">Join our Discord</a>
-    <a href="/about" style="
-      color: #c491f4; 
-      text-decoration: none; 
-      transition: color 0.4s;
-    ">About Us</a>
-  </div>
-  <div style="font-size: 14px; color: #FFFFFF;">
-    &copy; <span id="year"></span> CanLite. All rights reserved.
-  </div>
-</footer>
-<script>
-    // Set the current year dynamically
     document.getElementById('year').textContent = new Date().getFullYear();
+
+    function adjustAdMargin() {
+        const screenWidth = window.innerWidth;
+        if (screenWidth >= 1600) {
+            const marginTop = 1 + ((screenWidth - 1600) / 38.4);
+            document.querySelector('.ad1').style.marginTop = `${marginTop}vw`;
+        } else {
+            document.querySelector('.ad1').style.marginTop = "1vw";
+        }
+    }
+
+    window.addEventListener("resize", adjustAdMargin);
+    window.addEventListener("load", adjustAdMargin);
 </script>
-<script src="../../login/index.js"></script>
+</body>
+</html>
