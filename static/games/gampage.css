@@ -99,6 +99,8 @@
 }
 
 .script-container {
+    width: 20vw; /* Adjust width as needed */
+    height: 20vw;
     text-align: center; /* Center script content horizontally */
     /*margin-top: 10%; !* Adjust vertical position of script *!*/
 }
