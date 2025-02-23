@@ -1,7 +1,7 @@
 (function() {
     var adsenseScript = document.createElement('script');
     adsenseScript.async = true;
-    adsenseScript.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2550143154036518';
+    adsenseScript.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1655414789495559';
     adsenseScript.crossOrigin = 'anonymous';
     document.head.appendChild(adsenseScript);
 
