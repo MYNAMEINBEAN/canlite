@@ -119,8 +119,7 @@ app.get("/games/play/:game", (req , res) => {
         if (err) {
             return res.status(500).send('Error reading file');
         }
-        console.log(name)
-        console.log(req.params.game)
+        console.log(name + ' ' + req.get('host'))
 
         if (req.get('host') === "canlite.org") {
             data = data.replace('<meta name="description" content="Play GAME_NAME online, free, un bl0ck3d on CanLite!">', '');
