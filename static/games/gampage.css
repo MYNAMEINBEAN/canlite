@@ -341,8 +341,23 @@
     }
 }
 
-@media screen and (min-width: 1600px) {
-    .ad1 {
-        margin-top: clamp(1vw, 1vw + (25 * ((100vw - 1600px) / 960)), 26vw);
-    }
-}
+@media screen and (min-width: 1600px) { .ad1 { margin-top: 1.3vw; } }
+@media screen and (min-width: 1650px) { .ad1 { margin-top: 2.6vw; } }
+@media screen and (min-width: 1700px) { .ad1 { margin-top: 3.9vw; } }
+@media screen and (min-width: 1750px) { .ad1 { margin-top: 5.2vw; } }
+@media screen and (min-width: 1800px) { .ad1 { margin-top: 6.5vw; } }
+@media screen and (min-width: 1850px) { .ad1 { margin-top: 7.8vw; } }
+@media screen and (min-width: 1900px) { .ad1 { margin-top: 9.1vw; } }
+@media screen and (min-width: 1950px) { .ad1 { margin-top: 10.4vw; } }
+@media screen and (min-width: 2000px) { .ad1 { margin-top: 11.7vw; } }
+@media screen and (min-width: 2050px) { .ad1 { margin-top: 13vw; } }
+@media screen and (min-width: 2100px) { .ad1 { margin-top: 14.3vw; } }
+@media screen and (min-width: 2150px) { .ad1 { margin-top: 15.6vw; } }
+@media screen and (min-width: 2200px) { .ad1 { margin-top: 16.9vw; } }
+@media screen and (min-width: 2250px) { .ad1 { margin-top: 18.2vw; } }
+@media screen and (min-width: 2300px) { .ad1 { margin-top: 19.5vw; } }
+@media screen and (min-width: 2350px) { .ad1 { margin-top: 20.8vw; } }
+@media screen and (min-width: 2400px) { .ad1 { margin-top: 22.1vw; } }
+@media screen and (min-width: 2450px) { .ad1 { margin-top: 23.4vw; } }
+@media screen and (min-width: 2500px) { .ad1 { margin-top: 24.7vw; } }
+@media screen and (min-width: 2550px) { .ad1 { margin-top: 26vw; } }
