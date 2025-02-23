@@ -14,7 +14,7 @@ const generateRandomString = (length) => {
     return crypto.randomBytes(length).toString('hex').slice(0, length);
 };
 
-router.post("/stats", verifyUser, async (req, res) => {
+router.get("/stats", verifyUser, async (req, res) => {
     try {
         const domains = await redisClientAPI.sMembers("tracked_domains");
         const days = [...Array(30)].map((_, i) =>
@@ -26,7 +26,7 @@ router.post("/stats", verifyUser, async (req, res) => {
             stats[domain] = {};
             for (let day of days) {
                 const key = `api_requests:${domain}:${day}`;
-                stats[domain][day] = (await redisClient.get(key)) || 0;
+                stats[domain][day] = (await redisClientAPI.get(key)) || 0;
             }
         }
 
