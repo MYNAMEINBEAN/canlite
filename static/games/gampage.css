@@ -335,7 +335,7 @@
 }
 
 /* General improvements for smaller screens */
-@media screen and (max-width: 1024px) {
+@media screen and (max-width: 1377px) {
     .embed-container {
         max-width: 90vw;
         margin-left: auto;
