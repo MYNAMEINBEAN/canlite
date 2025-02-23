@@ -8,8 +8,9 @@
     adsenseScript.onload = function() {
         var adContainer = document.createElement('ins');
         adContainer.className = 'adsbygoogle';
-        adContainer.setAttribute('data-ad-format', 'auto');
-        adContainer.setAttribute('data-full-width-responsive', 'true');
+        adContainer.style.display = 'inline-block';
+        adContainer.style.width = '18.2vw';
+        adContainer.style.height = '18.2vw';
         adContainer.setAttribute('data-ad-client', 'ca-pub-1655414789495559');
         adContainer.setAttribute('data-ad-slot', '8885226602');
 
