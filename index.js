@@ -160,7 +160,8 @@ const server = http.createServer();
 server.on("request", async (req, res) => {
     try {
         if (bareServer.shouldRoute(req)) {
-            const domain = req.get('host');
+            const { headers } = req;
+            const domain = headers.host;
             const date = moment().format("YYYY-MM-DD");
             const key = `api_requests:${domain}:${date}`;
 
@@ -172,14 +173,17 @@ server.on("request", async (req, res) => {
         }
     } catch (error) {
         console.error("Request error:", error);
-        res.status(500).send("Internal Server Error");
+        res.statusCode = 200
+        res.write(error)
+        res.end();
     }
 });
 
 server.on("upgrade", async (req, socket, head) => {
     try {
         if (bareServer.shouldRoute(req)) {
-            const domain = req.get('host');
+            const { headers } = req;
+            const domain = headers.host;
             const date = moment().format("YYYY-MM-DD");
             const key = `api_requests:${domain}:${date}`;
 
