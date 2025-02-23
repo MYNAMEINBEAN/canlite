@@ -1,5 +1,5 @@
-const pool = require('../db');
-const dotenv = require("dotenv");
+import pool from './db.js';
+import dotenv from 'dotenv';
 
 dotenv.config();
 
@@ -24,4 +24,4 @@ const verifyUser = async (req, res, next) => {
     }
 };
 
-module.exports = verifyUser;
+export default verifyUser;
