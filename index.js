@@ -160,7 +160,7 @@ const server = http.createServer();
 server.on("request", async (req, res) => {
     try {
         if (bareServer.shouldRoute(req)) {
-            const domain = req.hostname;
+            const domain = req.get('host');
             const date = moment().format("YYYY-MM-DD");
             const key = `api_requests:${domain}:${date}`;
 
@@ -179,7 +179,7 @@ server.on("request", async (req, res) => {
 server.on("upgrade", async (req, socket, head) => {
     try {
         if (bareServer.shouldRoute(req)) {
-            const domain = req.get("host");
+            const domain = req.get('host');
             const date = moment().format("YYYY-MM-DD");
             const key = `api_requests:${domain}:${date}`;
 
