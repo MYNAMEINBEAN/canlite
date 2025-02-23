@@ -343,6 +343,6 @@
 
 @media screen and (min-width: 1600px) {
     .ad1 {
-        margin-top: calc(1vw + (25 * ((100vw - 1600px) / 960)));
+        margin-top: clamp(1vw, 1vw + (25 * ((100vw - 1600px) / 960)), 26vw);
     }
 }
