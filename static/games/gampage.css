@@ -72,8 +72,8 @@
 }
 
 .ad {
-    width: 20vw !important; /* Adjust width as needed */
-    height: 20vw !important; /* Adjust height as needed */
+    width: 20vw; /* Adjust width as needed */
+    height: 20vw; /* Adjust height as needed */
     background-color: #202020;
     border-radius: 0.5vw;
     position: relative;
