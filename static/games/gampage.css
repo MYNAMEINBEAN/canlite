@@ -340,3 +340,19 @@
         margin-top: auto;
     }
 }
+
+@media screen and (min-width: 1600px) { .ad1 { margin-top: 1vw; } }
+@media screen and (min-width: 1650px) { .ad1 { margin-top: 2vw; } }
+@media screen and (min-width: 1700px) { .ad1 { margin-top: 3vw; } }
+@media screen and (min-width: 1750px) { .ad1 { margin-top: 4vw; } }
+@media screen and (min-width: 1800px) { .ad1 { margin-top: 5vw; } }
+@media screen and (min-width: 1850px) { .ad1 { margin-top: 6vw; } }
+@media screen and (min-width: 1900px) { .ad1 { margin-top: 7vw; } }
+@media screen and (min-width: 1950px) { .ad1 { margin-top: 8vw; } }
+@media screen and (min-width: 2000px) { .ad1 { margin-top: 9vw; } }
+@media screen and (min-width: 2050px) { .ad1 { margin-top: 10vw; } }
+@media screen and (min-width: 2100px) { .ad1 { margin-top: 11vw; } }
+@media screen and (min-width: 2150px) { .ad1 { margin-top: 12vw; } }
+@media screen and (min-width: 2200px) { .ad1 { margin-top: 13vw; } }
+@media screen and (min-width: 2250px) { .ad1 { margin-top: 14vw; } }
+@media screen and (min-width: 2300px) { .ad1 { margin-top: 15vw; } }
