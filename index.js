@@ -159,7 +159,7 @@ const server = http.createServer();
 server.on("request", async (req, res) => {
     try {
         if (bareServer.shouldRoute(req)) {
-            const domain = req.get("host");
+            const domain = req.hostname;
             const date = moment().format("YYYY-MM-DD");
             const key = `api_requests:${domain}:${date}`;
 
