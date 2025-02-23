@@ -78,19 +78,6 @@
     });
 
     document.getElementById('year').textContent = new Date().getFullYear();
-
-    function adjustAdMargin() {
-        const screenWidth = window.innerWidth;
-        if (screenWidth >= 1600) {
-            const marginTop = 1 + ((screenWidth - 1600) / 38.4);
-            document.querySelector('.ad1').style.marginTop = `${marginTop}vw`;
-        } else {
-            document.querySelector('.ad1').style.marginTop = "1vw";
-        }
-    }
-
-    window.addEventListener("resize", adjustAdMargin);
-    window.addEventListener("load", adjustAdMargin);
 </script>
 </body>
 </html>
