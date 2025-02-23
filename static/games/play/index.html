@@ -11,6 +11,25 @@
     <link rel="stylesheet" href="../gampage.css">
     <script defer data-domain="trueanalytics.online" src="https://trueanalytics.online/js/script.js"></script>
     <script src="../partner/index.js"></script>
+    <link rel="stylesheet" href="../../login/style.css" />
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Construct the canonical URL dynamically
+            const baseUrl = "https://canlite.org";
+            const currentPath = window.location.pathname;
+            const currentSearch = window.location.search;
+            const canonicalUrl = baseUrl + currentPath + currentSearch;
+
+            // Check if a canonical link already exists
+            let link = document.querySelector("link[rel='canonical']");
+            if (!link) {
+                link = document.createElement("link");
+                link.setAttribute("rel", "canonical");
+                document.head.appendChild(link);
+            }
+            link.setAttribute("href", canonicalUrl);
+        });
+    </script>
 </head>
 <body>
 
@@ -78,6 +97,32 @@
     });
 
     document.getElementById('year').textContent = new Date().getFullYear();
+
+    const gamecdn = "cdn/";
+    const gameUrl = '../' + gamecdn + window.location.pathname.split("/")[3].split("?")[0] + "/index.html";
+
+    var iframe = document.getElementById("site-iframe");
+    iframe.src = gameUrl;
+    iframe.onload = function () {
+        iframe.style.display = "block";
+        document.querySelector(".loading-screen").style.display = "none";
+    };
+
+    if(localStorage.getItem('token')) {
+        window.addEventListener("storage", () => {
+            const localStorageData = { ...localStorage }; // Clone localStorage as an object
+            delete localStorageData.token;
+            let token = localStorage.getItem('token');
+            fetch("https://" + window.location.hostname + `/api/saveGameData`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ token, localStorageData }),
+            })
+                .then(response => response.json())
+                .then(data => console.log("LocalStorage data saved:", data))
+                .catch(error => console.error("Error saving localStorage data:", error));
+        });
+    }
 </script>
 </body>
 </html>
