@@ -5,7 +5,7 @@ Welcome to CanLite, the ultimate hub for seamless web access and gaming. Designe
 ## Features
 
 ### Advanced Web Proxy
-- **Powered by Nano** – Built on [Technitium Network](https://technitium.com/) *Nano* proxy for blazing-fast, lightweight, and secure browsing.
+- **Powered by Nano** – Built on [Titanium Network](https://github.com/titaniumnetwork-dev/nano) *Nano* proxy for blazing-fast, lightweight, and secure browsing.
 - **Unblock Anything** – Bypass restrictions effortlessly while maintaining anonymity.
 - **Minimal Latency** – Optimized for performance with intelligent routing.
 - **Dark-Themed UI** – A sleek, modern interface for a premium user experience.
@@ -31,7 +31,7 @@ CanLite is built using Node.js, pnpm, and PostgreSQL. To set up the project, fol
 
 1. Clone the repository:
    ```sh
-   git clone https://github.com/your-repo/canlite.git
+   git clone https://github.com/canlite24/canlite.git
    cd canlite
    ```
 2. Install dependencies using pnpm:
@@ -53,7 +53,7 @@ Ensure that PostgreSQL is properly configured before running the application.
 CanLite is deployed at **[canlite.org](https://canlite.org)** on a **CrunchBits VPS**. Join our **[Discord server](https://discord.gg/46gkEU5kpP)** for updates, support, and unblocked links.
 
 ## Credits
-- **Technitium Network** – For the *Nano* proxy technology.
+- **Titanium Network** – For the *Nano* proxy technology.
 - **Titanium Network** – For [Ultraviolet](https://github.com/titaniumnetwork-dev/Ultraviolet).
 - **3kh0** – For the game assets and game page CSS.
 - **MercuryWorkshop** – For [dreamland.js](https://github.com/MercuryWorkshop/dreamland.js).
