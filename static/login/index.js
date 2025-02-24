@@ -1,18 +1,26 @@
-if(localStorage.getItem('token')) {
+if (localStorage.getItem('token')) {
     let token = localStorage.getItem('token');
-    const response = await fetch("/api/check", {
+
+    fetch("/api/check", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ token })
-    });
-    const result = await response;
-    if(result.status === 200) {
-        document.getElementById('loginModalBtn').innerHTML = `<span id="loginSpan" class="material-symbols-outlined">logout</span>Logout`;
-    } else {
-        localStorage.removeItem('token');
-        alert("Session expired");
-    }
+    })
+        .then(response => {
+            if (response.status === 200) {
+                document.getElementById('loginModalBtn').innerHTML =
+                    `<span id="loginSpan" class="material-symbols-outlined">logout</span>Logout`;
+            } else {
+                localStorage.removeItem('token');
+                alert("Session expired");
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            alert("Failed to verify session");
+        });
 }
+
 
 const modal = document.getElementById("authModal");
 const btn = document.getElementById("loginModalBtn");
