@@ -30,9 +30,6 @@
             }
             link.setAttribute("href", canonicalUrl);
         });
-        if(window.location.hostname != "canlite.org") {
-            aclib.runAutoTag({zoneId: 'yhqj50takh'});
-        }
     </script>
 </head>
 <body>
@@ -99,17 +96,15 @@
     <div class="script-container1">
         <script src="../../ads/longad.js"></script>
         <script>
-            const delay = ms => new Promise(res => setTimeout(res, ms));
-            const run = async () => {
-                await delay(3000);
-                if (document.getElementsByClassName('adsbygoogle').length < 1) {
-                    aclib.runBanner({
-                        zoneId: '9589722',
-                    });
-                    aclib.runAutoTag({zoneId: 'yhqj50takh'});
-                }
-            };
-            run().catch(console.error);
+            if (document.getElementsByClassName('adsbygoogle').length < 1) {
+                aclib.runBanner({
+                    zoneId: '9589722',
+                });
+                aclib.runAutoTag({zoneId: 'yhqj50takh'});
+                aclib.runBanner({
+                    zoneId: '9589722',
+                });
+            }
         </script>
     </div>
 </div>
