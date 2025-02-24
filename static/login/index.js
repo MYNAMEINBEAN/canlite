@@ -131,9 +131,9 @@ document.querySelector("#registerForm form").addEventListener("submit", async fu
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email, password })
         });
-        const result = await response.text();
+        const token = await response.text();
 
-        if(result === "exists") {
+        if(token === "exists") {
             alert("Account already exists. Please log in.");
         } else {
             document.getElementById('loginModalBtn').innerHTML = `<span id="loginSpan" class="material-symbols-outlined">logout</span>Logout`;
@@ -142,12 +142,12 @@ document.querySelector("#registerForm form").addEventListener("submit", async fu
             fetch("https://" + window.location.hostname + `/api/saveGameData`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ result, localStorageData }),
+                body: JSON.stringify({ token, localStorageData }),
             })
                 .then(response => response.json())
                 .then(data => {
                     console.log("LocalStorage data saved:", data);
-                    localStorage.setItem("token", result);
+                    localStorage.setItem("token", token);
                     modal.style.display = "none";
                     alert("Registration successful.");
                 })
