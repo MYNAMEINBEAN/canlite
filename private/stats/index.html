@@ -71,7 +71,7 @@
 
 <script>
   async function fetchStats() {
-    const res = await fetch("/stats");
+    const res = await fetch("/api/stats");
     const { stats, days } = await res.json();
 
     const tableHeader = document.getElementById("date-header");
