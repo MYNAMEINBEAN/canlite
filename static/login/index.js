@@ -1,5 +1,17 @@
 if(localStorage.getItem('token')) {
-    document.getElementById('loginModalBtn').innerHTML = `<span id="loginSpan" class="material-symbols-outlined">logout</span>Logout`;
+    let token = localStorage.getItem('token');
+    const response = await fetch("/api/check", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token })
+    });
+    const result = await response;
+    if(result.status === 200) {
+        document.getElementById('loginModalBtn').innerHTML = `<span id="loginSpan" class="material-symbols-outlined">logout</span>Logout`;
+    } else {
+        localStorage.removeItem('token');
+        alert("Session expired");
+    }
 }
 
 const modal = document.getElementById("authModal");

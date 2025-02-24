@@ -14,6 +14,23 @@ const generateRandomString = (length) => {
     return crypto.randomBytes(length).toString('hex').slice(0, length);
 };
 
+router.post('/check', async (req, res) => {
+    const { token } = req.body;
+    try {
+        const tokenResult = await pool.query('SELECT token, admin FROM users WHERE token = $1', [token]);
+
+        if (tokenResult.rowCount === 0) {
+            return res.status(400).json(false); // Account does not exist
+        } else {
+            req.session.token = tokenResult.rows[0].token;
+            req.session.admin = tokenResult.rows[0].admin;
+            return res.status(200).json(true);
+        }
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+})
+
 router.get("/stats", verifyUser, async (req, res) => {
     try {
         const domains = await redisClientAPI.sMembers("tracked_domains");
