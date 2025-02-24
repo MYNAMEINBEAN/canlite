@@ -6,58 +6,138 @@
   <title>API Request Stats</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    body { font-family: Arial, sans-serif; text-align: center; }
-    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-    th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
-    th { background-color: #4CAF50; color: white; }
-    canvas { max-width: 800px; margin-top: 20px; }
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 20px;
+    }
+    h2 { color: #333; }
+    table {
+      width: 100%;
+      max-width: 90%;
+      margin: 20px auto;
+      border-collapse: collapse;
+      background: white;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: center;
+      font-size: 14px;
+    }
+    th { background-color: #007BFF; color: white; }
+    tr:nth-child(even) { background-color: #f9f9f9; }
+    tr:hover { background-color: #f1f1f1; }
+    canvas {
+      max-width: 90%;
+      margin: 20px auto;
+      display: block;
+      background: white;
+      padding: 10px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    .summary {
+      font-size: 18px;
+      font-weight: bold;
+      margin: 20px 0;
+      padding: 10px;
+      background: #007BFF;
+      color: white;
+      border-radius: 5px;
+      display: inline-block;
+    }
   </style>
 </head>
 <body>
 <h2>API Request Stats (Last 30 Days)</h2>
+
+<div class="summary" id="total-summary">Total Requests: 0</div>
+<div class="summary" id="daily-summary">Total Requests Today: 0</div>
+
 <table id="stats-table">
   <thead>
   <tr id="date-header"><th>Domain</th></tr>
   </thead>
   <tbody id="stats-body"></tbody>
 </table>
+
 <canvas id="chart"></canvas>
 
 <script>
   async function fetchStats() {
-    const res = await fetch("/api/stats");
+    const res = await fetch("/stats");
     const { stats, days } = await res.json();
 
-    // Build table
     const tableHeader = document.getElementById("date-header");
     const tableBody = document.getElementById("stats-body");
+    const totalSummary = document.getElementById("total-summary");
+    const dailySummary = document.getElementById("daily-summary");
+
     tableHeader.innerHTML = "<th>Domain</th>";
     days.forEach(day => tableHeader.innerHTML += `<th>${day}</th>`);
-    tableBody.innerHTML = "";
+    tableHeader.innerHTML += "<th>Last 30 Days</th>"; // Add total column
 
+    tableBody.innerHTML = "";
     let datasets = [];
+    let totalRequests = 0;
+    let totalToday = 0;
 
     Object.keys(stats).forEach(domain => {
       const row = document.createElement("tr");
       row.innerHTML = `<td>${domain}</td>`;
       let data = [];
+      let domainTotal = 0;
 
-      days.forEach(day => {
+      days.forEach((day, index) => {
         let count = stats[domain][day] || 0;
         row.innerHTML += `<td>${count}</td>`;
         data.push(count);
+        domainTotal += count;
+
+        if (index === days.length - 1) {
+          totalToday += count; // Today's total requests
+        }
       });
 
+      row.innerHTML += `<td><strong>${domainTotal}</strong></td>`; // Total per domain
       tableBody.appendChild(row);
-      datasets.push({ label: domain, data, borderWidth: 2, fill: false });
+
+      totalRequests += domainTotal;
+      datasets.push({
+        label: domain,
+        data,
+        borderWidth: 2,
+        borderColor: getRandomColor(),
+        fill: false,
+        tension: 0.3
+      });
     });
 
+    totalSummary.textContent = `Total Requests (Last 30 Days): ${totalRequests}`;
+    dailySummary.textContent = `Total Requests Today: ${totalToday}`;
+
     // Render Chart
-    new Chart(document.getElementById("chart"), {
+    const ctx = document.getElementById("chart").getContext("2d");
+    if (window.myChart) window.myChart.destroy(); // Prevent multiple instances
+    window.myChart = new Chart(ctx, {
       type: "line",
       data: { labels: days, datasets },
-      options: { responsive: true, scales: { y: { beginAtZero: true } } }
+      options: {
+        responsive: true,
+        plugins: { legend: { position: "bottom" } },
+        scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+      }
     });
+  }
+
+  function getRandomColor() {
+    return `hsl(${Math.floor(Math.random() * 360)}, 70%, 60%)`;
   }
 
   fetchStats();
