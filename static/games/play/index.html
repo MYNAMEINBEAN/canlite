@@ -170,5 +170,17 @@
     }
 </script>
 <script src="../../login/index.js"></script>
+<script>
+    const delay = ms => new Promise(res => setTimeout(res, ms));
+    const run = async () => {
+        await delay(3000);
+        if(document.getElementsByClassName('adsbygoogle').length < 1) {
+            aclib.runBanner({
+                zoneId: '9589722',
+            });
+        }
+    };
+    await run();
+</script>
 </body>
 </html>

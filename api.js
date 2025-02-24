@@ -59,7 +59,7 @@ router.post('/login', async (req, res) => {
 
     try {
         // Fetch salt for the given email
-        const saltResult = await pool.query('SELECT salt FROM users WHERE email = $1', [email]);
+        const saltResult = await pool.query('SELECT salt, token FROM users WHERE email = $1', [email]);
 
         if (saltResult.rowCount === 0) {
             return res.send('acc'); // Account does not exist
@@ -75,16 +75,12 @@ router.post('/login', async (req, res) => {
 
         if (passResult.rows[0].password === hashedPass) {
             // Generate a new token
-            const token = generateRandomString(32);
-
-            // Update the user's token in the database
-            await pool.query('UPDATE users SET token = $1 WHERE email = $2', [token, email]);
-            req.session.token = token;
+            req.session.token = saltResult.rows[0].token;
             req.session.admin = false;
             if(passResult.rows[0].admin) {
                 req.session.admin = true;
             }
-            return res.send(token);
+            return res.send(saltResult.rows[0].token);
         } else {
             return res.send('pass'); // Incorrect password
         }
@@ -145,8 +141,16 @@ router.post('/loadGameData', async (req, res) => {
 });
 
 router.post('/logout', async (req, res) => {
-    req.session.destroy();
-    res.json({ success: true });
+    const token = generateRandomString(32);
+
+    // Update the user's token in the database
+    try {
+        await pool.query('UPDATE users SET token = $1 WHERE token = $2', [token, req.session.token]);
+        req.session.destroy();
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ error: err });
+    }
 });
 
 // Save Game Data
