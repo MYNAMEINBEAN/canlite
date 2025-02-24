@@ -11,7 +11,7 @@ import * as http from "node:http";
 import * as https from "node:https";
 import {createClient} from "redis"
 import apiRoutes from './api.js';
-import verifyUser from "./middleware/auth.js";
+import verifyUser from "./middleware/authAdmin.js";
 import moment from "moment";
 
 const __filename = fileURLToPath(import.meta.url);

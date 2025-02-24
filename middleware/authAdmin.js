@@ -1,4 +1,3 @@
-import pool from '../db.js';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -6,14 +5,13 @@ dotenv.config();
 const verifyUser = async (req, res, next) => {
 
     try {
-        if (!req.session.token) {
+        if (!req.session.admin) {
             return res.status(401).json({ error: 'Unauthorized' });
         }
 
         // Fetch user token and refresh time
-        const result = await pool.query('SELECT token, email FROM users WHERE token = $1', [req.session.token]);
 
-        if (result.rowCount === 0 || result.rows[0].email !== process.env.ADMIN_EMAIL) {
+        if (req.session.admin == false) {
             return res.status(403).json({ error: 'Invalid token' });
         }
 

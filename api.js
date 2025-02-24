@@ -1,7 +1,7 @@
 import express from "express";
 import crypto from 'crypto';
 import pool from './db.js';
-import verifyUser from "./middleware/auth.js";
+import verifyUser from "./middleware/authAdmin.js";
 import {createClient} from "redis";
 import moment from "moment";
 
@@ -54,7 +54,7 @@ router.post('/login', async (req, res) => {
         const hashedPass = crypto.createHash('sha256').update(password + salt).digest('hex');
 
         // Fetch stored password
-        const passResult = await pool.query('SELECT password FROM users WHERE email = $1', [email]);
+        const passResult = await pool.query('SELECT password, admin FROM users WHERE email = $1', [email]);
 
         if (passResult.rows[0].password === hashedPass) {
             // Generate a new token
@@ -63,6 +63,10 @@ router.post('/login', async (req, res) => {
             // Update the user's token in the database
             await pool.query('UPDATE users SET token = $1 WHERE email = $2', [token, email]);
             req.session.token = token;
+            req.session.admin = false;
+            if(passResult.rows[0].admin) {
+                req.session.admin = true;
+            }
             return res.send(token);
         } else {
             return res.send('pass'); // Incorrect password
@@ -94,10 +98,11 @@ router.post('/register', async (req, res) => {
 
         // Insert new user into database
         await pool.query(
-            'INSERT INTO users (email, token, salt, password, verified, data, id) VALUES ($1, $2, $3, $4, false, $5, $6)',
-            [email, token, salt, hashedPass, "{}", Math.floor(Math.random() * (9000000000)) + 1000000000]
+            'INSERT INTO users (email, token, salt, password, verified, data, id, admin) VALUES ($1, $2, $3, $4, false, $5, $6)',
+            [email, token, salt, hashedPass, "{}", Math.floor(Math.random() * (9000000000)) + 1000000000, false]
         );
         req.session.token = token;
+        req.session.admin = false;
         return res.send(token);
     } catch (err) {
         console.error(err);
