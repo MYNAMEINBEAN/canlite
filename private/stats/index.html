@@ -91,8 +91,10 @@
 <canvas id="chart"></canvas>
 
 <script>
+  let chartInstance = null; // Store the Chart instance
+
   async function fetchStats() {
-    const res = await fetch("/api/stats");
+    const res = await fetch("/stats");
     const { stats, days } = await res.json();
 
     const tableHeader = document.getElementById("date-header");
@@ -100,11 +102,13 @@
     const totalSummary = document.getElementById("total-summary");
     const dailySummary = document.getElementById("daily-summary");
 
+    // ✅ CLEAR OLD TABLE CONTENT
     tableHeader.innerHTML = "<th>Domain</th>";
+    tableBody.innerHTML = "";
+
     days.forEach(day => tableHeader.innerHTML += `<th>${day}</th>`);
     tableHeader.innerHTML += "<th>Last 30 Days</th>"; // Total per domain
 
-    tableBody.innerHTML = "";
     let datasets = [];
     let totalRequests = 0;
     let totalToday = 0;
@@ -116,17 +120,17 @@
       let domainTotal = 0;
 
       days.forEach((day, index) => {
-        let count = parseInt(stats[domain][day]) || 0; // Ensure integer values
+        let count = parseInt(stats[domain][day]) || 0;
         row.innerHTML += `<td>${count}</td>`;
         data.push(count);
         domainTotal += count;
 
         if (index === days.length - 1) {
-          totalToday += count; // Sum today's requests
+          totalToday += count;
         }
       });
 
-      row.innerHTML += `<td><strong>${domainTotal}</strong></td>`; // Total per domain
+      row.innerHTML += `<td><strong>${domainTotal}</strong></td>`;
       tableBody.appendChild(row);
 
       totalRequests += domainTotal;
@@ -144,36 +148,28 @@
     totalSummary.textContent = `Total Requests (Last 30 Days): ${totalRequests}`;
     dailySummary.textContent = `Total Requests Today: ${totalToday}`;
 
-    // Render Chart
+    // ✅ Destroy existing chart before creating a new one
+    if (chartInstance) {
+      chartInstance.destroy();
+    }
+
+    // ✅ Create a new chart
     const ctx = document.getElementById("chart").getContext("2d");
-    if (window.myChart) window.myChart.destroy(); // Prevent multiple instances
-    window.myChart = new Chart(ctx, {
+    chartInstance = new Chart(ctx, {
       type: "line",
       data: { labels: days, datasets },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { position: "bottom" } },
-        scales: {
-          y: {
-            beginAtZero: true,
-            ticks: { stepSize: 1, color: "#FF9800" },
-            grid: { color: "rgba(255, 152, 0, 0.2)" }
-          },
-          x: {
-            ticks: { color: "#FF9800" },
-            grid: { color: "rgba(255, 152, 0, 0.2)" }
-          }
-        }
-      }
+      options: { responsive: true, scales: { y: { beginAtZero: true } } }
     });
   }
 
+  // ✅ Generate random colors for each dataset
   function getRandomColor() {
-    return `hsl(${Math.floor(Math.random() * 360)}, 90%, 60%)`;
+    return `hsl(${Math.floor(Math.random() * 360)}, 70%, 50%)`;
   }
 
+  // Load stats on page load
   fetchStats();
+
 </script>
 </body>
 </html>
