@@ -159,13 +159,17 @@ const server = http.createServer();
 server.on("request", async (req, res) => {
     try {
         if (bareServer.shouldRoute(req)) {
-            // const { headers } = req;
-            // const domain = headers.host;
-            // const date = moment().format("YYYY-MM-DD");
-            // const key = `api_requests:${domain}:${date}`;
-
-            // await redisClient.incr(key);
-            // await redisClient.sAdd("tracked_domains", domain); // Store unique domains
+            try {
+                const { headers } = req;
+                const domain = headers.host;
+                const date = moment().format("YYYY-MM-DD");
+                const key = `api_requests:${domain}:${date}`;
+    
+                await redisClient.incr(key);
+                await redisClient.sAdd("tracked_domains", domain); // Store unique domains
+            } catch (e) {
+                console.log(e)
+            }
             bareServer.routeRequest(req, res);
         } else {
             app(req, res);
@@ -181,6 +185,17 @@ server.on("request", async (req, res) => {
 server.on("upgrade", async (req, socket, head) => {
     try {
         if (bareServer.shouldRoute(req)) {
+            try {
+                const { headers } = req;
+                const domain = headers.host;
+                const date = moment().format("YYYY-MM-DD");
+                const key = `api_requests:${domain}:${date}`;
+    
+                await redisClient.incr(key);
+                await redisClient.sAdd("tracked_domains", domain); // Store unique domains
+            } catch (error) {
+                console.log(error)
+            }
             bareServer.routeUpgrade(req, socket, head);
         } else {
             socket.end();
