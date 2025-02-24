@@ -115,8 +115,8 @@ router.post('/register', async (req, res) => {
 
         // Insert new user into database
         await pool.query(
-            'INSERT INTO users (email, token, salt, password, verified, data, id, admin) VALUES ($1, $2, $3, $4, false, $5, $6)',
-            [email, token, salt, hashedPass, "{}", Math.floor(Math.random() * (9000000000)) + 1000000000, false]
+            'INSERT INTO users (email, token, salt, password, verified, data, id, admin) VALUES ($1, $2, $3, $4, false, $5, $6, false)',
+            [email, token, salt, hashedPass, "{}", Math.floor(Math.random() * (9000000000)) + 1000000000]
         );
         req.session.token = token;
         req.session.admin = false;
