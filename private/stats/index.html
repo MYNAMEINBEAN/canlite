@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>API Request Stats</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
@@ -11,7 +11,7 @@
       font-family: 'Arial', sans-serif;
       text-align: center;
       background: #121212;
-      color: #E0E0E0;
+      color: #e0e0e0;
       margin: 0;
       padding: 20px;
     }
@@ -27,8 +27,8 @@
       margin: 10px;
       border-radius: 6px;
       display: inline-block;
-      background: #1E1E1E;
-      color: #FFA726;
+      background: #1e1e1e;
+      color: #ffa726;
       box-shadow: 2px 2px 10px rgba(255, 152, 0, 0.3);
     }
     table {
@@ -48,16 +48,16 @@
       border: 1px solid #444;
     }
     th {
-      background: #FF9800;
+      background: #ff9800;
       color: #000;
       font-size: 16px;
     }
     td {
       background: #333;
-      color: #E0E0E0;
+      color: #e0e0e0;
     }
     tr:nth-child(even) td {
-      background: #2A2A2A;
+      background: #2a2a2a;
     }
     tr:hover td {
       background: #444;
@@ -68,7 +68,7 @@
       height: 400px;
       margin: 30px auto;
       display: block;
-      background: #1E1E1E;
+      background: #1e1e1e;
       padding: 10px;
       border-radius: 8px;
       box-shadow: 3px 3px 15px rgba(255, 152, 0, 0.3);
@@ -78,12 +78,14 @@
 <body>
 <h2>API Request Stats (Last 30 Days)</h2>
 
-<div class="summary" id="total-summary">Total Requests: 0</div>
+<div class="summary" id="total-summary">Total Requests (Last 30 Days): 0</div>
 <div class="summary" id="daily-summary">Total Requests Today: 0</div>
 
 <table id="stats-table">
   <thead>
-  <tr id="date-header"><th>Domain</th></tr>
+  <tr id="date-header">
+    <th>Domain</th>
+  </tr>
   </thead>
   <tbody id="stats-body"></tbody>
 </table>
@@ -94,24 +96,32 @@
   let chartInstance = null; // Store the Chart instance
 
   async function fetchStats() {
-    const res = await fetch("/api/stats");
+    const res = await fetch("/stats");
     const { stats, days } = await res.json();
+
+    // Ensure days are sorted in ascending order (oldest to newest)
+    days.sort((a, b) => new Date(a) - new Date(b));
 
     const tableHeader = document.getElementById("date-header");
     const tableBody = document.getElementById("stats-body");
     const totalSummary = document.getElementById("total-summary");
     const dailySummary = document.getElementById("daily-summary");
 
-    // ✅ CLEAR OLD TABLE CONTENT
+    // Clear old table header and body
     tableHeader.innerHTML = "<th>Domain</th>";
     tableBody.innerHTML = "";
 
-    days.forEach(day => tableHeader.innerHTML += `<th>${day}</th>`);
+    days.forEach(day => {
+      tableHeader.innerHTML += `<th>${day}</th>`;
+    });
     tableHeader.innerHTML += "<th>Last 30 Days</th>"; // Total per domain
 
     let datasets = [];
     let totalRequests = 0;
     let totalToday = 0;
+
+    // Determine today's date in YYYY-MM-DD format
+    const todayStr = new Date().toISOString().slice(0, 10);
 
     Object.keys(stats).forEach(domain => {
       const row = document.createElement("tr");
@@ -119,18 +129,20 @@
       let data = [];
       let domainTotal = 0;
 
-      days.forEach((day, index) => {
+      days.forEach(day => {
+        // Parse the count as an integer, defaulting to 0 if missing
         let count = parseInt(stats[domain][day]) || 0;
-        row.innerHTML += `<td>${count}</td>`;
+        row.innerHTML += `<td>${count.toLocaleString()}</td>`;
         data.push(count);
         domainTotal += count;
 
-        if (index === days.length - 1) {
+        // Use today's date for "calls today"
+        if (day === todayStr) {
           totalToday += count;
         }
       });
 
-      row.innerHTML += `<td><strong>${domainTotal}</strong></td>`;
+      row.innerHTML += `<td><strong>${domainTotal.toLocaleString()}</strong></td>`;
       tableBody.appendChild(row);
 
       totalRequests += domainTotal;
@@ -141,35 +153,48 @@
         borderColor: getRandomColor(),
         backgroundColor: "rgba(255, 152, 0, 0.2)",
         fill: true,
-        tension: 0.3
+        tension: 0.1
       });
     });
 
-    totalSummary.textContent = `Total Requests (Last 30 Days): ${totalRequests}`;
-    dailySummary.textContent = `Total Requests Today: ${totalToday}`;
+    totalSummary.textContent = `Total Requests (Last 30 Days): ${totalRequests.toLocaleString()}`;
+    dailySummary.textContent = `Total Requests Today: ${totalToday.toLocaleString()}`;
 
-    // ✅ Destroy existing chart before creating a new one
+    // Destroy any existing chart instance before creating a new one
     if (chartInstance) {
       chartInstance.destroy();
     }
 
-    // ✅ Create a new chart
+    // Create the chart with the updated data
     const ctx = document.getElementById("chart").getContext("2d");
     chartInstance = new Chart(ctx, {
       type: "line",
       data: { labels: days, datasets },
-      options: { responsive: true, scales: { y: { beginAtZero: true } } }
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: { stepSize: 1, color: "#ff9800" },
+            grid: { color: "rgba(255, 152, 0, 0.2)" }
+          },
+          x: {
+            ticks: { autoSkip: false, maxRotation: 45, minRotation: 45, color: "#ff9800" },
+            grid: { color: "rgba(255, 152, 0, 0.2)" }
+          }
+        },
+        plugins: { legend: { position: "top" } }
+      }
     });
   }
 
-  // ✅ Generate random colors for each dataset
+  // Generate a random color for each dataset
   function getRandomColor() {
     return `hsl(${Math.floor(Math.random() * 360)}, 70%, 50%)`;
   }
 
-  // Load stats on page load
   fetchStats();
-
 </script>
 </body>
 </html>
