@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>API Request Stats</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    /* Dark Modern Theme */
+    /* Updated Dark Theme */
     body {
       font-family: 'Arial', sans-serif;
       text-align: center;
@@ -99,7 +99,7 @@
     const res = await fetch("/api/stats");
     const { stats, days } = await res.json();
 
-    // Ensure days are sorted in ascending order (oldest to newest)
+    // Sort days in ascending order (oldest to newest)
     days.sort((a, b) => new Date(a) - new Date(b));
 
     const tableHeader = document.getElementById("date-header");
@@ -111,10 +111,11 @@
     tableHeader.innerHTML = "<th>Domain</th>";
     tableBody.innerHTML = "";
 
+    // Populate table header with sorted days (oldest on left, newest on right)
     days.forEach(day => {
       tableHeader.innerHTML += `<th>${day}</th>`;
     });
-    tableHeader.innerHTML += "<th>Last 30 Days</th>"; // Total per domain
+    tableHeader.innerHTML += "<th>Last 30 Days</th>";
 
     let datasets = [];
     let totalRequests = 0;
@@ -130,13 +131,13 @@
       let domainTotal = 0;
 
       days.forEach(day => {
-        // Parse the count as an integer, defaulting to 0 if missing
-        let count = parseInt(stats[domain][day]) || 0;
+        // Convert the count to a number; default to 0 if missing
+        let count = Number(stats[domain][day]) || 0;
         row.innerHTML += `<td>${count.toLocaleString()}</td>`;
         data.push(count);
         domainTotal += count;
 
-        // Use today's date for "calls today"
+        // If this day is today's date, add to today's total
         if (day === todayStr) {
           totalToday += count;
         }
@@ -160,12 +161,12 @@
     totalSummary.textContent = `Total Requests (Last 30 Days): ${totalRequests.toLocaleString()}`;
     dailySummary.textContent = `Total Requests Today: ${totalToday.toLocaleString()}`;
 
-    // Destroy any existing chart instance before creating a new one
+    // Destroy any existing chart before creating a new one
     if (chartInstance) {
       chartInstance.destroy();
     }
 
-    // Create the chart with the updated data
+    // Create the chart with the sorted days (x-axis: oldest left, newest right)
     const ctx = document.getElementById("chart").getContext("2d");
     chartInstance = new Chart(ctx, {
       type: "line",
