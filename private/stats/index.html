@@ -100,10 +100,8 @@
     const res = await fetch("/api/stats");
     const { stats, days } = await res.json();
 
-    // Sort days in ascending order (oldest to newest) for the chart
+    // Sort days in ascending order (oldest to newest)
     const ascendingDays = days.slice().sort((a, b) => new Date(a) - new Date(b));
-    // For the table, we want descending order (newest first, oldest on right)
-    const descendingDays = ascendingDays.slice().reverse();
 
     const tableHeader = document.getElementById("date-header");
     const tableBody = document.getElementById("stats-body");
@@ -114,8 +112,8 @@
     tableHeader.innerHTML = "<th>Domain</th>";
     tableBody.innerHTML = "";
 
-    // Build table header using descending order (newest on left, oldest on right)
-    descendingDays.forEach(day => {
+    // Build table header using ascendingDays (oldest on left, newest on right)
+    ascendingDays.forEach(day => {
       tableHeader.innerHTML += `<th>${day}</th>`;
     });
     tableHeader.innerHTML += "<th>Last 30 Days</th>";
@@ -124,26 +122,18 @@
     let totalRequests = 0;
     let totalToday = 0;
 
-    // Today's date in YYYY-MM-DD format
+    // Determine today's date in YYYY-MM-DD format
     const todayStr = new Date().toISOString().slice(0, 10);
 
-    // Process each domain's data
+    // We'll also track the maximum value across all datasets to set chart max
+    let overallMax = 0;
+
     Object.keys(stats).forEach(domain => {
       const row = document.createElement("tr");
       row.innerHTML = `<td>${domain}</td>`;
       let dataForChart = [];
       let domainTotal = 0;
 
-      // For the table: iterate over descendingDays (newest first)
-      descendingDays.forEach(day => {
-        let count = Number(stats[domain][day]);
-        if (isNaN(count) || count < 0) {
-          count = 0;
-        }
-        row.innerHTML += `<td>${count.toLocaleString()}</td>`;
-      });
-
-      // For the chart: iterate over ascendingDays (oldest first)
       ascendingDays.forEach(day => {
         let count = Number(stats[domain][day]);
         if (isNaN(count) || count < 0) {
@@ -151,9 +141,23 @@
         }
         dataForChart.push(count);
         domainTotal += count;
+        // If this day is today's date, add to today's total
         if (day === todayStr) {
           totalToday += count;
         }
+      });
+
+      // Update overall maximum
+      const domainMax = Math.max(...dataForChart);
+      if (domainMax > overallMax) overallMax = domainMax;
+
+      // Build table row (using the same ascending order)
+      ascendingDays.forEach(day => {
+        let count = Number(stats[domain][day]);
+        if (isNaN(count) || count < 0) {
+          count = 0;
+        }
+        row.innerHTML += `<td>${count.toLocaleString()}</td>`;
       });
       row.innerHTML += `<td><strong>${domainTotal.toLocaleString()}</strong></td>`;
       tableBody.appendChild(row);
@@ -178,6 +182,9 @@
       chartInstance.destroy();
     }
 
+    // Set the y-axis max value with a 20% margin (if overallMax is 0, default to 10)
+    const yMax = overallMax > 0 ? overallMax * 1.2 : 10;
+
     // Create a new chart with ascendingDays as labels (oldest on left, newest on right)
     const ctx = document.getElementById("chart").getContext("2d");
     chartInstance = new Chart(ctx, {
@@ -189,8 +196,9 @@
         scales: {
           y: {
             beginAtZero: true,
-            min: 0, // Prevent negative scaling
-            ticks: { stepSize: 1, color: "#ff9800" },
+            min: 0,
+            max: yMax,
+            ticks: { stepSize: Math.ceil(yMax / 10), color: "#ff9800" },
             grid: { color: "rgba(255, 152, 0, 0.2)" }
           },
           x: {
