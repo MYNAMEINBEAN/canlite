@@ -12,7 +12,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
+            background-color: rgba(0, 0, 0, 0.7); /* Darker background for better contrast */
             z-index: 999;
             display: none; /* Initially hidden */
         }
@@ -38,12 +38,14 @@
         iframe.style.top = '50%';
         iframe.style.left = '50%';
         iframe.style.transform = 'translate(-50%, -50%)';
-        iframe.style.width = '300px';
-        iframe.style.height = '250px';
+        iframe.style.width = '90%'; /* Take up 90% of the screen width */
+        iframe.style.height = '90%'; /* Take up 90% of the screen height */
         iframe.style.border = 'none';
         iframe.style.zIndex = '1000';
-        iframe.style.backgroundColor = 'white';
-        iframe.style.boxShadow = '0 0 10px rgba(0, 0, 0, 0.5)';
+        iframe.style.backgroundColor = '#89b4fa'; /* Use the specified color */
+        iframe.style.borderRadius = '10px'; /* Rounded corners */
+        iframe.style.boxShadow = '0 0 20px rgba(0, 0, 0, 0.5)'; /* Add a shadow for depth */
+        iframe.style.overflow = 'hidden'; /* Prevent scrollbars */
 
         // Set the iframe content
         iframe.srcdoc = `
@@ -58,13 +60,29 @@
                             font-family: Arial, sans-serif;
                             text-align: center;
                             padding: 20px;
+                            margin: 0;
+                            background-color: #89b4fa; /* Match the iframe background */
+                            color: #1e1e1e; /* Dark text for contrast */
+                            display: flex;
+                            flex-direction: column;
+                            justify-content: center;
+                            align-items: center;
+                            height: 100%;
                         }
                         .message {
                             margin-bottom: 20px;
+                            font-size: 1.5em;
                         }
                         .timer {
                             font-weight: bold;
-                            color: #d9534f;
+                            color: #d9534f; /* Red color for the timer */
+                            font-size: 1.2em;
+                        }
+                        .ad-container {
+                            margin-top: 20px;
+                            background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent white background */
+                            padding: 10px;
+                            border-radius: 5px;
                         }
                     </style>
                 </head>
@@ -73,18 +91,20 @@
                         <p>Help keep CanLite free</p>
                         <p>This will close in <span class="timer">5</span> seconds...</p>
                     </div>
-                    <!-- Ad code -->
-                    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1655414789495559"
-                            crossorigin="anonymous"><\/script>
-                    <ins class="adsbygoogle"
-                         style="display:block"
-                         data-ad-client="ca-pub-1655414789495559"
-                         data-ad-slot="7467137497"
-                         data-ad-format="auto"
-                         data-full-width-responsive="true"></ins>
-                    <script>
-                         (adsbygoogle = window.adsbygoogle || []).push({});
-                    <\/script>
+                    <div class="ad-container">
+                        <!-- Ad code -->
+                        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1655414789495559"
+                                crossorigin="anonymous"><\/script>
+                        <ins class="adsbygoogle"
+                             style="display:block"
+                             data-ad-client="ca-pub-1655414789495559"
+                             data-ad-slot="7467137497"
+                             data-ad-format="auto"
+                             data-full-width-responsive="true"></ins>
+                        <script>
+                             (adsbygoogle = window.adsbygoogle || []).push({});
+                        <\/script>
+                    </div>
                     <script>
                         // Timer logic
                         let seconds = 5;
