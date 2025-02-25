@@ -3,162 +3,149 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Overlay Iframe Example</title>
+    <title>CanLite Overlay</title>
     <style>
-        /* Style for the overlay background */
-        #overlay-background {
+        .overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.7); /* Darker background for better contrast */
-            z-index: 999;
-            display: none; /* Initially hidden */
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 10000;
+            display: none;
+        }
+
+        #ad-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90vw;
+            height: 90vh;
+            z-index: 10001;
+            display: none;
         }
     </style>
 </head>
 <body>
-<!-- Main page content -->
-<h1>Welcome to CanLite</h1>
-<p>This is the main page content.</p>
+<h1>Main Content</h1>
+<p>Your regular page content here</p>
 
-<!-- Overlay background -->
-<div id="overlay-background"></div>
+<div class="overlay"></div>
+<div id="ad-container"></div>
 
 <script>
-    // Function to create and show the overlay iframe
-    function showOverlay() {
-        const overlayBackground = document.getElementById('overlay-background');
+    function initAdOverlay() {
+        const overlay = document.querySelector('.overlay');
+        const adContainer = document.querySelector('#ad-container');
 
-        // Create a new iframe element
-        const iframe = document.createElement('iframe');
-        iframe.id = 'overlay-iframe';
-        iframe.style.position = 'fixed';
-        iframe.style.top = '50%';
-        iframe.style.left = '50%';
-        iframe.style.transform = 'translate(-50%, -50%)';
-        iframe.style.width = '90%'; /* Take up 90% of the screen width */
-        iframe.style.height = '90%'; /* Take up 90% of the screen height */
-        iframe.style.border = 'none';
-        iframe.style.zIndex = '1000';
-        iframe.style.backgroundColor = '#89b4fa'; /* Use the specified color */
-        iframe.style.borderRadius = '10px'; /* Rounded corners */
-        iframe.style.boxShadow = '0 0 20px rgba(0, 0, 0, 0.5)'; /* Add a shadow for depth */
-        iframe.style.overflow = 'hidden'; /* Prevent scrollbars */
+        // Create shadow DOM
+        const shadowRoot = adContainer.attachShadow({ mode: 'open' });
 
-        // Set the iframe content
-        iframe.srcdoc = `
-                <!DOCTYPE html>
-                <html lang="en">
-                <head>
-                    <meta charset="UTF-8">
-                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                    <title>Overlay</title>
-                    <style>
-                        body {
-                            font-family: Arial, sans-serif;
-                            text-align: center;
-                            padding: 20px;
-                            margin: 0;
-                            background-color: #89b4fa; /* Match the iframe background */
-                            color: #1e1e1e; /* Dark text for contrast */
-                            display: flex;
-                            flex-direction: column;
-                            justify-content: center;
-                            align-items: center;
-                            height: 100%;
-                        }
-                        .message {
-                            margin-bottom: 20px;
-                            font-size: 1.5em;
-                        }
-                        .timer {
-                            font-weight: bold;
-                            color: #d9534f; /* Red color for the timer */
-                            font-size: 1.2em;
-                        }
-                        .ad-container {
-                            margin-top: 20px;
-                            width: 700px; /* Fixed width for the ad container */
-                            height: 500px; /* Fixed height for the ad container */
-                        }
-                    </style>
-                </head>
-                <body>
+        // Random time between 10-15 seconds
+        const displayTime = Math.floor(Math.random() * 6) + 10;
+
+        shadowRoot.innerHTML = `
+                <style>
+                    :host {
+                        display: block;
+                        background: #89b4fa;
+                        border-radius: 12px;
+                        padding: 20px;
+                        box-shadow: 0 0 20px rgba(0,0,0,0.3);
+                        text-align: center;
+                    }
+                    .content {
+                        height: 100%;
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: center;
+                    }
+                    .message {
+                        font-size: 1.5em;
+                        margin-bottom: 20px;
+                    }
+                    .timer {
+                        font-size: 1.2em;
+                        color: #d9534f;
+                        font-weight: bold;
+                    }
+                    .ad-wrapper {
+                        margin: 20px auto;
+                        width: 700px;
+                        height: 500px;
+                        background: rgba(255,255,255,0.9);
+                        border-radius: 8px;
+                        padding: 10px;
+                    }
+                </style>
+                <div class="content">
                     <div class="message">
-                        <p>Help keep CanLite free</p>
-                        <p>This will close in <span class="timer">5</span> seconds...</p>
+                        Help keep CanLite free<br>
+                        <span class="timer">${displayTime}</span> seconds remaining
                     </div>
-                    <div class="ad-container">
-                        <!-- Ad code -->
-                        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1655414789495559"
-                                crossorigin="anonymous"><\/script>
-                        <ins class="adsbygoogle"
-                             style="display:block"
-                             data-ad-client="ca-pub-1655414789495559"
-                             data-ad-slot="7467137497"
-                             data-ad-format="auto"
-                             data-full-width-responsive="true"></ins>
-                        <script>
-                             (adsbygoogle = window.adsbygoogle || []).push({});
-                        <\/script>
+                    <div class="ad-wrapper">
+                        <!-- Ad content will be injected here -->
                     </div>
-                    <script>
-                        // Timer logic
-                        let seconds = 5;
-                        const timerElement = document.querySelector('.timer');
-                        const countdown = setInterval(() => {
-                            seconds--;
-                            timerElement.textContent = seconds;
-                            if (seconds <= 0) {
-                                clearInterval(countdown);
-                                window.parent.postMessage('closeOverlay', '*'); // Notify parent to close the iframe
-                            }
-                        }, 1000);
-                    <\/script>
-                </body>
-                </html>
+                </div>
             `;
 
-        // Append the iframe to the body
-        document.body.appendChild(iframe);
+        // Attempt to load AdSense
+        const adWrapper = shadowRoot.querySelector('.ad-wrapper');
+        const timerElement = shadowRoot.querySelector('.timer');
 
-        // Show the overlay background
-        overlayBackground.style.display = 'block';
-
-        // Listen for the close message from the iframe
-        window.addEventListener('message', (event) => {
-            if (event.data === 'closeOverlay') {
-                // Remove the iframe and hide the background
-                iframe.remove();
-                overlayBackground.style.display = 'none';
-            }
-        });
-    }
-
-    // Function to check if AdSense ads are loaded
-    function checkAdSense() {
         const adScript = document.createElement('script');
         adScript.async = true;
         adScript.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1655414789495559';
         adScript.crossOrigin = 'anonymous';
+
         adScript.onload = () => {
-            // AdSense script loaded successfully, show the overlay
-            showOverlay();
-            setInterval(showOverlay, 300000); // Show every 5 minutes
+            // Create AdSense ad
+            const ins = document.createElement('ins');
+            ins.className = 'adsbygoogle';
+            ins.style.display = 'block';
+            ins.dataset.adClient = 'ca-pub-1655414789495559';
+            ins.dataset.adSlot = '7467137497';
+            ins.dataset.adFormat = 'auto';
+            ins.dataset.fullWidthResponsive = 'true';
+
+            adWrapper.appendChild(ins);
+            (adsbygoogle = window.adsbygoogle || []).push({});
+
+            // Show overlay
+            overlay.style.display = 'block';
+            adContainer.style.display = 'block';
+
+            // Start timer
+            let seconds = displayTime;
+            const timerInterval = setInterval(() => {
+                seconds--;
+                timerElement.textContent = seconds;
+                if (seconds <= 0) {
+                    clearInterval(timerInterval);
+                    overlay.style.display = 'none';
+                    adContainer.style.display = 'none';
+                }
+            }, 1000);
         };
+
         adScript.onerror = () => {
-            // AdSense script failed to load, run aclib.runAutoTag instead
-            aclib.runAutoTag({
-                zoneId: 'yhqj50takh',
-            });
+            // Fallback if AdSense is blocked
+            if(typeof aclib !== 'undefined') {
+                aclib.runAutoTag({ zoneId: 'yhqj50takh' });
+            }
+            // Don't show the overlay if ads are blocked
         };
+
         document.head.appendChild(adScript);
     }
 
-    // Check if AdSense is available and run the appropriate logic
-    checkAdSense();
+    // Initial call
+    initAdOverlay();
+
+    // Repeat every 5 minutes (300000ms)
+    setInterval(initAdOverlay, 300000);
 </script>
 </body>
 </html>
