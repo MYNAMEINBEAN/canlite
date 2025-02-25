@@ -4,9 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>API Request Stats</title>
+  <!-- Chart.js Library -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    /* Modern Dark Theme with Orange Accents */
+    /* Dark Modern Theme with Orange Accents */
     body {
       font-family: 'Arial', sans-serif;
       text-align: center;
@@ -62,16 +63,17 @@
     tr:hover td {
       background: #444;
     }
-    canvas {
+    #chartContainer {
       max-width: 1000px;
-      width: 100%;
-      height: 400px;
       margin: 30px auto;
-      display: block;
       background: #1e1e1e;
-      padding: 10px;
+      padding: 20px;
       border-radius: 8px;
       box-shadow: 3px 3px 15px rgba(255, 152, 0, 0.3);
+    }
+    canvas {
+      width: 100%;
+      height: 400px;
     }
   </style>
 </head>
@@ -90,19 +92,76 @@
   <tbody id="stats-body"></tbody>
 </table>
 
-<!-- Chart Canvas -->
-<canvas id="chart"></canvas>
+<!-- Chart Container -->
+<div id="chartContainer">
+  <canvas id="chart"></canvas>
+</div>
 
 <script>
-  let chartInstance = null;
+  // Helper: Generate a random vibrant color
+  function getRandomColor() {
+    return `hsl(${Math.floor(Math.random() * 360)}, 70%, 50%)`;
+  }
 
+  // Helper: Compute a suggested maximum for the y-axis with a 20% margin
+  function computeSuggestedMax(datasets) {
+    let maxVal = 0;
+    datasets.forEach(ds => {
+      const dsMax = Math.max(...ds.data);
+      if (dsMax > maxVal) maxVal = dsMax;
+    });
+    return maxVal > 0 ? maxVal * 1.2 : 10;
+  }
+
+  // Create (or recreate) the chart from scratch
+  function createChart(labels, datasets) {
+    const ctx = document.getElementById('chart').getContext('2d');
+    // Destroy previous chart if exists
+    if (window.myChart) {
+      window.myChart.destroy();
+    }
+    const suggestedMax = computeSuggestedMax(datasets);
+    window.myChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels, // Array of dates in ascending order (oldest → newest)
+        datasets
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true,
+            min: 0,
+            suggestedMax: suggestedMax,
+            ticks: { color: '#ff9800' },
+            grid: { color: 'rgba(255, 152, 0, 0.2)' }
+          },
+          x: {
+            ticks: {
+              autoSkip: false,
+              maxRotation: 45,
+              minRotation: 45,
+              color: '#ff9800'
+            },
+            grid: { color: 'rgba(255, 152, 0, 0.2)' }
+          }
+        },
+        plugins: { legend: { position: 'top' } }
+      }
+    });
+  }
+
+  // Fetch stats from the API, build table and chart
   async function fetchStats() {
     const res = await fetch("/api/stats");
     const { stats, days } = await res.json();
 
-    // Sort days in ascending order (oldest to newest)
+    // Sort days in ascending order (oldest → newest) for both table and chart
     const ascendingDays = days.slice().sort((a, b) => new Date(a) - new Date(b));
 
+    // Update Table
     const tableHeader = document.getElementById("date-header");
     const tableBody = document.getElementById("stats-body");
     const totalSummary = document.getElementById("total-summary");
@@ -121,54 +180,36 @@
     let datasets = [];
     let totalRequests = 0;
     let totalToday = 0;
-
-    // Determine today's date in YYYY-MM-DD format
+    // Today's date as YYYY-MM-DD
     const todayStr = new Date().toISOString().slice(0, 10);
 
-    // We'll also track the maximum value across all datasets to set chart max
-    let overallMax = 0;
-
+    // Process each domain's stats
     Object.keys(stats).forEach(domain => {
       const row = document.createElement("tr");
       row.innerHTML = `<td>${domain}</td>`;
       let dataForChart = [];
       let domainTotal = 0;
 
+      // For each day in ascending order
       ascendingDays.forEach(day => {
-        let count = Number(stats[domain][day]);
-        if (isNaN(count) || count < 0) {
-          count = 0;
-        }
+        let count = Number(stats[domain][day]) || 0;
+        row.innerHTML += `<td>${count.toLocaleString()}</td>`;
         dataForChart.push(count);
         domainTotal += count;
-        // If this day is today's date, add to today's total
         if (day === todayStr) {
           totalToday += count;
         }
       });
-
-      // Update overall maximum
-      const domainMax = Math.max(...dataForChart);
-      if (domainMax > overallMax) overallMax = domainMax;
-
-      // Build table row (using the same ascending order)
-      ascendingDays.forEach(day => {
-        let count = Number(stats[domain][day]);
-        if (isNaN(count) || count < 0) {
-          count = 0;
-        }
-        row.innerHTML += `<td>${count.toLocaleString()}</td>`;
-      });
       row.innerHTML += `<td><strong>${domainTotal.toLocaleString()}</strong></td>`;
       tableBody.appendChild(row);
-
       totalRequests += domainTotal;
+
       datasets.push({
         label: domain,
         data: dataForChart,
-        borderWidth: 3,
         borderColor: getRandomColor(),
         backgroundColor: "rgba(255, 152, 0, 0.2)",
+        borderWidth: 3,
         fill: true,
         tension: 0.1
       });
@@ -177,43 +218,8 @@
     totalSummary.textContent = `Total Requests (Last 30 Days): ${totalRequests.toLocaleString()}`;
     dailySummary.textContent = `Total Requests Today: ${totalToday.toLocaleString()}`;
 
-    // Destroy the previous chart instance if it exists
-    if (chartInstance) {
-      chartInstance.destroy();
-    }
-
-    // Set the y-axis max value with a 20% margin (if overallMax is 0, default to 10)
-    const yMax = overallMax > 0 ? overallMax * 1.2 : 10;
-
-    // Create a new chart with ascendingDays as labels (oldest on left, newest on right)
-    const ctx = document.getElementById("chart").getContext("2d");
-    chartInstance = new Chart(ctx, {
-      type: "line",
-      data: { labels: ascendingDays, datasets },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-          y: {
-            beginAtZero: true,
-            min: 0,
-            max: yMax,
-            ticks: { stepSize: Math.ceil(yMax / 10), color: "#ff9800" },
-            grid: { color: "rgba(255, 152, 0, 0.2)" }
-          },
-          x: {
-            ticks: { autoSkip: false, maxRotation: 45, minRotation: 45, color: "#ff9800" },
-            grid: { color: "rgba(255, 152, 0, 0.2)" }
-          }
-        },
-        plugins: { legend: { position: "top" } }
-      }
-    });
-  }
-
-  // Generate a random color for each dataset
-  function getRandomColor() {
-    return `hsl(${Math.floor(Math.random() * 360)}, 70%, 50%)`;
+    // Build the chart using our new function
+    createChart(ascendingDays, datasets);
   }
 
   fetchStats();
