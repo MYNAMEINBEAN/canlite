@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>API Request Stats</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    /* Updated Dark Theme */
+    /* Modern Dark Theme with Orange Accents */
     body {
       font-family: 'Arial', sans-serif;
       text-align: center;
@@ -78,41 +78,44 @@
 <body>
 <h2>API Request Stats (Last 30 Days)</h2>
 
+<!-- Summary Boxes -->
 <div class="summary" id="total-summary">Total Requests (Last 30 Days): 0</div>
 <div class="summary" id="daily-summary">Total Requests Today: 0</div>
 
+<!-- Stats Table -->
 <table id="stats-table">
   <thead>
-  <tr id="date-header">
-    <th>Domain</th>
-  </tr>
+  <tr id="date-header"><th>Domain</th></tr>
   </thead>
   <tbody id="stats-body"></tbody>
 </table>
 
+<!-- Chart Canvas -->
 <canvas id="chart"></canvas>
 
 <script>
-  let chartInstance = null; // Store the Chart instance
+  let chartInstance = null;
 
   async function fetchStats() {
     const res = await fetch("/api/stats");
     const { stats, days } = await res.json();
 
-    // Sort days in ascending order (oldest to newest)
-    days.sort((a, b) => new Date(a) - new Date(b));
+    // Sort days in ascending order (oldest to newest) for the chart
+    const ascendingDays = days.slice().sort((a, b) => new Date(a) - new Date(b));
+    // For the table, we want descending order (newest first, oldest on right)
+    const descendingDays = ascendingDays.slice().reverse();
 
     const tableHeader = document.getElementById("date-header");
     const tableBody = document.getElementById("stats-body");
     const totalSummary = document.getElementById("total-summary");
     const dailySummary = document.getElementById("daily-summary");
 
-    // Clear old table header and body
+    // Clear previous table header and body
     tableHeader.innerHTML = "<th>Domain</th>";
     tableBody.innerHTML = "";
 
-    // Populate table header with sorted days (oldest on left, newest on right)
-    days.forEach(day => {
+    // Build table header using descending order (newest on left, oldest on right)
+    descendingDays.forEach(day => {
       tableHeader.innerHTML += `<th>${day}</th>`;
     });
     tableHeader.innerHTML += "<th>Last 30 Days</th>";
@@ -121,35 +124,44 @@
     let totalRequests = 0;
     let totalToday = 0;
 
-    // Determine today's date in YYYY-MM-DD format
+    // Today's date in YYYY-MM-DD format
     const todayStr = new Date().toISOString().slice(0, 10);
 
+    // Process each domain's data
     Object.keys(stats).forEach(domain => {
       const row = document.createElement("tr");
       row.innerHTML = `<td>${domain}</td>`;
-      let data = [];
+      let dataForChart = [];
       let domainTotal = 0;
 
-      days.forEach(day => {
-        // Convert the count to a number; default to 0 if missing
-        let count = Number(stats[domain][day]) || 0;
+      // For the table: iterate over descendingDays (newest first)
+      descendingDays.forEach(day => {
+        let count = Number(stats[domain][day]);
+        if (isNaN(count) || count < 0) {
+          count = 0;
+        }
         row.innerHTML += `<td>${count.toLocaleString()}</td>`;
-        data.push(count);
-        domainTotal += count;
+      });
 
-        // If this day is today's date, add to today's total
+      // For the chart: iterate over ascendingDays (oldest first)
+      ascendingDays.forEach(day => {
+        let count = Number(stats[domain][day]);
+        if (isNaN(count) || count < 0) {
+          count = 0;
+        }
+        dataForChart.push(count);
+        domainTotal += count;
         if (day === todayStr) {
           totalToday += count;
         }
       });
-
       row.innerHTML += `<td><strong>${domainTotal.toLocaleString()}</strong></td>`;
       tableBody.appendChild(row);
 
       totalRequests += domainTotal;
       datasets.push({
         label: domain,
-        data,
+        data: dataForChart,
         borderWidth: 3,
         borderColor: getRandomColor(),
         backgroundColor: "rgba(255, 152, 0, 0.2)",
@@ -161,22 +173,23 @@
     totalSummary.textContent = `Total Requests (Last 30 Days): ${totalRequests.toLocaleString()}`;
     dailySummary.textContent = `Total Requests Today: ${totalToday.toLocaleString()}`;
 
-    // Destroy any existing chart before creating a new one
+    // Destroy the previous chart instance if it exists
     if (chartInstance) {
       chartInstance.destroy();
     }
 
-    // Create the chart with the sorted days (x-axis: oldest left, newest right)
+    // Create a new chart with ascendingDays as labels (oldest on left, newest on right)
     const ctx = document.getElementById("chart").getContext("2d");
     chartInstance = new Chart(ctx, {
       type: "line",
-      data: { labels: days, datasets },
+      data: { labels: ascendingDays, datasets },
       options: {
         responsive: true,
         maintainAspectRatio: false,
         scales: {
           y: {
             beginAtZero: true,
+            min: 0, // Prevent negative scaling
             ticks: { stepSize: 1, color: "#ff9800" },
             grid: { color: "rgba(255, 152, 0, 0.2)" }
           },
