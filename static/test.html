@@ -80,9 +80,8 @@
                         }
                         .ad-container {
                             margin-top: 20px;
-                            background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent white background */
-                            padding: 10px;
-                            border-radius: 5px;
+                            width: 700px; /* Fixed width for the ad container */
+                            height: 500px; /* Fixed height for the ad container */
                         }
                     </style>
                 </head>
@@ -138,11 +137,28 @@
         });
     }
 
-    // Show the overlay when the page first loads
-    showOverlay();
+    // Function to check if AdSense ads are loaded
+    function checkAdSense() {
+        const adScript = document.createElement('script');
+        adScript.async = true;
+        adScript.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1655414789495559';
+        adScript.crossOrigin = 'anonymous';
+        adScript.onload = () => {
+            // AdSense script loaded successfully, show the overlay
+            showOverlay();
+            setInterval(showOverlay, 300000); // Show every 5 minutes
+        };
+        adScript.onerror = () => {
+            // AdSense script failed to load, run aclib.runAutoTag instead
+            aclib.runAutoTag({
+                zoneId: 'yhqj50takh',
+            });
+        };
+        document.head.appendChild(adScript);
+    }
 
-    // Show the overlay every 5 minutes (300,000 milliseconds)
-    setInterval(showOverlay, 300000);
+    // Check if AdSense is available and run the appropriate logic
+    checkAdSense();
 </script>
 </body>
 </html>
