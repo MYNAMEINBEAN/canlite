@@ -96,7 +96,7 @@
   let chartInstance = null; // Store the Chart instance
 
   async function fetchStats() {
-    const res = await fetch("/stats");
+    const res = await fetch("/api/stats");
     const { stats, days } = await res.json();
 
     // Ensure days are sorted in ascending order (oldest to newest)
