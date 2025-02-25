@@ -1,121 +1,96 @@
+<body>
+<!-- Your main page content -->
+
 <script>
-    // Function to show the ad overlay with an iframe
     function showAdOverlay() {
-        // Remove any existing overlay (to avoid duplicates)
-        let oldOverlay = document.getElementById('adOverlay');
+        // Remove any existing overlay to avoid duplicates
+        var oldOverlay = document.getElementById('adOverlay');
         if (oldOverlay) {
             oldOverlay.remove();
         }
 
         // Create the overlay container
-        const overlay = document.createElement('div');
+        var overlay = document.createElement('div');
         overlay.id = 'adOverlay';
         overlay.style.position = 'fixed';
         overlay.style.top = '0';
         overlay.style.left = '0';
         overlay.style.width = '100%';
         overlay.style.height = '100%';
-        overlay.style.backgroundColor = 'rgba(255,255,255,0.95)'; // Light white background
+        overlay.style.backgroundColor = 'rgba(255, 255, 255, 0.95)';
         overlay.style.zIndex = '9999';
         overlay.style.display = 'flex';
         overlay.style.justifyContent = 'center';
         overlay.style.alignItems = 'center';
         document.body.appendChild(overlay);
 
-        // Create an iframe to isolate the ad and timer
-        const iframe = document.createElement('iframe');
+        // Create an iframe to fully isolate the ad and timer
+        var iframe = document.createElement('iframe');
         iframe.style.border = 'none';
         iframe.style.width = '100%';
         iframe.style.height = '100%';
+        overlay.appendChild(iframe);
 
-        // Use srcdoc so that all content is self-contained within the iframe
-        iframe.srcdoc = `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="utf-8">
-      <title>Advertisement</title>
-      <style>
-        body {
-          margin: 0;
-          padding: 0;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          align-items: center;
-          height: 100vh;
-          background: #fff;
-          font-family: Arial, sans-serif;
-        }
-        #countdown {
-          position: absolute;
-          top: 20px;
-          right: 20px;
-          font-size: 24px;
-          font-weight: bold;
-          color: red;
-        }
-        #adMessage {
-          font-size: 20px;
-          font-weight: bold;
-          margin-bottom: 10px;
-          text-align: center;
-        }
-        #adInstructions {
-          font-size: 16px;
-          margin-bottom: 20px;
-          text-align: center;
-        }
-      </style>
-    </head>
-    <body>
-      <div id="countdown">5</div>
-      <div id="adMessage">Help keep CanLite free</div>
-      <div id="adInstructions">This ad will close in <span id="countdown-text">5</span> seconds.</div>
+    // Build the HTML content for the iframe using concatenated strings.
+    // We break up the closing </script> tags so they don't interfere with our parent script.
+var htmlContent = '<!DOCTYPE html>' +
+'<html>' +
+'<head>' +
+    '<meta charset="utf-8">' +
+    '<title>Advertisement</title>' +
+    '<style>' +
+    'body { margin: 0; padding: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; background: #fff; font-family: Arial, sans-serif; }' +
+    '#countdown { position: absolute; top: 20px; right: 20px; font-size: 24px; font-weight: bold; color: red; }' +
+    '#adMessage { font-size: 20px; font-weight: bold; margin-bottom: 10px; text-align: center; }' +
+    '#adInstructions { font-size: 16px; margin-bottom: 20px; text-align: center; }' +
+    '</style>' +
+    '</head>' +
+'<body>' +
+'<div id="countdown">5</div>' +
+'<div id="adMessage">Help keep CanLite free</div>' +
+'<div id="adInstructions">This ad will close in <span id="countdown-text">5</span> seconds.</div>' +
+// Load the ad script
+'<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1655414789495559" crossorigin="anonymous"></' + 'script>' +
+'<ins class="adsbygoogle" style="display:block" ' +
+'data-ad-client="ca-pub-1655414789495559" ' +
+'data-ad-slot="7467137497" ' +
+'data-ad-format="auto" ' +
+'data-full-width-responsive="true"></ins>' +
+'<script>' +
+'(adsbygoogle = window.adsbygoogle || []).push({});' +
+'</' + 'script>' +
+// Countdown timer
+'<script>' +
+'var seconds = 5;' +
+'var countdown = document.getElementById("countdown");' +
+'var countdownText = document.getElementById("countdown-text");' +
+'var timer = setInterval(function() {' +
+'seconds--;' +
+'countdown.innerHTML = seconds;' +
+'countdownText.innerHTML = seconds;' +
+'if (seconds <= 0) {' +
+'clearInterval(timer);' +
+'if (window.parent && window.parent.removeAdOverlay) {' +
+'window.parent.removeAdOverlay();' +
+'}' +
+'}' +
+'}, 1000);' +
+'</' + 'script>' +
+'</body>' +
+'</html>';
 
-      <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1655414789495559" crossorigin="anonymous"></script>
-<ins class="adsbygoogle"
-     style="display:block"
-     data-ad-client="ca-pub-1655414789495559"
-     data-ad-slot="7467137497"
-     data-ad-format="auto"
-     data-full-width-responsive="true"></ins>
-<script>
-    (adsbygoogle = window.adsbygoogle || []).push({});
-    <\/script>
-
-    <script>
-        // Countdown timer inside the iframe
-        let seconds = 5;
-        const countdown = document.getElementById('countdown');
-        const countdownText = document.getElementById('countdown-text');
-        const timer = setInterval(() => {
-        seconds--;
-        countdown.innerText = seconds;
-        countdownText.innerText = seconds;
-        if (seconds <= 0) {
-        clearInterval(timer);
-        // Signal the parent window to remove the overlay
-        if (window.parent && window.parent.removeAdOverlay) {
-        window.parent.removeAdOverlay();
-    }
-    }
-    }, 1000);
-        <\/script>
-    </body>
-    </html>
-    `;
-  overlay.appendChild(iframe);
+// Set the iframe source to a data URL containing our HTML content.
+iframe.src = "data:text/html;charset=utf-8," + encodeURIComponent(htmlContent);
 }
 
-// Function to remove the ad overlay entirely
 function removeAdOverlay() {
-  const overlay = document.getElementById('adOverlay');
-  if (overlay) {
-    overlay.remove();
-  }
+    var overlay = document.getElementById('adOverlay');
+    if (overlay) {
+        overlay.remove();
+    }
 }
 
 // Show the ad overlay every 5 minutes (300,000 milliseconds)
 setInterval(showAdOverlay, 5 * 60 * 1000);
 </script>
+</body>
