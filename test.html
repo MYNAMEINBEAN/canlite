@@ -1,46 +1,52 @@
-<!-- Load GPT Library -->
+<!-- Load Google Publisher Tag (GPT) -->
 <script async src="https://securepubads.g.doubleclick.net/tag/js/gpt.js"></script>
 
 <script>
+  alert("🚀 Initializing rewarded ad setup...");
+
   window.googletag = window.googletag || {cmd: []};
 
   googletag.cmd.push(function() {
-    // Define a rewarded ad slot
+    alert("📢 Defining rewarded ad slot...");
+
+    // Define the rewarded ad slot
     var rewardedSlot = googletag.defineOutOfPageSlot(
-      '/23286994098/rewardadproxe', // Replace with your actual ad unit
+      '/23286994098/rewardadproxe1', // Ad Unit Path from your setup
       googletag.enums.OutOfPageFormat.REWARDED
     );
 
     if (rewardedSlot) {
+      alert("✅ Rewarded ad slot successfully created.");
       rewardedSlot.addService(googletag.pubads());
 
-      // Enable the button when the rewarded ad is ready
+      // Enable the button when the ad is ready
       googletag.pubads().addEventListener('rewardedSlotReady', function(event) {
         document.getElementById('rewarded-ad-button').disabled = false;
-        alert("✅ Rewarded ad is ready! Click the button to watch.");
+        alert("🎥 Rewarded ad is ready! Click the button to watch.");
       });
 
       // Grant the reward when the user finishes watching the ad
       googletag.pubads().addEventListener('rewardedSlotGranted', function(event) {
         alert("🎉 Congratulations! You’ve earned your reward!");
-        // Add logic to grant the reward (e.g., extra game life, coins, access, etc.)
       });
 
       googletag.enableServices();
-      alert("🔄 Rewarded ad setup initialized.");
+      alert("🔄 Rewarded ad setup completed. Waiting for ad to load...");
     } else {
-      alert("❌ Failed to define rewarded ad slot.");
+      alert("❌ Failed to define rewarded ad slot. Check your Google Ad Manager settings.");
     }
   });
 
   function showRewardedAd() {
     alert("📢 Requesting rewarded ad...");
-    
+
     googletag.cmd.push(function() {
-      var slot = googletag.pubads().getSlots().find(slot => slot.getAdUnitPath() === '/23286994098/rewardadproxe');
+      var slot = googletag.pubads().getSlots().find(slot => slot.getAdUnitPath() === '/23286994098/rewardadproxe1');
       if (slot) {
+        alert("🎥 Found rewarded ad slot, attempting to show ad...");
+
         slot.getRewardedAd().then(ad => {
-          alert("🎥 Showing rewarded ad...");
+          alert("📺 Showing rewarded ad...");
           ad.show();
         }).catch(error => {
           alert("❌ Error showing rewarded ad: " + error.message);
