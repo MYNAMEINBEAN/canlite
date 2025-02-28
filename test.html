@@ -1,6 +1,40 @@
-<!-- /23286994098/rewardadproxe -->
-<div id='div-gpt-ad-1740757341663-0'>
-  <script>
-    googletag.cmd.push(function() { googletag.display('div-gpt-ad-1740757341663-0'); });
-  </script>
-</div>
+<!-- Load GPT Library -->
+<script async src="https://securepubads.g.doubleclick.net/tag/js/gpt.js"></script>
+
+<script>
+  window.googletag = window.googletag || {cmd: []};
+
+  googletag.cmd.push(function() {
+    // Define the rewarded slot
+    var rewardedSlot = googletag.defineOutOfPageSlot(
+      '/23286994098/rewardadproxe', 
+      googletag.enums.OutOfPageFormat.REWARDED
+    );
+
+    if (rewardedSlot) {
+      rewardedSlot.addService(googletag.pubads());
+
+      // Listen for when the rewarded ad is ready
+      googletag.pubads().addEventListener('rewardedSlotReady', function(event) {
+        document.getElementById('rewarded-ad-button').disabled = false;
+      });
+
+      // Listen for when the user earns a reward
+      googletag.pubads().addEventListener('rewardedSlotGranted', function(event) {
+        alert("Congratulations! You’ve earned your reward!");
+        // Implement your logic to give rewards here (e.g., extra game lives, premium access, etc.)
+      });
+
+      googletag.enableServices();
+    }
+  });
+
+  function showRewardedAd() {
+    googletag.cmd.push(function() {
+      googletag.pubads().refresh();
+    });
+  }
+</script>
+
+<!-- Rewarded Ad Button -->
+<button id="rewarded-ad-button" onclick="showRewardedAd()" disabled>Watch Ad for Reward</button>
