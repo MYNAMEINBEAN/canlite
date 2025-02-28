@@ -16,9 +16,9 @@
       return;
     }
 
-    // Define the rewarded ad slot
+    // Define the rewarded ad slot using your ad unit path
     var rewardedSlot = googletag.defineOutOfPageSlot(
-      '/23286994098/rewardadproxe1', // Your Ad Unit Path
+      '/23286140618/rewardadproxe1', // Your Ad Unit Path
       googletag.enums.OutOfPageFormat.REWARDED
     );
 
@@ -27,20 +27,20 @@
       rewardedSlot.addService(googletag.pubads());
 
       // Enable the button when the ad is ready
-      googletag.pubads().addEventListener('rewardedSlotReady', function(event) {
+      googletag.pubads().addEventListener('rewardedSlotReady', function() {
         document.getElementById('rewarded-ad-button').disabled = false;
         alert("🎥 Rewarded ad is ready! Click the button to watch.");
       });
 
       // Grant the reward when the user finishes watching the ad
-      googletag.pubads().addEventListener('rewardedSlotGranted', function(event) {
+      googletag.pubads().addEventListener('rewardedSlotGranted', function() {
         alert("🎉 Congratulations! You’ve earned your reward!");
       });
 
       googletag.enableServices();
-      alert("🔄 Rewarded ad setup completed. Waiting for ad to load...");
+      alert("🔄 Rewarded ad setup complete.");
     } else {
-      alert("❌ Failed to define rewarded ad slot. Check your Google Ad Manager settings.");
+      alert("❌ Failed to define rewarded ad slot.");
     }
   }
 
@@ -51,7 +51,7 @@
     alert("📢 Requesting rewarded ad...");
 
     googletag.cmd.push(function() {
-      var slot = googletag.pubads().getSlots().find(slot => slot.getAdUnitPath() === '/23286994098/rewardadproxe1');
+      var slot = googletag.pubads().getSlots().find(slot => slot.getAdUnitPath() === '/23286140618/rewardadproxe1');
       if (slot) {
         alert("🎥 Found rewarded ad slot, attempting to show ad...");
 
