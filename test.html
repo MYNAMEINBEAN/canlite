@@ -5,33 +5,49 @@
   window.googletag = window.googletag || {cmd: []};
 
   googletag.cmd.push(function() {
-    // Define the rewarded slot
+    // Define a rewarded ad slot
     var rewardedSlot = googletag.defineOutOfPageSlot(
-      '/23286994098/rewardadproxe', 
+      '/23286994098/rewardadproxe', // Replace with your actual ad unit
       googletag.enums.OutOfPageFormat.REWARDED
     );
 
     if (rewardedSlot) {
       rewardedSlot.addService(googletag.pubads());
 
-      // Listen for when the rewarded ad is ready
+      // Enable the button when the rewarded ad is ready
       googletag.pubads().addEventListener('rewardedSlotReady', function(event) {
         document.getElementById('rewarded-ad-button').disabled = false;
+        alert("✅ Rewarded ad is ready! Click the button to watch.");
       });
 
-      // Listen for when the user earns a reward
+      // Grant the reward when the user finishes watching the ad
       googletag.pubads().addEventListener('rewardedSlotGranted', function(event) {
-        alert("Congratulations! You’ve earned your reward!");
-        // Implement your logic to give rewards here (e.g., extra game lives, premium access, etc.)
+        alert("🎉 Congratulations! You’ve earned your reward!");
+        // Add logic to grant the reward (e.g., extra game life, coins, access, etc.)
       });
 
       googletag.enableServices();
+      alert("🔄 Rewarded ad setup initialized.");
+    } else {
+      alert("❌ Failed to define rewarded ad slot.");
     }
   });
 
   function showRewardedAd() {
+    alert("📢 Requesting rewarded ad...");
+    
     googletag.cmd.push(function() {
-      googletag.pubads().refresh();
+      var slot = googletag.pubads().getSlots().find(slot => slot.getAdUnitPath() === '/23286994098/rewardadproxe');
+      if (slot) {
+        slot.getRewardedAd().then(ad => {
+          alert("🎥 Showing rewarded ad...");
+          ad.show();
+        }).catch(error => {
+          alert("❌ Error showing rewarded ad: " + error.message);
+        });
+      } else {
+        alert("⚠️ Rewarded ad slot not found.");
+      }
     });
   }
 </script>
