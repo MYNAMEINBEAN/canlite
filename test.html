@@ -6,12 +6,19 @@
 
   window.googletag = window.googletag || {cmd: []};
 
-  googletag.cmd.push(function() {
-    alert("📢 Defining rewarded ad slot...");
+  function setupRewardedAd() {
+    alert("📢 Attempting to define rewarded ad slot...");
+
+    // Ensure GPT is loaded
+    if (!googletag.pubads) {
+      alert("❌ Google Publisher Tag (GPT) is not available. Retrying in 2 seconds...");
+      setTimeout(setupRewardedAd, 2000); // Retry after 2 seconds
+      return;
+    }
 
     // Define the rewarded ad slot
     var rewardedSlot = googletag.defineOutOfPageSlot(
-      '/23286994098/rewardadproxe1', // Ad Unit Path from your setup
+      '/23286994098/rewardadproxe1', // Your Ad Unit Path
       googletag.enums.OutOfPageFormat.REWARDED
     );
 
@@ -35,7 +42,10 @@
     } else {
       alert("❌ Failed to define rewarded ad slot. Check your Google Ad Manager settings.");
     }
-  });
+  }
+
+  // Run the setup when the GPT library is loaded
+  googletag.cmd.push(setupRewardedAd);
 
   function showRewardedAd() {
     alert("📢 Requesting rewarded ad...");
