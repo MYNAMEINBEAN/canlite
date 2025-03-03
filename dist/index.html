@@ -47,9 +47,9 @@
     <div id="app"></div>
 
     <script type="text/javascript">
-        aclib.runAutoTag({
-            zoneId: 'yhqj50takh',
-        });
+        if(!window.location.hostname.includes(".org")) {
+            aclib.runAutoTag({zoneId: 'yhqj50takh'});
+        }
         // setTimeout(() => {
         //     navigator.serviceWorker.getRegistrations().then(registrations => {
         //         if (!registrations.some(r => r.active && r.active.scriptURL.includes('uv.sw.js'))) {

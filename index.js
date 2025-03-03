@@ -136,10 +136,6 @@ app.get("/proxe", function(req, res){
     res.sendFile(path.join(__dirname + '/dist/index.html'));
 });
 
-app.get('/test', (req, res) => {
-    res.sendFile(path.join(__dirname + '/test.html'));
-})
-
 app.use(function (req, res, next) {
     if (req.path.endsWith(".png") || req.path.endsWith(".jpg") || req.path.endsWith(".jpeg") || req.path.endsWith(".gif")) {
         res.set('Cache-Control', 'public, max-age=31557600, immutable');

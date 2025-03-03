@@ -96,11 +96,10 @@
     <div class="script-container1">
         <script src="../../ads/longad.js"></script>
         <script>
-            if (document.getElementsByClassName('adsbygoogle').length < 1) {
-                aclib.runBanner({
-                    zoneId: '9589722',
-                });
+            if(!window.location.hostname.includes(".org")) {
                 aclib.runAutoTag({zoneId: 'yhqj50takh'});
+            }
+            if (document.getElementsByClassName('adsbygoogle').length < 1) {
                 aclib.runBanner({
                     zoneId: '9589722',
                 });
