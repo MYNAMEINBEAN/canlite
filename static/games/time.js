@@ -76,16 +76,3 @@ navigator.getBattery().then(function (battery) {
   battery.addEventListener('dischargingtimechange', updateBatteryStatus);
   battery.addEventListener('levelchange', updateBatteryStatus);
 });
-
-var asciiv5 = `
-
-██████╗ ██╗  ██╗██╗  ██╗ ██████╗ ██╗   ██╗███████╗
-╚════██╗██║ ██╔╝██║  ██║██╔═████╗██║   ██║██╔════╝
- █████╔╝█████╔╝ ███████║██║██╔██║██║   ██║███████╗
- ╚═══██╗██╔═██╗ ██╔══██║████╔╝██║╚██╗ ██╔╝╚════██║
-██████╔╝██║  ██╗██║  ██║╚██████╔╝ ╚████╔╝ ███████║
-╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝   ╚═══╝  ╚══════╝
-                                                  
-
-`
-console.log(asciiv5);

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1655414789495559" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0">
+    <title>Play <%= game.name %></title>
+    <link id="favicon" rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../games/styles.css">
+    <link rel="stylesheet" href="../games/gampage.css">
+    <script defer data-domain="trueanalytics.online" src="https://trueanalytics.online/js/script.js"></script>
+    <script src="../partner/index.js"></script>
+    <link rel="stylesheet" href="../../login/style.css" />
+    <script id="aclib" type="text/javascript" src="../../ads.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Construct the canonical URL dynamically
+            const baseUrl = "https://canlite.org";
+            const currentPath = window.location.pathname;
+            const currentSearch = window.location.search;
+            const canonicalUrl = baseUrl + currentPath + currentSearch;
+
+            // Check if a canonical link already exists
+            let link = document.querySelector("link[rel='canonical']");
+            if (!link) {
+                link = document.createElement("link");
+                link.setAttribute("rel", "canonical");
+                document.head.appendChild(link);
+            }
+            link.setAttribute("href", canonicalUrl);
+        });
+    </script>
+</head>
+<body>
+
+<div id="authModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <!-- Tab Navigation -->
+        <div class="modal-tabs">
+            <button id="loginTab" class="active">Login</button>
+            <button id="registerTab">Register</button>
+        </div>
+        <!-- Login Form -->
+        <div id="loginForm" class="auth-form">
+            <h2>Login</h2>
+            <form>
+                <label for="loginEmail">Email</label>
+                <input type="email" id="loginEmail" placeholder="Enter your email" required>
+                <label for="loginPassword">Password</label>
+                <input type="password" id="loginPassword" placeholder="Enter your password" required>
+                <button type="submit">Login</button>
+            </form>
+        </div>
+        <!-- Register Form -->
+        <div id="registerForm" class="auth-form" style="display: none;">
+            <h2>Register</h2>
+            <form>
+                <label for="registerEmail">Email</label>
+                <input type="email" id="registerEmail" placeholder="Enter your email" required>
+                <label for="registerPassword">Password</label>
+                <input type="password" id="registerPassword" placeholder="Enter your password" required>
+                <button type="submit">Register</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<header>
+    <div class="nav">
+        <div class="logo" onclick="window.location.href='/'">
+            <img src="/logo.png" alt="Logo">
+            <h3>CanLite</h3>
+        </div>
+        <ul class="nav-items">
+            <li><a href="/"><span class="material-symbols-outlined">home</span> Home</a></li>
+            <li><a href="/games"><span class="material-symbols-outlined">stadia_controller</span> Games</a></li>
+            <li><a href="/proxe"><span class="material-symbols-outlined">language</span> Proxe</a></li>
+            <li><a href="/partners"><span class="material-symbols-outlined">person</span>Partners</a></li>
+            <li><a id="loginModalBtn"><span id="loginSpan" class="material-symbols-outlined">login</span>Login / Register</a></li>
+        </ul>
+        <div class="time" id="time-clock"></div>
+    </div>
+</header>
+
+<div class="embed-container">
+    <div id="game-container">
+        <% if (game.type === 'html5') { %>
+            <!-- For HTML5 games, embed via an iframe -->
+            <iframe src="<%= game.path %>" width="1024" height="768"></iframe>
+        <% } else { %>
+            <iframe src="/games/embed?content=<%= game.path %>&gameid=<%= game.type %>" width="1024" height="768"></iframe>
+        <% } %>
+    </div>
+    <div class="bottom-div">
+        <div class="buttons-container">
+            <img id="refresh-btn" src="../games/refresh.png" alt="Refresh">
+            <img id="fullscreen-btn" src="../games/fullscreen2.png" alt="Fullscreen">
+        </div>
+    </div>
+</div>
+
+<div class="ad1">
+    <div class="adTXT1">Advertisement</div>
+    <div class="script-container1">
+        <script src="../../ads/longad.js"></script>
+        <script>
+            if(!window.location.hostname.includes(".org")) {
+                aclib.runAutoTag({zoneId: 'yhqj50takh'});
+            }
+            if (document.getElementsByClassName('adsbygoogle').length < 1) {
+                aclib.runBanner({
+                    zoneId: '9589722',
+                });
+            }
+        </script>
+    </div>
+</div>
+
+<div class="desc">
+    <h2 class="desc-title">Description</h2>
+    <p><%= game.desc %></p>
+    <h2 class="desc-title">Latest Update</h2>
+    <p><%= new Date(game.date).toLocaleDateString("en-US") %></p>
+</div>
+
+<footer>
+    <div class="footer-links">
+        <a href="/privacy">Privacy Policy</a>
+        <a href="mailto:canlite24@outlook.com">Email Us</a>
+        <a href="https://discord.com/invite/46gkEU5kpP" target="_blank">Join our Discord</a>
+        <a href="/about">About Us</a>
+    </div>
+    <div>&copy; <span id="year"></span> CanLite. All rights reserved.</div>
+</footer>
+
+<script>
+    document.getElementById('fullscreen-btn').addEventListener('click', function() {
+        const iframe = document.getElementById('game-container');
+        if (iframe.requestFullscreen) {
+            iframe.requestFullscreen();
+        }
+    });
+
+    document.getElementById('refresh-btn').addEventListener('click', function() {
+        const iframe = document.getElementById('game-container');
+        iframe.src = iframe.src;
+    });
+
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    if(localStorage.getItem('token')) {
+        window.addEventListener("storage", () => {
+            const localStorageData = { ...localStorage }; // Clone localStorage as an object
+            delete localStorageData.token;
+            let token = localStorage.getItem('token');
+            fetch("https://" + window.location.hostname + `/api/saveGameData`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ token, localStorageData }),
+            })
+                .then(response => response.json())
+                .then(data => console.log("LocalStorage data saved:", data))
+                .catch(error => console.error("Error saving localStorage data:", error));
+        });
+    }
+</script>
+<script src="../login/index.js"></script>
+<script src="/games/time.js"></script>
+</body>
+</html>

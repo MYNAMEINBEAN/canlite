@@ -18,17 +18,29 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const app = express();
 const bareServer = createBareServer("/b/");
+
+let games = [];
+const gamesFilePath = path.join(__dirname, 'final.json');
+try {
+    const data = fs.readFileSync(gamesFilePath, 'utf8');
+    games = JSON.parse(data);
+} catch (err) {
+    console.error("Failed to load games data:", err);
+}
+
 app.disable("x-powered-by");
-let redisClient = createClient();
-redisClient.connect().catch(console.error)
-let redisStore = new RedisStore({
-    client: redisClient,
-    prefix: "myapp:",
-})
+// let redisClient = createClient();
+// redisClient.connect().catch(console.error)
+// let redisStore = new RedisStore({
+//     client: redisClient,
+//     prefix: "myapp:",
+// })
 app.set('trust proxy', 1)
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
 
 app.use(session({
-    store: redisStore,
+    // store: redisStore,
     secret: process.env.EXPRESSJS_SECRET,
     resave: false,
     saveUninitialized: false,
@@ -62,48 +74,52 @@ app.get('/stats', verifyUser, (req, res) => {
     res.sendFile(path.join(__dirname + '/private/stats/index.html'));
 });
 
-app.get('/app/:route/:file', function(req , res){
-        if (req.originalUrl.indexOf('app.js') > -1) {
-            const apps = {
-                discord: 'https://discord.com',
-                geforce: 'https://www.nvidia.com/en-us/geforce-now/',
-                reddit: 'https://reddit.com',
-                chatgpt: 'https://chat.openai.com',
-                xbox: "https://www.xbox.com/en-us/play",
-                coolmath: 'https://www.coolmathgames.com/',
-                crazygames: 'https://crazygames.com/',
-                facebook: 'https://facebook.com/',
-                nowgg: 'https://now.gg',
-                poki: 'https://poki.com',
-                snapchat: 'https://snapchat.com/',
-                soundcloud: 'https://soundcloud.com/',
-                thirty: 'https://thirtydollar.website',
-                tiktok: 'https://tiktok.com',
-                twitch: 'https://twitch.com',
-                twitter: 'https://twitter.com/',
-                spotify: 'https://accounts.spotify.com/en/login'
-            };
+app.get('/games', (req, res) => {
+    const perPage = 100;
+    let search = req.query.search || '';
+    let page = parseInt(req.query.page) || 1;
 
-            const jsFilePath = path.join(__dirname + '/static/app/app.js'); // Your base JS file
-            fs.readFile(jsFilePath, 'utf8', (err, data) => {
-                if (err) {
-                    return res.status(500).send('Error reading JavaScript file');
-                }
+    const filteredGames = games.filter(game =>
+        game.name.toLowerCase().includes(search)
+    );
 
-                // Replace a placeholder (e.g., 'APP_URL') in your JS with the dynamic appUrl
-                const modifiedJs = data.replace('APP_URL', apps[req.params.route]);
+    const total = filteredGames.length;
+    const totalPages = Math.ceil(total / perPage);
+    if (page < 1) page = 1;
+    if (page > totalPages) page = totalPages;
 
-                // Set the appropriate headers and send the modified JS file to the client
-                res.setHeader('Content-Type', 'application/javascript');
-                res.send(modifiedJs);
-            });
-        } else {
-            res.sendFile(path.join(__dirname + '/static/app/' + req.params.file));
-        }
+    // Sort games by name (alphabetical order)
+    const sortedGames = filteredGames.sort((a, b) => a.name.localeCompare(b.name));
+    const startIndex = (page - 1) * perPage;
+    const paginatedGames = sortedGames.slice(startIndex, startIndex + perPage);
+
+    res.render('games', {
+        games: paginatedGames,
+        currentPage: page,
+        totalPages: totalPages
+    });
 });
 
-app.get('/app/:route/', function(req , res){
-    res.sendFile(path.join(__dirname + '/static/app/index.html'));
+app.get('/d/:gameName.jpg', (req, res) => {
+    const gameName = req.params.gameName;
+    const filePath = path.join(__dirname, 'static/d/', `${gameName}.jpg`);
+
+    if (fs.existsSync(filePath)) {
+        res.sendFile(filePath);
+    } else {
+        res.sendFile(path.join(__dirname, 'static', 'logo.png'));
+    }
+});
+
+// Route: Play page for a specific game by unique id
+app.get('/play/:id', (req, res) => {
+    const gameName = req.params.id;
+    console.log(gameName);
+    const game = games.find(g => g.name === gameName);
+    if (!game) {
+        return res.status(404).send('Game not found');
+    }
+    res.render('play', { game });
 });
 
 app.get('/', (req, res) => {
@@ -111,26 +127,6 @@ app.get('/', (req, res) => {
     console.log(origin)
     res.sendFile(path.join(__dirname + '/static/landing/index.html'));
 });
-
-app.get("/games/play/:game", (req , res) => {
-    const name = req.query.name;
-    const filePath = path.join(__dirname + '/static/games/play/index.html'); // Your base JS file
-    fs.readFile(filePath, 'utf8', (err, data) => {
-        if (err) {
-            return res.status(500).send('Error reading file');
-        }
-        console.log(name + ' ' + req.get('host'))
-
-        if (req.get('host') === "canlite.org") {
-            data = data.replace('<meta name="description" content="Play GAME_NAME online, free, un bl0ck3d on CanLite!">', '');
-        }
-
-        let modifiedFile = data.replaceAll('GAME_NAME', name).replaceAll('GAME_SHORT', req.params.game);
-
-        res.setHeader('Content-Type', 'text/html; charset=utf-8');
-        res.send(modifiedFile);
-    });
-})
 
 app.get("/proxe", function(req, res){
     res.sendFile(path.join(__dirname + '/dist/index.html'));

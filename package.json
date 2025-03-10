@@ -29,6 +29,7 @@
         "dotenv": "^16.4.7",
         "dreamland": "^0.0.24",
         "dreamland-router": "https://github.com/mercuryworkshop/dreamland-router",
+        "ejs": "^3.1.10",
         "express": "^4.19.2",
         "express-session": "^1.18.0",
         "fernet": "^0.3.2",

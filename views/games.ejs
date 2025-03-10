@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width">
+    <title>CanLite - Games</title>
+
+    <!-- Analytics and Ads -->
+    <script defer data-domain="trueanalytics.online" src="https://trueanalytics.online/js/script.js"></script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1655414789495559" crossorigin="anonymous"></script>
+
+    <!-- Stylesheets -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer">
+    <link href="/games/games.css" rel="stylesheet" type="text/css">
+    <link href="/games/style.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="/login/style.css">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+
+    <!-- Canonical URL -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const baseUrl = "https://canlite.org";
+            const canonicalUrl = baseUrl + window.location.pathname + window.location.search;
+            let link = document.querySelector("link[rel='canonical']");
+            if (!link) {
+                link = document.createElement("link");
+                link.setAttribute("rel", "canonical");
+                document.head.appendChild(link);
+            }
+            link.setAttribute("href", canonicalUrl);
+        });
+    </script>
+
+    <style>
+        .pagination-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            gap: 10px;
+        }
+        .page-input {
+            width: 50px;
+            text-align: center;
+            padding: 5px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .page-input:focus {
+            outline: 2px solid blue;
+        }
+        .total-pages {
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Authentication Modal -->
+<div id="authModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <div class="modal-tabs">
+            <button id="loginTab" class="active">Login</button>
+            <button id="registerTab">Register</button>
+        </div>
+        <div id="loginForm" class="auth-form">
+            <h2>Login</h2>
+            <form>
+                <label for="loginEmail">Email</label>
+                <input type="email" id="loginEmail" placeholder="Enter your email" required>
+                <label for="loginPassword">Password</label>
+                <input type="password" id="loginPassword" placeholder="Enter your password" required>
+                <button type="submit">Login</button>
+            </form>
+        </div>
+        <div id="registerForm" class="auth-form" style="display: none;">
+            <h2>Register</h2>
+            <form>
+                <label for="registerEmail">Email</label>
+                <input type="email" id="registerEmail" placeholder="Enter your email" required>
+                <label for="registerPassword">Password</label>
+                <input type="password" id="registerPassword" placeholder="Enter your password" required>
+                <button type="submit">Register</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Navigation Bar -->
+<div class="nav">
+    <div class="logo" onclick="window.open('/', '_self')">
+        <img src="/logo.png">
+        <h3>CanLite</h3>
+    </div>
+    <div class="nav-items">
+        <li><a href="/"><span class="material-symbols-outlined">home</span> Home</a></li>
+        <li><a href="/games"><span class="material-symbols-outlined">stadia_controller</span> Games</a></li>
+        <li><a href="/proxe"><span class="material-symbols-outlined">language</span> Proxe</a></li>
+        <li><a href="/partners"><span class="material-symbols-outlined">person</span>Partners</a></li>
+        <li><a id="loginModalBtn"><span id="loginSpan" class="material-symbols-outlined">login</span>Login / Register</a></li>
+    </div>
+    <div class="time" id="time-clock"></div>
+</div>
+
+<!-- Search Bar -->
+<div class="search-container">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <input type="text" placeholder="Search" id="searchbar">
+</div>
+
+<script>
+    document.getElementById('searchbar').addEventListener("keypress", function(event) {
+        // If the user presses the "Enter" key on the keyboard
+        if(event.key === 'Enter') {
+            const url = new URL(window.location.href);
+            url.searchParams.delete("page")
+            url.searchParams.set("search", this.value)
+            window.location.href = url;
+        }
+    });
+</script>
+
+<div class="pagination-container">
+    <span style="color: white">Page</span>
+    <input type="number" class="page-input" id="currentPage" min="1" value="<%= currentPage %>">
+    <span style="color: white">of <span class="total-pages" id="totalPages" style="color: white"><%= totalPages %></span></span>
+</div>
+
+<script>
+    document.getElementById("currentPage").addEventListener("change", function () {
+        let page = parseInt(this.value);
+        let totalPages = <%= totalPages %>;
+
+        if (page < 1) page = 1;
+        if (page > totalPages) page = totalPages;
+
+        const url = new URL(window.location.href);
+        url.searchParams.set("page", page)
+        window.location.href = url;
+    });
+</script>
+
+<!-- Game Library -->
+<div class="g-container">
+    <% games.forEach(game => { %>
+        <a class="g" href="/play/<%= game.name %>">
+            <% if (game.prev) { %>
+                <img src="<%= game.prev %>" alt="<%= game.name %>">
+            <% } else { %>
+                <img src="/d/<%= encodeURIComponent(game.name.replace(/\//g, '')) %>.jpg" alt="<%= game.name %>">
+            <% } %>
+            <h3><%= game.name %></h3>
+        </a>
+    <% }); %>
+</div>
+
+<!-- Background Particles -->
+<div id="particles-js"></div>
+
+<p style="color: white">All games have been sourced from NettleWeb, an open source repository. If you believe that I am illegally violating your copyright, please email canlite24@outlook.com, or fil out this form <a href="https://docs.google.com/forms/d/e/1FAIpQLSd6RQqR6QMTSPjVwBMedaPs39Yqk2Z_aXw0zomFClf62tokmg/viewform?usp=dialog">here</a>.</p>
+
+<!-- Footer -->
+<footer style="
+  background-color: rgba(0, 0, 0, 0.8);
+  padding: 20px 10px;
+  text-align: center;
+  color: #FFFFFF;
+  box-shadow: 0 -2px 5px rgba(255, 87, 51, 0.8);
+  position: relative; /* Ensures it stays at the bottom of the screen */
+  bottom: 0;
+  left: 0;
+  width: 100%; /* Prevent horizontal overflow */
+  z-index: 10;
+  box-sizing: border-box; /* Includes padding in width calculation */
+  overflow: hidden; /* Hides any overflow from box-shadow or content */
+  margin: 0; /* Avoid unintended margin causing overflow */
+">
+    <div style="
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 15px;
+  ">
+        <a href="/privacy" style="
+      color: #c491f4;
+      text-decoration: none;
+      transition: color 0.4s;
+    ">Privacy Policy</a>
+        <a href="mailto:canlite24@outlook.com" style="
+      color: #c491f4;
+      text-decoration: none;
+      transition: color 0.4s;
+    ">Email Us</a>
+        <a href="https://discord.com/invite/46gkEU5kpP" target="_blank" style="
+      color: #c491f4;
+      text-decoration: none;
+      transition: color 0.4s;
+    ">Join our Discord</a>
+        <a href="/about" style="
+      color: #c491f4;
+      text-decoration: none;
+      transition: color 0.4s;
+    ">About Us</a>
+    </div>
+    <div style="font-size: 14px; color: #FFFFFF;">
+        &copy; <span id="year"></span> CanLite. All rights reserved.
+    </div>
+</footer>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+<script src="games/script.js"></script>
+<script src="games/time.js"></script>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+</script>
+<script src="/login/index.js"></script></body>
+</html>
