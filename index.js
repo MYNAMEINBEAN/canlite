@@ -29,18 +29,18 @@ try {
 }
 
 app.disable("x-powered-by");
-// let redisClient = createClient();
-// redisClient.connect().catch(console.error)
-// let redisStore = new RedisStore({
-//     client: redisClient,
-//     prefix: "myapp:",
-// })
+let redisClient = createClient();
+redisClient.connect().catch(console.error)
+let redisStore = new RedisStore({
+    client: redisClient,
+    prefix: "myapp:",
+})
 app.set('trust proxy', 1)
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
 app.use(session({
-    // store: redisStore,
+    store: redisStore,
     secret: process.env.EXPRESSJS_SECRET,
     resave: false,
     saveUninitialized: false,
