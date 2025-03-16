@@ -35,14 +35,14 @@ app.set('trust proxy', 1)
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-app.use(
-    umbress({
-        advancedClientChallenging: {
-            enabled: true,
-            cookieTtl: 30
-        }
-    })
-)
+// app.use(
+//     umbress({
+//         advancedClientChallenging: {
+//             enabled: true,
+//             cookieTtl: 30
+//         }
+//     })
+// )
 
 let redisClient = createClient();
 redisClient.connect().catch(console.error)
