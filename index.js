@@ -6,13 +6,13 @@ import path from 'path';
 import { dirname } from 'path';
 import { createBareServer } from "@tomphttp/bare-server-node";
 import { fileURLToPath } from 'url';
-import {RedisStore} from "connect-redis";
 import * as http from "node:http";
 import * as https from "node:https";
 import {createClient} from "redis"
 import apiRoutes from './api.js';
 import verifyUser from "./middleware/authAdmin.js";
 import moment from "moment";
+import {RedisStore} from "connect-redis";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -20,7 +20,7 @@ const app = express();
 const bareServer = createBareServer("/b/");
 
 let games = [];
-const gamesFilePath = path.join(__dirname, 'final.json');
+const gamesFilePath = path.join(__dirname, 'end.json');
 try {
     const data = fs.readFileSync(gamesFilePath, 'utf8');
     games = JSON.parse(data);
@@ -29,23 +29,33 @@ try {
 }
 
 app.disable("x-powered-by");
-let redisClient = createClient();
-redisClient.connect().catch(console.error)
-let redisStore = new RedisStore({
-    client: redisClient,
-    prefix: "myapp:",
-})
 app.set('trust proxy', 1)
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-app.use(session({
-    store: redisStore,
-    secret: process.env.EXPRESSJS_SECRET,
-    resave: false,
-    saveUninitialized: false,
-    cookie: { secure: true }
-}));
+if(process.env.DEV) {
+    console.log(process.env.DEV + " dev")
+    app.use(session({
+        secret: process.env.EXPRESSJS_SECRET,
+        resave: false,
+        saveUninitialized: false,
+        cookie: { secure: true }
+    }));
+} else {
+    let redisClient = createClient();
+    redisClient.connect().catch(console.error)
+    let redisStore = new RedisStore({
+        client: redisClient,
+        prefix: "myapp:",
+    })
+    app.use(session({
+        store: redisStore,
+        secret: process.env.EXPRESSJS_SECRET,
+        resave: false,
+        saveUninitialized: false,
+        cookie: { secure: true }
+    }));
+}
 app.use(express.json({limit: '50mb'}));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
