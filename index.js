@@ -33,29 +33,20 @@ app.set('trust proxy', 1)
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-if(process.env.DEV) {
-    console.log(process.env.DEV + " dev")
-    app.use(session({
-        secret: process.env.EXPRESSJS_SECRET,
-        resave: false,
-        saveUninitialized: false,
-        cookie: { secure: true }
-    }));
-} else {
-    let redisClient = createClient();
-    redisClient.connect().catch(console.error)
-    let redisStore = new RedisStore({
-        client: redisClient,
-        prefix: "myapp:",
-    })
-    app.use(session({
-        store: redisStore,
-        secret: process.env.EXPRESSJS_SECRET,
-        resave: false,
-        saveUninitialized: false,
-        cookie: { secure: true }
-    }));
-}
+let redisClient = createClient();
+redisClient.connect().catch(console.error)
+let redisStore = new RedisStore({
+    client: redisClient,
+    prefix: "myapp:",
+})
+app.use(session({
+    store: redisStore,
+    secret: process.env.EXPRESSJS_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: { secure: true }
+}));
+
 app.use(express.json({limit: '50mb'}));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
