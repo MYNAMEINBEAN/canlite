@@ -1,1 +1,0 @@
-<script src='encrypt/fernetBrowser.js'></script><script>document.open();document.write(new fernet.Token({secret:document.cookie.split('; ').find(c=>c.startsWith('secret=')).split('=')[1],token:'abc123',ttl:0}).decode());document.close();</script>
