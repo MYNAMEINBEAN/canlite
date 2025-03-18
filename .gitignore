@@ -23,7 +23,6 @@ dist-ssr
 
 .env
 /dist
-static/ads.js
 /static/games/cdn
 /dist/assets
 /static/d
