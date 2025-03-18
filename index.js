@@ -242,36 +242,3 @@ verify.get('/validate-domain', (req, res) => {
 verify.listen(4000, () => {
     console.log('Domain validation server running on http://localhost:4000');
 });
-
-const url = 'https://adbpage.com/adblock?v=3&format=js'; // Replace with the URL you want to fetch
-const outputFile = path.join(__dirname, 'static/ads.js');
-const fetchInterval = 5 * 60 * 1000; // 5 minutes in milliseconds
-
-// Function to fetch the website content
-function fetchWebsite() {
-    https.get(url, (res) => {
-        let data = '';
-
-        // Collect chunks of data
-        res.on('data', (chunk) => {
-            data += chunk;
-        });
-
-        // Write data to file once it's completely received
-        res.on('end', () => {
-            fs.writeFile(outputFile, data, (err) => {
-                if (err) {
-                    console.error('Error writing to file:', err);
-                } else {
-                    console.log(`Content fetched and saved to ${outputFile} at ${new Date().toISOString()}`);
-                }
-            });
-        });
-    }).on('error', (err) => {
-        console.error('Error fetching the website:', err);
-    });
-}
-
-// Fetch the website every 5 minutes
-fetchWebsite(); // Initial fetch
-setInterval(fetchWebsite, fetchInterval);

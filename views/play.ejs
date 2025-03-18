@@ -13,7 +13,7 @@
     <script defer data-domain="trueanalytics.online" src="https://trueanalytics.online/js/script.js"></script>
     <script src="../partner/index.js"></script>
     <link rel="stylesheet" href="../../login/style.css" />
-    <script id="aclib" type="text/javascript" src="../../ads.js"></script>
+    <script type="text/javascript" src="../../ads.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             // Construct the canonical URL dynamically
@@ -107,13 +107,17 @@
     <div class="script-container1">
         <script src="../../ads/longad.js"></script>
         <script>
-            if(!window.location.hostname.includes(".org") || window.location.hostname !== 'psybolt.com') {
-                aclib.runAutoTag({zoneId: 'yhqj50takh'});
-            }
             if (document.getElementsByClassName('adsbygoogle').length < 1) {
-                aclib.runBanner({
-                    zoneId: '9589722',
-                });
+                atOptions = {
+                    'key' : '09b9fa8b87e95b31563faf919739e0a4',
+                    'format' : 'iframe',
+                    'height' : 90,
+                    'width' : 728,
+                    'params' : {}
+                };
+                var script = document.createElement('script');
+                script.src = "//www.highperformanceformat.com/09b9fa8b87e95b31563faf919739e0a4/invoke.js";
+                document.head.appendChild(script);
             }
         </script>
     </div>

