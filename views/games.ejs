@@ -164,8 +164,8 @@
 <a id="next">Next Page</a>
 <script>
     const url = new URL(window.location.href);
-    let currentPage = searchParams.get("page") || 0
-    document.getElementById("next").href = "?page=" + (currentPage + 1)
+    let currentPage = parseInt(url.searchParams.get("page")) || 1; // Ensure it's a number
+    document.getElementById("next").href = "?page=" + (currentPage + 1);
 </script>
 <p style="color: white">All games have been sourced from NettleWeb, an open source repository. If you believe that I am illegally violating your copyright, please email canlite24@outlook.com, or fil out this form <a href="https://docs.google.com/forms/d/e/1FAIpQLSd6RQqR6QMTSPjVwBMedaPs39Yqk2Z_aXw0zomFClf62tokmg/viewform?usp=dialog">here</a>.</p>
 
