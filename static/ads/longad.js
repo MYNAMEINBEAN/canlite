@@ -1,5 +1,5 @@
 (function() {
-    if(window.location.hostname.includes(".org") || window.location.hostname.includes(".psybolt")) {
+    if(window.location.hostname.includes(".org") || window.location.hostname.includes("psybolt")) {
         var adsenseScript = document.createElement('script');
         adsenseScript.async = true;
         adsenseScript.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1655414789495559';
