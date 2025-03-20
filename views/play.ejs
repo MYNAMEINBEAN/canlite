@@ -142,11 +142,18 @@
 
 <script>
     document.getElementById('fullscreen-btn').addEventListener('click', function() {
-        const iframe = document.getElementById('game-container');
+        const iframe = document.querySelector('#game-container iframe');
         if (iframe.requestFullscreen) {
             iframe.requestFullscreen();
+        } else if (iframe.mozRequestFullScreen) { // Firefox
+            iframe.mozRequestFullScreen();
+        } else if (iframe.webkitRequestFullscreen) { // Chrome, Safari and Opera
+            iframe.webkitRequestFullscreen();
+        } else if (iframe.msRequestFullscreen) { // IE/Edge
+            iframe.msRequestFullscreen();
         }
     });
+
 
     document.getElementById('refresh-btn').addEventListener('click', function() {
         const iframe = document.getElementById('game-container');
