@@ -161,7 +161,7 @@
 
 <!-- Background Particles -->
 <div id="particles-js"></div>
-<a id="next">Next Page</a>
+<a href="?page=<%= currentPage + 1 %>">Next Page</a>
 <script>
     const url = new URL(window.location.href);
     let currentPage = parseInt(url.searchParams.get("page")) || 1; // Ensure it's a number
