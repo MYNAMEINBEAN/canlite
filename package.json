@@ -18,11 +18,16 @@
         "revert": "git reset HEAD --hard && git clean -fd"
     },
     "dependencies": {
+        "@babel/generator": "^7.26.10",
+        "@babel/parser": "^7.26.10",
+        "@babel/traverse": "^7.26.10",
+        "@babel/types": "^7.26.10",
         "@fingerprintjs/botd": "^1.9.1",
         "@mercuryworkshop/bare-mux": "^2.1.6",
         "@mercuryworkshop/epoxy-transport": "^2.1.26",
         "@tomphttp/bare-server-node": "^2.0.5",
         "axios": "^1.7.5",
+        "cheerio": "^1.0.0",
         "chemicaljs": "^1.6.3",
         "child_process": "^1.0.2",
         "connect-redis": "^8.0.1",
