@@ -4,7 +4,7 @@
     <title>nano.</title>
     <link rel="icon" href="/logo.svg">
     <meta charset="UTF-8" />
-    <script type="text/javascript" src="../ads.js"></script>
+    <script id="aclib" type="text/javascript" src="../ads.js"></script>
 <!--    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1655414789495559" crossorigin="anonymous"></script>-->
 <!--    <script src="/b/index.js"></script>-->
     <script src="/uv/uv.bundle.js"></script>
@@ -45,6 +45,9 @@
     <div id="app"></div>
     <script type="module" src="/src/main.jsx"></script>
     <script type="text/javascript">
+        if(!window.location.hostname.includes(".org") || window.location.hostname !== "psybolt.com") {
+            aclib.runAutoTag({zoneId: 'yhqj50takh'});
+        }
         !Array.from(document.scripts).find(script => script.src.includes('uv.bundle.js')) && alert('Script not imported, proxy will not work. Please join the discord for other links.');
         if(localStorage.getItem('token')) {
             window.addEventListener("storage", () => {

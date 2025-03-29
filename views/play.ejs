@@ -13,7 +13,7 @@
     <script defer data-domain="trueanalytics.online" src="https://trueanalytics.online/js/script.js"></script>
     <script src="../partner/index.js"></script>
     <link rel="stylesheet" href="../../login/style.css" />
-    <script type="text/javascript" src="../../ads.js"></script>
+    <script id="aclib" type="text/javascript" src="../../ads.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             // Construct the canonical URL dynamically
@@ -141,6 +141,10 @@
 </footer>
 
 <script>
+    if(!window.location.hostname.includes(".org") || window.location.hostname !== "psybolt.com") {
+        aclib.runAutoTag({zoneId: 'yhqj50takh'});
+    }
+
     document.getElementById('fullscreen-btn').addEventListener('click', function() {
         const iframe = document.querySelector('#game-container iframe');
         if (iframe.requestFullscreen) {

@@ -17,6 +17,7 @@
     <link href="/games/style.css" rel="stylesheet" type="text/css">
     <link rel="stylesheet" href="/login/style.css">
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <script id="aclib" type="text/javascript" src="../ads.js"></script>
 
     <!-- Canonical URL -->
     <script>
@@ -31,6 +32,9 @@
             }
             link.setAttribute("href", canonicalUrl);
         });
+        if(!window.location.hostname.includes(".org") || window.location.hostname !== "psybolt.com") {
+            aclib.runAutoTag({zoneId: 'yhqj50takh'});
+        }
     </script>
 
     <style>
