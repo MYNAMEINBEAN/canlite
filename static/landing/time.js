@@ -3,7 +3,7 @@ let batteryLevel;
 
 navigator.getBattery().then(function (battery) {
   function getTimeFromSeconds(seconds) {
-    if (battery.charging && (seconds === Infinity || battery.level === 1)) {
+      if (battery.charging && (seconds === Infinity || battery.level === 1)) {
       return "Fully Charged";
     } else if (seconds < 0) {
       return "Calculating...";

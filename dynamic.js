@@ -24,9 +24,16 @@ import * as cheerio from "cheerio";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-const app = express();
-const bareServer = createBareServer("/b/");
 
+// ───────────────────────────────────────────────
+// Main (decoded) app: routes send raw content.
+const app = express();
+
+// ───────────────────────────────────────────────
+// The encrypted instance sits in front of app.
+const encrypted = express();
+
+const bareServer = createBareServer("/b/");
 let games = [];
 const gamesFilePath = path.join(__dirname, "end.json");
 try {
@@ -36,12 +43,13 @@ try {
     console.error("Failed to load games data:", err);
 }
 
-app.disable("x-powered-by");
-app.set("trust proxy", 1);
+encrypted.disable("x-powered-by");
+encrypted.set("trust proxy", 1);
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
 const reservedIdentifiers = new Set([
+    "Infinity",
     "console",
     "require",
     "module",
@@ -71,8 +79,7 @@ let redisStore = new RedisStore({
     prefix: "myapp:",
 });
 
-// Set cookie.secure to false in development (NODE_ENV not "production")
-app.use(
+encrypted.use(
     session({
         // store: redisStore,
         secret: process.env.EXPRESSJS_SECRET,
@@ -82,28 +89,12 @@ app.use(
     })
 );
 
-app.use(express.json({ limit: "50mb" }));
-app.use(express.urlencoded({ extended: true, limit: "50mb" }));
+encrypted.use(express.json({ limit: "50mb" }));
+encrypted.use(express.urlencoded({ extended: true, limit: "50mb" }));
 
 // ───────────────────────────────────────────────
-// OBFUSCATION SESSION MAPPING MIDDLEWARE
-app.use((req, res, next) => {
-    if (!req.session.obfuscationMapping) {
-        req.session.obfuscationMapping = {
-            identifiers: {},
-            classnames: {},
-            strings: {},
-            links: {},
-        };
-    }
-    if (!req.session.sessionKey) {
-        req.session.sessionKey = Math.random().toString(36).substring(2, 15);
-    }
-    next();
-});
+// Helper Functions
 
-// ───────────────────────────────────────────────
-// Helper Functions using crypto for unique hashes
 function getOrCreate(mapping, original, generator) {
     if (Object.prototype.hasOwnProperty.call(mapping, original)) {
         return mapping[original];
@@ -114,23 +105,282 @@ function getOrCreate(mapping, original, generator) {
     }
 }
 
+function getOrCreateClass(mapping, className, sessionKey) {
+    return getOrCreate(mapping, className, (name) =>
+        deterministicScrambleClass(name, sessionKey)
+    );
+}
+
+function getOrCreateId(mapping, idName, sessionKey) {
+    return getOrCreate(mapping, idName, (name) =>
+        scrambleIdentifier(name, sessionKey)
+    );
+}
+
 function hashString(str) {
     return crypto.createHash("md5").update(str).digest("hex");
 }
 
 function scrambleIdentifier(name, sessionKey) {
-    // Ensure the generated identifier starts with an underscore.
-    return "_" + sessionKey.slice(0, 5) + "_" + hashString("id:" + name + ":session:" + sessionKey).slice(0, 12);
+    return "_" + sessionKey.slice(0, 5) + "_" +
+        hashString("id:" + name + ":session:" + sessionKey).slice(0, 12);
 }
 
-function scrambleClass(className, sessionKey) {
-    // Ensure the generated class name starts with an underscore.
-    return "_" + sessionKey.slice(0, 5) + "_" + hashString("class:" + className + ":session:" + sessionKey).slice(0, 12);
+// ───────────────────────────────────────────────
+// Deterministic scramble for class names.
+function deterministicScrambleClass(className, sessionKey) {
+    return "_" + sessionKey.slice(0, 5) + "_" +
+        crypto.createHash("md5")
+            .update("class:" + className + ":session:" + sessionKey)
+            .digest("hex")
+            .slice(0, 12);
 }
 
 function scrambleLink(link, sessionKey) {
-    // Ensure the generated link token starts with an underscore.
-    return "_" + sessionKey.slice(0, 5) + "_" + hashString("link:" + link + ":session:" + sessionKey).slice(0, 12);
+    return "_" + sessionKey.slice(0, 5) + "_" +
+        hashString("link:" + link + ":session:" + sessionKey).slice(0, 12);
+}
+
+function obfuscateHTMLText(original, sessionKey) {
+    if (original.length <= 1) return original;
+    let pieces = [];
+    let i = 0;
+    while (i < original.length) {
+        let chunkLength = Math.floor(Math.random() * 3) + 1;
+        pieces.push(original.substr(i, chunkLength));
+        i += chunkLength;
+    }
+    return pieces.join("<!-- -->");
+}
+
+// ───────────────────────────────────────────────
+// Asset resolution helper (unchanged)
+function resolveAssetPath(href) {
+    console.log(href);
+    href = decodeURI(href);
+    console.log(href);
+    const segments = href.split("/");
+    const lastSegment = segments.pop() || "";
+    if (lastSegment.indexOf(".") === -1) {
+        return href;
+    }
+    const relativeHref = href.startsWith("/") ? href.slice(1) : href;
+    const candidates = [
+        { folder: "static", fullPath: path.join(__dirname, "static", relativeHref) },
+        { folder: "dist", fullPath: path.join(__dirname, "dist", relativeHref) }
+    ];
+    for (const candidate of candidates) {
+        if (fs.existsSync(candidate.fullPath)) {
+            console.log(path.posix.join("/", candidate.folder, relativeHref));
+            return path.posix.join("/", candidate.folder, relativeHref);
+        }
+    }
+    console.log(href.startsWith("/") ? href : "/" + href);
+    return href.startsWith("/") ? href : "/" + href;
+}
+
+// ───────────────────────────────────────────────
+// Transformation Functions
+//
+// We assume HTML text nodes contain only static content.
+// (UI text produced at runtime via concatenation in JS will not be touched by the Babel plugin.)
+async function transformHTML(code, sessionMapping, sessionKey) {
+    const $ = cheerio.load(code, { decodeEntities: false });
+    const debug = true;
+    const shouldRewrite = (url) =>
+        url &&
+        !url.startsWith("http://") &&
+        !url.startsWith("https://") &&
+        !url.startsWith("//") &&
+        !url.startsWith("data:") &&
+        !url.startsWith("mailto:");
+
+    $("*")
+        .contents()
+        .each(function () {
+            const parentTag = this.parent && this.parent.tagName ? this.parent.tagName.toLowerCase() : "";
+            if (parentTag === "script" || parentTag === "title" || parentTag === "style") return;
+            if (this.type === "text") {
+                let txt = $(this).text();
+                if (txt.trim().length > 1) {
+                    const obf = getOrCreate(sessionMapping.strings, txt, (str) => obfuscateHTMLText(str, sessionKey));
+                    if (debug) console.debug("Rewriting text node:", txt, "->", obf);
+                    $(this).replaceWith(obf);
+                }
+            }
+        });
+
+    // Process class attributes.
+    $("[class]").each(function () {
+        const origClasses = $(this)
+            .attr("class")
+            .trim()
+            .split(/\s+/);
+        const newClasses = origClasses.map((cls) =>
+            cls === "material-symbols-outlined"
+                ? cls
+                : getOrCreateClass(sessionMapping.classnames, cls, sessionKey)
+        );
+        if (debug) console.debug("Rewriting class attribute:", $(this).attr("class"), "->", newClasses.join(" "));
+        $(this).attr("class", newClasses.join(" "));
+    });
+
+    // Process id attributes.
+    $("[id]").each(function () {
+        const origId = $(this).attr("id").trim();
+        const newId = getOrCreateId(sessionMapping.ids, origId, sessionKey);
+        if (debug) console.debug("Rewriting id attribute:", origId, "->", newId);
+        $(this).attr("id", newId);
+    });
+
+    // Rewrite src attributes (for images and scripts).
+    $("[src]").each(function () {
+        let src = $(this).attr("src");
+        src = decodeURI(src);
+        if (!src || !shouldRewrite(src)) return;
+        let resolvedPath = resolveAssetPath(src);
+        const ext = path.extname(resolvedPath);
+        const obf = getOrCreate(sessionMapping.links, resolvedPath, (link) => scrambleLink(link, sessionKey));
+        const newSrc = "/" + obf + ext;
+        if (debug) console.debug(`Rewriting src on <${$(this).get(0).tagName}>: ${src} -> ${newSrc}`);
+        $(this).attr("src", newSrc);
+    });
+
+    // Rewrite href attributes (for stylesheets, links, etc.).
+    $("[href]").each(function () {
+        let href = $(this).attr("href");
+        if (!href || !shouldRewrite(href)) return;
+        let resolvedPath = resolveAssetPath(href);
+        const ext = path.extname(resolvedPath);
+        if (debug) console.debug("Resolved href path:", resolvedPath);
+        const obf = getOrCreate(sessionMapping.links, resolvedPath, (link) => scrambleLink(link, sessionKey));
+        const newHref = "/" + obf + ext;
+        if (debug) console.debug(`Rewriting href on <${$(this).get(0).tagName}>: ${href} -> ${newHref}`);
+        $(this).attr("href", newHref);
+    });
+
+    return $.html();
+}
+
+async function transformCSS(code, sessionMapping, sessionKey) {
+    code = code.replace(/(^|\s)\.([a-zA-Z0-9_-]+)/g, (match, prefix, origClass) => {
+        const newClass = deterministicScrambleClass(origClass, sessionKey);
+        return prefix + "." + newClass;
+    });
+    code = code.replace(/(["'])(.*?)\1/g, (match, quote, content) => {
+        if (content.length > 1) {
+            let pieces = [];
+            let i = 0;
+            while (i < content.length) {
+                let chunkLength = Math.floor(Math.random() * 3) + 1;
+                pieces.push(content.substr(i, chunkLength));
+                i += chunkLength;
+            }
+            const obfContent = pieces.join("/* */");
+            return quote + obfContent + quote;
+        }
+        return match;
+    });
+    return code;
+}
+
+// ───────────────────────────────────────────────
+// Babel Plugin for JS Transformation
+//
+// We now add a check to skip obfuscation for short string literals (length < 4),
+// which covers cases like "AM", "PM", etc.
+function obfuscationPlugin(sessionMapping, sessionKey) {
+    return {
+        visitor: {
+            Identifier(path) {
+                // Do not change member expressions or keys.
+                if (
+                    path.parent &&
+                    t.isMemberExpression(path.parent) &&
+                    path.parent.property === path.node &&
+                    !path.parent.computed
+                ) {
+                    return;
+                }
+                if (path.key === "key") return;
+                const orig = path.node.name;
+                if (reservedIdentifiers.has(orig)) return;
+                const newName = getOrCreate(sessionMapping.identifiers, orig, (name) =>
+                    scrambleIdentifier(name, sessionKey)
+                );
+                path.node.name = newName;
+            },
+            StringLiteral(path) {
+                // Skip module specifiers.
+                if (
+                    path.parent &&
+                    (
+                        (path.parent.type === "ImportDeclaration" && path.key === "source") ||
+                        (path.parent.type === "ExportNamedDeclaration" && path.key === "source") ||
+                        (path.parent.type === "ExportAllDeclaration" && path.key === "source") ||
+                        (path.parent.type === "CallExpression" && path.parent.callee.name === "require")
+                    )
+                ) {
+                    return;
+                }
+                if (path.node._obfuscated) return;
+                const orig = path.node.value;
+
+                // **** FIX: Skip obfuscation for string literals that appear to be HTML markup.
+                if (orig.includes("<") || orig.includes(">")) {
+                    return;
+                }
+
+                // New check: skip short literals (likely runtime UI values like "AM"/"PM").
+                if (orig.length < 4) {
+                    return;
+                }
+
+                // Check for common DOM id lookups.
+                if (
+                    path.parent && path.parent.type === "CallExpression" &&
+                    path.parent.callee &&
+                    (
+                        (path.parent.callee.type === "MemberExpression" &&
+                            path.parent.callee.property &&
+                            path.parent.callee.property.name === "getElementById") ||
+                        (path.parent.callee.type === "MemberExpression" &&
+                            path.parent.callee.property &&
+                            path.parent.callee.property.name === "querySelector" &&
+                            orig.startsWith("#"))
+                    )
+                ) {
+                    let idValue = orig.startsWith("#") ? orig.slice(1) : orig;
+                    const newId = getOrCreateId(sessionMapping.ids, idValue, sessionKey);
+                    path.node.value = orig.startsWith("#") ? "#" + newId : newId;
+                    return;
+                }
+
+                // For plain strings that match an ID pattern and exist in the mapping, use it.
+                if (/^[a-zA-Z0-9_-]+$/.test(orig) && sessionMapping.ids[orig]) {
+                    path.node.value = sessionMapping.ids[orig];
+                    return;
+                }
+
+                // Otherwise, if the string is a valid class name, use the class mapping.
+                if (/^[a-zA-Z0-9_-]+$/.test(orig)) {
+                    path.node.value = getOrCreateClass(sessionMapping.classnames, orig, sessionKey);
+                } else if (orig.length > 1) {
+                    const obf = getOrCreate(sessionMapping.strings, orig, (str) => obfuscateJSString(str, sessionKey));
+                    const parsed = babelParser.parseExpression(obf, { plugins: ["jsx"] });
+                    parsed._obfuscated = true;
+                    path.replaceWith(parsed);
+                }
+            },
+        },
+    };
+}
+
+function transformJS(code, sessionMapping, sessionKey) {
+    const ast = babelParser.parse(code, { sourceType: "module", plugins: ["jsx"] });
+    const traverseFn = typeof traverse === "function" ? traverse : traverse.default;
+    traverseFn(ast, obfuscationPlugin(sessionMapping, sessionKey).visitor);
+    return generate.default(ast, {}).code;
 }
 
 function obfuscateJSString(original, sessionKey) {
@@ -149,346 +399,149 @@ function obfuscateJSString(original, sessionKey) {
     return generate.default(expr).code;
 }
 
-function obfuscateHTMLText(original, sessionKey) {
-    if (original.length <= 1) return original;
-    let pieces = [];
-    let i = 0;
-    while (i < original.length) {
-        let chunkLength = Math.floor(Math.random() * 3) + 1;
-        pieces.push(original.substr(i, chunkLength));
-        i += chunkLength;
-    }
-    return pieces.join("<!-- -->");
-}
+// ───────────────────────────────────────────────
+// Static routes for UV files – read and send raw content.
+const uvFiles = [
+    { route: "/uv/sw.js", file: "static/uv/sw.js", type: "application/javascript" },
+    { route: "/~/uv/uv/uv.bundle.js", file: "static/uv/uv.bundle.js", type: "application/javascript" },
+    { route: "/~/uv/uv/uv.config.js", file: "static/uv/uv.config.js", type: "application/javascript" },
+    { route: "/~/uv/uv/uv.handler.js", file: "static/uv/uv.handler.js", type: "application/javascript" }
+];
+
+uvFiles.forEach(({ route, file, type }) => {
+    encrypted.get(route, async (req, res, next) => {
+        try {
+            const filePath = path.join(__dirname, file);
+            const data = await fs.promises.readFile(filePath, "utf8");
+            res.set("Content-Type", type);
+            res.send(data);
+        } catch (err) {
+            next(err);
+        }
+    });
+});
 
 // ───────────────────────────────────────────────
-// Asset resolution helper: checks /static first then /dist
-function resolveAssetPath(href) {
-    href = decodeURI(href);
-    // If the URL doesn’t contain a period in its last path segment, assume it's dynamic.
-    const segments = href.split("/");
-    const lastSegment = segments.pop() || "";
-    if (lastSegment.indexOf(".") === -1) {
-        // No file extension found; return href as-is.
-        return href;
-    }
-
-    // Otherwise, try to resolve from /static then /dist.
-    const relativeHref = href.startsWith("/") ? href.slice(1) : href;
-    const candidates = [
-        { folder: "static", fullPath: path.join(__dirname, "static", relativeHref) },
-        { folder: "dist", fullPath: path.join(__dirname, "dist", relativeHref) }
-    ];
-    for (const candidate of candidates) {
-        if (fs.existsSync(candidate.fullPath)) {
-            console.log(path.posix.join("/", candidate.folder, relativeHref))
-            return path.posix.join("/", candidate.folder, relativeHref);
+// encoding function
+async function encode(req, res, body) {
+    console.log("Called encode")
+    let transformed = body;
+    const contentType = res.get("Content-Type") || "";
+    console.log("Content type: " + contentType)
+    if (typeof body === "string") {
+        try {
+            if (contentType.includes("text/html")) {
+                transformed = await transformHTML(body, req.session.obfuscationMapping, req.session.sessionKey);
+            } else if (contentType.includes("application/javascript")) {
+                transformed = transformJS(body, req.session.obfuscationMapping, req.session.sessionKey);
+            } else if (contentType.includes("text/css")) {
+                transformed = await transformCSS(body, req.session.obfuscationMapping, req.session.sessionKey);
+            }
+            res.send(transformed);
+        } catch (e) {
+            console.error("Error encoding response:", e);
         }
     }
-    console.log(href.startsWith("/") ? href : "/" + href);
-    return href.startsWith("/") ? href : "/" + href;
 }
 
 // ───────────────────────────────────────────────
-// Transformation Functions
-function transformHTML(code, sessionMapping, sessionKey) {
-    const $ = cheerio.load(code, { decodeEntities: false });
-    const debug = true;
-    const shouldRewrite = (url) =>
-        url &&
-        !url.startsWith("http://") &&
-        !url.startsWith("https://") &&
-        !url.startsWith("//") &&
-        !url.startsWith("data:") &&
-        !url.startsWith("mailto:") &&
-        !url.startsWith("/o/");
+// Landing page route
+app.get("/", async (req, res, next) => {
+    try {
+        const filePath = path.join(__dirname, "static", "landing", "index.html");
+        const data = await fs.promises.readFile(filePath, "utf8");
+        res.set("Content-Type", "text/html");
+        await encode(req, res, data);
+    } catch (err) {
+        next(err);
+    }
+});
 
-    $("*")
-        .contents()
-        .each(function () {
-            // Skip obfuscation if parent is <script> or <title>
-            const parentTag = this.parent && this.parent.tagName ? this.parent.tagName.toLowerCase() : "";
-            if (parentTag === "script" || parentTag === "title" || parentTag === "style") return;
-            if (this.type === "text") {
-                let txt = $(this).text();
-                if (txt.trim().length > 1) {
-                    const obf = getOrCreate(sessionMapping.strings, txt, (str) => obfuscateHTMLText(str, sessionKey));
-                    if (debug) console.debug("Rewriting text node:", txt, "->", obf);
-                    $(this).replaceWith(obf);
-                }
+app.get("/proxe", async (req, res, next) => {
+    try {
+        const filePath = path.join(__dirname, "dist", "index.html");
+        const data = await fs.promises.readFile(filePath, "utf8");
+        res.set("Content-Type", "text/html");
+        await encode(req, res, data);
+    } catch (err) {
+        next(err);
+    }
+});
+
+// Games list route
+app.get("/games", async (req, res, next) => {
+    try {
+        console.log("Called games")
+        const perPage = 100;
+        let search = req.query.search || "";
+        let page = parseInt(req.query.page) || 1;
+
+        const filteredGames = games.filter((game) =>
+            game.name.toLowerCase().includes(search.toLowerCase())
+        );
+        const total = filteredGames.length;
+        const totalPages = Math.ceil(total / perPage);
+        if (page < 1) page = 1;
+        if (page > totalPages) page = totalPages;
+
+        const sortedGames = filteredGames.sort((a, b) => a.name.localeCompare(b.name));
+        const startIndex = (page - 1) * perPage;
+        const paginatedGames = sortedGames.slice(startIndex, startIndex + perPage);
+
+        const obfuscateLink = (link) => {
+            if (!req.session.obfuscationMapping.links[link]) {
+                req.session.obfuscationMapping.links[link] = scrambleLink(link, req.session.sessionKey);
+            }
+            return req.session.obfuscationMapping.links[link];
+        };
+        console.log("Got to res render")
+        res.render("games", { games: paginatedGames, currentPage: page, totalPages, obfuscateLink }, async (err, html) => {
+            console.log("In res render")
+            if (err) console.log("ERR " + err);
+            if (err) return next(err);
+            try {
+                console.log("Trying to render")
+                res.set("Content-Type", "text/html");
+                await encode(req, res, html);
+            } catch (encodingError) {
+                console.log("Game error")
+                next(encodingError);
             }
         });
-
-    $("[class]").each(function () {
-        // Skip obfuscation for classes matching "material-symbols-outlined"
-        const origClasses = $(this)
-            .attr("class")
-            .trim()
-            .split(/\s+/);
-        const newClasses = origClasses.map((cls) =>
-            cls === "material-symbols-outlined"
-                ? cls
-                : getOrCreate(sessionMapping.classnames, cls, (name) => scrambleClass(name, sessionKey))
-        );
-        if (debug) console.debug("Rewriting class attribute:", $(this).attr("class"), "->", newClasses.join(" "));
-        $(this).attr("class", newClasses.join(" "));
-    });
-
-    $("[src]").each(function () {
-        let src = $(this).attr("src");
-        src = decodeURI(src);
-        if (!src || !shouldRewrite(src)) return;
-        let resolvedPath = resolveAssetPath(src);
-        const obf = getOrCreate(sessionMapping.links, resolvedPath, (link) => scrambleLink(link, sessionKey));
-        const newSrc = "/o/" + obf;
-        if (debug) console.debug(`Rewriting src on <${$(this).get(0).tagName}>: ${src} -> ${newSrc}`);
-        $(this).attr("src", newSrc);
-    });
-
-    $("[href]").each(function () {
-        let href = $(this).attr("href");
-        if (!href || !shouldRewrite(href)) return;
-        let resolvedPath = resolveAssetPath(href);
-        if (debug) console.debug("Resolved href path:", resolvedPath);
-        const obf = getOrCreate(sessionMapping.links, resolvedPath, (link) => scrambleLink(link, sessionKey));
-        const newHref = "/o/" + obf;
-        if (debug) console.debug(`Rewriting href on <${$(this).get(0).tagName}>: ${href} -> ${newHref}`);
-        $(this).attr("href", newHref);
-    });
-
-    return $.html();
-}
-
-function transformCSS(code, sessionMapping, sessionKey) {
-    // Only replace class selectors outside url(...) constructs.
-    code = code.replace(/(^|\s)\.([a-zA-Z0-9_-]+)/g, (match, prefix, origClass) => {
-        const newClass = getOrCreate(sessionMapping.classnames, origClass, (name) => scrambleClass(name, sessionKey));
-        return prefix + "." + newClass;
-    });
-
-    // Obfuscate string literals in CSS (e.g., font names) while preserving quotes.
-    code = code.replace(/(["'])(.*?)\1/g, (match, quote, content) => {
-        if (content.length > 1) {
-            let pieces = [];
-            let i = 0;
-            while (i < content.length) {
-                let chunkLength = Math.floor(Math.random() * 3) + 1;
-                pieces.push(content.substr(i, chunkLength));
-                i += chunkLength;
-            }
-            const obfContent = pieces.join("/* */");
-            return quote + obfContent + quote;
-        }
-        return match;
-    });
-    return code;
-}
-
-function obfuscationPlugin(sessionMapping, sessionKey) {
-    return {
-        visitor: {
-            Identifier(path) {
-                // Skip member expressions and object keys.
-                if (
-                    path.parent &&
-                    t.isMemberExpression(path.parent) &&
-                    path.parent.property === path.node &&
-                    !path.parent.computed
-                ) {
-                    return;
-                }
-                if (path.key === "key") return;
-                const orig = path.node.name;
-                // Skip reserved identifiers.
-                if (reservedIdentifiers.has(orig)) return;
-                const newName = getOrCreate(sessionMapping.identifiers, orig, (name) =>
-                    scrambleIdentifier(name, sessionKey)
-                );
-                path.node.name = newName;
-            },
-            StringLiteral(path) {
-                // Skip module specifiers (import/export declarations or require calls)
-                if (
-                    path.parent &&
-                    (
-                        (path.parent.type === "ImportDeclaration" && path.key === "source") ||
-                        (path.parent.type === "ExportNamedDeclaration" && path.key === "source") ||
-                        (path.parent.type === "ExportAllDeclaration" && path.key === "source") ||
-                        (path.parent.type === "CallExpression" && path.parent.callee.name === "require")
-                    )
-                ) {
-                    return;
-                }
-                // Avoid transforming already-obfuscated nodes.
-                if (path.node._obfuscated) return;
-
-                const orig = path.node.value;
-                // If the string looks like HTML (or contains tokens that may break valid JS), skip it.
-                if (orig.includes("<") || orig.includes(">")) return;
-
-                if (/^[a-zA-Z0-9_-]+$/.test(orig)) {
-                    const newClass = getOrCreate(sessionMapping.classnames, orig, (name) => scrambleClass(name, sessionKey));
-                    path.node.value = newClass;
-                } else if (orig.length > 1) {
-                    const obf = getOrCreate(sessionMapping.strings, orig, (str) => obfuscateJSString(str, sessionKey));
-                    const parsed = babelParser.parseExpression(obf, { plugins: ["jsx"] });
-                    parsed._obfuscated = true;
-                    path.replaceWith(parsed);
-                }
-            },
-        },
-    };
-}
-
-function transformJS(code, sessionMapping, sessionKey) {
-    const ast = babelParser.parse(code, { sourceType: "module", plugins: ["jsx"] });
-    // Use traverse; ensure we use the correct function (default or not)
-    const traverseFn = typeof traverse === "function" ? traverse : traverse.default;
-    traverseFn(ast, obfuscationPlugin(sessionMapping, sessionKey).visitor);
-    return generate.default(ast, {}).code;
-}
-
-// ───────────────────────────────────────────────
-// STATIC ROUTES THAT SHOULD REMAIN UNCHANGED
-app.get("/uv/sw.js", (req, res) => {
-    res.set("Service-Worker-Allowed", "/~/uv/");
-    res.sendFile(path.join(__dirname, "static/uv/sw.js"));
-});
-app.get("/~/uv/uv/uv.bundle.js", (req, res) => {
-    res.sendFile(path.join(__dirname, "static/uv/uv.bundle.js"));
-});
-app.get("/~/uv/uv/uv.config.js", (req, res) => {
-    res.sendFile(path.join(__dirname, "static/uv/uv.config.js"));
-});
-app.get("/~/uv/uv/uv.handler.js", (req, res) => {
-    res.sendFile(path.join(__dirname, "static/uv/uv.handler.js"));
-});
-app.get("/validate-domain", (req, res) => {
-    res.status(200).send("OK");
-});
-app.get("/stats", verifyUser, (req, res) => {
-    res.sendFile(path.join(__dirname, "private/stats/index.html"));
+    } catch (error) {
+        next(error);
+    }
 });
 
-// ───────────────────────────────────────────────
-// MAIN APP ROUTES
-app.get("/", (req, res, next) => {
-    const filePath = path.join(__dirname, "static", "landing", "index.html");
-    fs.readFile(filePath, "utf8", (err, data) => {
-        if (err) return next(err);
-        const mapping = req.session.obfuscationMapping;
-        const key = req.session.sessionKey;
-        try {
-            const transformed = transformHTML(data, mapping, key);
-            res.set("Content-Type", "text/html");
-            res.send(transformed);
-        } catch (e) {
-            next(e);
-        }
-    });
-});
-
-app.get("/games", (req, res, next) => {
-    const perPage = 100;
-    let search = req.query.search || "";
-    let page = parseInt(req.query.page) || 1;
-
-    const filteredGames = games.filter((game) =>
-        game.name.toLowerCase().includes(search.toLowerCase())
-    );
-    const total = filteredGames.length;
-    const totalPages = Math.ceil(total / perPage);
-    if (page < 1) page = 1;
-    if (page > totalPages) page = totalPages;
-    const sortedGames = filteredGames.sort((a, b) => a.name.localeCompare(b.name));
-    const startIndex = (page - 1) * perPage;
-    const paginatedGames = sortedGames.slice(startIndex, startIndex + perPage);
-
-    const obfuscateLink = (link) => {
-        if (!req.session.obfuscationMapping.links[link]) {
-            req.session.obfuscationMapping.links[link] = scrambleLink(link, req.session.sessionKey);
-        }
-        return req.session.obfuscationMapping.links[link];
-    };
-
-    // Render the view to a string
-    res.render("games", { games: paginatedGames, currentPage: page, totalPages, obfuscateLink }, (err, html) => {
-        if (err) return next(err);
-        try {
-            const mapping = req.session.obfuscationMapping;
-            const key = req.session.sessionKey;
-            const transformed = transformHTML(html, mapping, key);
-            res.send(transformed);
-        } catch (e) {
-            next(e);
-        }
-    });
-});
-
-
+// Play a game route
 app.get("/play/:id", (req, res) => {
     const gameName = req.params.id;
     const game = games.find((g) => g.name === gameName);
     if (!game) {
         return res.status(404).send("Game not found");
     }
-
     const obfuscateLink = (link) => {
         if (!req.session.obfuscationMapping.links[link]) {
             req.session.obfuscationMapping.links[link] = scrambleLink(link, req.session.sessionKey);
         }
         return req.session.obfuscationMapping.links[link];
     };
-
     res.render("play", { game, obfuscateLink });
 });
 
 // ───────────────────────────────────────────────
-// OBFUSCATED LINK HANDLING
-app.get("/o/:obf", (req, res, next) => {
-    console.log("Called /o route with", req.params.obf);
-    console.log("Session ID:", req.session.id);
-    const mapping = req.session.obfuscationMapping;
-    // console.log("Mapping:", mapping.links);
-    if (mapping && mapping.links) {
-        const original = Object.keys(mapping.links).find((key) => mapping.links[key] === req.params.obf);
-        if (original) {
-            console.log("Found mapping:", original);
-            req.url = original;
-            console.log(req.url)
-            return app(req, res);
-        } else {
-            console.log("No original found for obf:", req.params.obf);
-        }
-    } else {
-        console.log("Mapping is not set correctly");
-    }
-    res.status(404).send("Not found");
-});
-
-// ───────────────────────────────────────────────
-// API Routes & Cache Headers
+// API Routes & static asset routes
 app.use("/api", apiRoutes);
 
-// ───────────────────────────────────────────────
-// ROUTE HANDLING FOR ASSET OBFUSCATION
-// ───────────────────────────────────────────────
-// STATIC ASSET ROUTE (for /static and /dist)
-app.get(["/:folder(static|dist)/*"], (req, res, next) => {
-    const folder = req.params.folder;
-    const fileSubPath = req.params[0] || "";
-    const filePath = path.join(__dirname, folder, fileSubPath);
-    const ext = path.extname(filePath).toLowerCase();
-    const mapping = req.session.obfuscationMapping;
-    const key = req.session.sessionKey;
-
-    // List of extensions that should be read as binary (images, fonts, etc.)
-    const binaryExtensions = [".png", ".jpg", ".jpeg", ".gif", ".ico", ".svg", ".woff", ".woff2", ".ttf", ".eot"];
-
-    if (binaryExtensions.includes(ext)) {
-        fs.readFile(filePath, (err, data) => {
-            if (err) return next(err);
-            // Simple Content-Type mapping (consider using a MIME library for production)
+// Static asset handler (async)
+app.get(["/:folder(static|dist)/*"], async (req, res, next) => {
+    try {
+        const folder = req.params.folder;
+        const fileSubPath = req.params[0] || "";
+        const filePath = path.join(__dirname, folder, fileSubPath);
+        const ext = path.extname(filePath).toLowerCase();
+        if ([".png", ".jpg", ".jpeg", ".gif", ".ico", ".svg", ".woff", ".woff2", ".ttf", ".eot"].includes(ext)) {
+            const data = await fs.promises.readFile(filePath);
             const contentTypes = {
                 ".png": "image/png",
                 ".webp": "image/webp",
@@ -504,34 +557,25 @@ app.get(["/:folder(static|dist)/*"], (req, res, next) => {
             };
             res.set("Content-Type", contentTypes[ext] || "application/octet-stream");
             res.send(data);
-        });
-    } else {
-        // For text-based files use UTF-8.
-        fs.readFile(filePath, "utf8", (err, data) => {
-            if (err) return next(err);
-            let transformed = data;
-            try {
-                if (ext === ".js") {
-                    transformed = transformJS(data, mapping, key);
-                    res.set("Content-Type", "application/javascript");
-                } else if (ext === ".html") {
-                    transformed = transformHTML(data, mapping, key);
-                    res.set("Content-Type", "text/html");
-                } else if (ext === ".css") {
-                    transformed = transformCSS(data, mapping, key);
-                    res.set("Content-Type", "text/css");
-                } else {
-                    res.set("Content-Type", "text/plain");
-                }
-                res.send(transformed);
-            } catch (e) {
-                next(e);
+        } else {
+            const data = await fs.promises.readFile(filePath, "utf8");
+            if (ext === ".js") {
+                res.set("Content-Type", "application/javascript");
+            } else if (ext === ".html") {
+                res.set("Content-Type", "text/html");
+            } else if (ext === ".css") {
+                res.set("Content-Type", "text/css");
+            } else {
+                res.set("Content-Type", "text/plain");
             }
-        });
+            await encode(req, res, data);
+        }
+    } catch (err) {
+        next(err);
     }
 });
 
-app.use((req, res, next) => {
+encrypted.use((req, res, next) => {
     if (
         req.path.endsWith(".png") ||
         req.path.endsWith(".jpg") ||
@@ -545,6 +589,48 @@ app.use((req, res, next) => {
     next();
 });
 
+// ───────────────────────────────────────────────
+// Obfuscation session mapping middleware (async)
+encrypted.use((req, res, next) => {
+    if (!req.session.obfuscationMapping) {
+        req.session.obfuscationMapping = {
+            identifiers: {},
+            classnames: {},
+            ids: {},
+            strings: {},
+            links: {},
+        };
+    }
+    if (!req.session.sessionKey) {
+        req.session.sessionKey = Math.random().toString(36).substring(2, 15);
+    }
+    next();
+});
+
+// ───────────────────────────────────────────────
+// Encrypted wrapper middleware: decode incoming requests if needed,
+// and override res.send so that every response passes through the encoding functions.
+encrypted.use((req, res, next) => {
+    const fullToken = req.path.slice(1); // remove leading '/'
+    const dotIndex = fullToken.lastIndexOf(".");
+    let tokenBase;
+    if (dotIndex > -1) {
+        tokenBase = fullToken.substring(0, dotIndex);
+    } else {
+        tokenBase = fullToken;
+    }
+    const mapping = req.session && req.session.obfuscationMapping && req.session.obfuscationMapping.links;
+    for (const key in mapping) {
+        if (mapping[key] === tokenBase) {
+            req.url = key;
+            break;
+        }
+    }
+    app(req, res);
+});
+
+// ───────────────────────────────────────────────
+// Server setup: all requests go to the encrypted instance.
 const server = http.createServer();
 
 server.on("request", async (req, res) => {
@@ -562,7 +648,7 @@ server.on("request", async (req, res) => {
             }
             bareServer.routeRequest(req, res);
         } else {
-            app(req, res);
+            encrypted(req, res);
         }
     } catch (error) {
         console.error("Request error:", error);
