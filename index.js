@@ -49,7 +49,7 @@ let redisStore = new RedisStore({
 });
 app.use(
   session({
-    // store: redisStore,
+    store: redisStore,
     secret: process.env.EXPRESSJS_SECRET,
     resave: false,
     saveUninitialized: false,
