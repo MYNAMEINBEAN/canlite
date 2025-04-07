@@ -35,3 +35,4 @@ dist-ssr
 /static/cdn
 /static/gameAssets
 /static/gameAssets
+static/ads.js
