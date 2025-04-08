@@ -44,49 +44,36 @@
             z-index: 10000;
         }
     </style>
-    <script defer>
-        function closeAd() {
-            const popup = document.getElementById("popup-ad");
-            if (popup) popup.style.display = "none";
-        }
+    <script>
+    function closeAd() {
+        const popup = document.getElementById("popup-ad");
+        if (popup) popup.style.display = "none";
+    }
 
-        window.addEventListener("DOMContentLoaded", () => {
-            // Update canonical
-            const canonical = document.querySelector("link[rel='canonical']");
-            if (canonical) {
-                canonical.href = `https://canlite.org${location.pathname}${location.search}`;
+    window.onload = () => {
+        // Show popup ad immediately
+        const popup = document.getElementById("popup-ad");
+        const closeBtn = document.getElementById("closeBtn");
+        popup.style.display = "flex";
+
+        let countdown = 5;
+        const interval = setInterval(() => {
+            countdown--;
+            closeBtn.textContent = `Close (${countdown})`;
+            if (countdown <= 0) {
+                clearInterval(interval);
+                closeBtn.textContent = "Close";
+                closeBtn.disabled = false;
             }
+        }, 1000);
 
-            // Save localStorage changes if token exists
-            if (localStorage.getItem('token')) {
-                window.addEventListener("storage", () => {
-                    const { token, ...rest } = localStorage;
-                    fetch(`https://${location.hostname}/api/saveGameData`, {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ token, localStorageData: rest })
-                    }).then(res => res.json())
-                        .then(data => console.log("LocalStorage saved:", data))
-                        .catch(err => console.error("Save failed:", err));
-                });
-            }
+        // Register service worker
+        navigator.serviceWorker.register("/uv/sw.js", {
+            scope: __uv$config.prefix
+        }).catch(err => console.error("Service worker registration failed:", err));
+    };
+</script>
 
-            // Check UV script loaded
-            if (!Array.from(document.scripts).some(s => s.src.includes('uv.bundle.js'))) {
-                alert('Script not imported, proxy will not work. Please join the discord for other links.');
-            }
-        });
-
-        window.onload = () => {
-            // Show popup ad immediately
-            document.getElementById("popup-ad").style.display = "flex";
-
-            // Register service worker
-            navigator.serviceWorker.register("/uv/sw.js", {
-                scope: __uv$config.prefix
-            }).catch(err => console.error("Service worker registration failed:", err));
-        };
-    </script>
 </head>
 <body>
 <div id="app"></div>
