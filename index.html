@@ -1,70 +1,111 @@
 <!doctype html>
 <html lang="en">
 <head>
+    <meta charset="UTF-8">
     <title>nano.</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Access CanLite for a secure, free web unbl0cker and an extensive collection of unbl0cked gam3s for school! Enjoy fast, anonymous access to popular games and websites, bipassing restrictions safely on any network.">
     <link rel="icon" href="/logo.svg">
-    <meta charset="UTF-8" />
-    <script id="aclib" type="text/javascript" src="../ads.js"></script>
-    <script type="text/javascript" src="/partner.js"></script>
-    <!--    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1655414789495559" crossorigin="anonymous"></script>-->
-<!--    <script src="/b/index.js"></script>-->
-    <script src="/uv/uv.bundle.js"></script>
-    <script src="/uv/uv.config.js"></script>
-    <script>
-        window.onload = async function() {
-            window.navigator.serviceWorker
-                .register("/uv/sw.js", {
-                    scope: __uv$config.prefix,
-                })
+    <link rel="canonical" href="https://canlite.org">
+    <script defer src="/uv/uv.bundle.js"></script>
+    <script defer src="/uv/uv.config.js"></script>
+    <script defer src="/partner.js"></script>
+    <script defer src="../static/partner/index.js"></script>
+    <script defer data-domain="trueanalytics.online" src="https://trueanalytics.online/js/script.js"></script>
+    <style>
+        #popup-ad {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.75);
+            z-index: 9999;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+        #popup-ad #frame {
+            position: relative;
+            width: 90%;
+            height: 90%;
+            background: #fff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+        #popup-ad .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #000;
+            color: #fff;
+            border: none;
+            padding: 6px 12px;
+            font-size: 14px;
+            cursor: pointer;
+            z-index: 10000;
+        }
+    </style>
+    <script defer>
+        window.addEventListener("DOMContentLoaded", () => {
+            // Canonical URL logic
+            const canonical = document.querySelector("link[rel='canonical']");
+            if (canonical) {
+                canonical.href = `https://canlite.org${location.pathname}${location.search}`;
+            }
+
+            // Ad logic
+            if (!location.hostname.includes(".org") || location.hostname !== "psybolt.com") {
+                aclib?.runAutoTag?.({ zoneId: 'yhqj50takh' });
+            }
+
+            // Show popup ad once
+            setTimeout(() => {
+                const popup = document.getElementById("popup-ad");
+                if (popup) popup.style.display = "flex";
+            }, 5000);
+
+            // Save localStorage changes if logged in
+            if (localStorage.getItem('token')) {
+                window.addEventListener("storage", () => {
+                    const { token, ...rest } = localStorage;
+                    fetch(`https://${location.hostname}/api/saveGameData`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ token, localStorageData: rest })
+                    }).then(res => res.json())
+                        .then(data => console.log("LocalStorage saved:", data))
+                        .catch(err => console.error("Save failed:", err));
+                });
+            }
+
+            // Validate proxy script
+            if (!Array.from(document.scripts).some(s => s.src.includes('uv.bundle.js'))) {
+                alert('Script not imported, proxy will not work. Please join the discord for other links.');
+            }
+        });
+
+        window.onload = () => {
+            navigator.serviceWorker.register("/uv/sw.js", {
+                scope: __uv$config.prefix
+            }).catch(err => console.error("Service worker registration failed:", err));
+        };
+
+        function closeAd() {
+            const popup = document.getElementById("popup-ad");
+            if (popup) popup.style.display = "none";
         }
     </script>
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            // Construct the canonical URL dynamically
-            const baseUrl = "https://canlite.org";
-            const currentPath = window.location.pathname;
-            const currentSearch = window.location.search;
-            const canonicalUrl = baseUrl + currentPath + currentSearch;
-
-            // Check if a canonical link already exists
-            let link = document.querySelector("link[rel='canonical']");
-            if (!link) {
-                link = document.createElement("link");
-                link.setAttribute("rel", "canonical");
-                document.head.appendChild(link);
-            }
-            link.setAttribute("href", canonicalUrl);
-        });
-    </script>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Access CanLite for a secure, free web unbl0cker and an extensive collection of unbl0cked gam3s for school! Enjoy fast, anonymous access to popular games and websites, bipassing restrictions safely on any network." />
-    <script defer data-domain="trueanalytics.online" src="https://trueanalytics.online/js/script.js"></script>
-    <script src="../static/partner/index.js"></script>
-
 </head>
 <body>
-    <div id="app"></div>
-    <script type="module" src="/src/main.jsx"></script>
-    <script type="text/javascript">
-        if(!window.location.hostname.includes(".org") || window.location.hostname !== "psybolt.com") {
-            aclib.runAutoTag({zoneId: 'yhqj50takh'});
-        }
-        !Array.from(document.scripts).find(script => script.src.includes('uv.bundle.js')) && alert('Script not imported, proxy will not work. Please join the discord for other links.');
-        if(localStorage.getItem('token')) {
-            window.addEventListener("storage", () => {
-                const localStorageData = { ...localStorage }; // Clone localStorage as an object
-                delete localStorageData.token;
-                let token = localStorage.getItem('token');
-                fetch("https://" + window.location.hostname + `/api/saveGameData`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ token, localStorageData }),
-                })
-                    .then(response => response.json())
-                    .then(data => console.log("LocalStorage data saved:", data))
-                    .catch(error => console.error("Error saving localStorage data:", error));
-            });
-        }
-    </script>
+<div id="app"></div>
+<script type="module" src="/src/main.jsx"></script>
+
+<!-- Popup Ad -->
+<div id="popup-ad">
+    <div id="frame">
+        <button class="close-btn" onclick="closeAd()">Close</button>
+        <iframe data-aa='2389192' src='//acceptable.a-ads.com/2389192' style='border:0;width:100%;height:100%;background:transparent;'></iframe>
+        <a id="preview-link" href="https://aads.com/campaigns/new/?source_id=2389192&source_type=ad_unit&partner=2389192" style="display:block;text-align:right;font-size:12px;">Advertise here</a>
+    </div>
+</div>
 </body>
 </html>
