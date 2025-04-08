@@ -45,25 +45,19 @@
         }
     </style>
     <script defer>
+        function closeAd() {
+            const popup = document.getElementById("popup-ad");
+            if (popup) popup.style.display = "none";
+        }
+
         window.addEventListener("DOMContentLoaded", () => {
-            // Canonical URL logic
+            // Update canonical
             const canonical = document.querySelector("link[rel='canonical']");
             if (canonical) {
                 canonical.href = `https://canlite.org${location.pathname}${location.search}`;
             }
 
-            // Ad logic
-            if (!location.hostname.includes(".org") || location.hostname !== "psybolt.com") {
-                aclib?.runAutoTag?.({ zoneId: 'yhqj50takh' });
-            }
-
-            // Show popup ad once
-            setTimeout(() => {
-                const popup = document.getElementById("popup-ad");
-                if (popup) popup.style.display = "flex";
-            }, 5000);
-
-            // Save localStorage changes if logged in
+            // Save localStorage changes if token exists
             if (localStorage.getItem('token')) {
                 window.addEventListener("storage", () => {
                     const { token, ...rest } = localStorage;
@@ -77,22 +71,21 @@
                 });
             }
 
-            // Validate proxy script
+            // Check UV script loaded
             if (!Array.from(document.scripts).some(s => s.src.includes('uv.bundle.js'))) {
                 alert('Script not imported, proxy will not work. Please join the discord for other links.');
             }
         });
 
         window.onload = () => {
+            // Show popup ad immediately
+            document.getElementById("popup-ad").style.display = "flex";
+
+            // Register service worker
             navigator.serviceWorker.register("/uv/sw.js", {
                 scope: __uv$config.prefix
             }).catch(err => console.error("Service worker registration failed:", err));
         };
-
-        function closeAd() {
-            const popup = document.getElementById("popup-ad");
-            if (popup) popup.style.display = "none";
-        }
     </script>
 </head>
 <body>
