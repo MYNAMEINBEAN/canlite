@@ -241,11 +241,11 @@ setInterval(async () => {
 
   try {
     await pipeline.exec();
-    console.log(`Flushed API stats to Redis at ${new Date().toISOString()}`);
   } catch (err) {
     console.error('Redis flush error:', err);
   }
 }, 5000);
+
 
 app.use((err, req, res, next) => {
   if (err && err.type === "request.aborted") {
