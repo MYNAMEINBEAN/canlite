@@ -33,7 +33,6 @@ app.set("trust proxy", 1);
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
-// Listen for request aborts on every request
 app.use((req, res, next) => {
   req.on("aborted", () => {
     console.warn("Request aborted by client:", req.url);
@@ -43,38 +42,43 @@ app.use((req, res, next) => {
 
 let redisClient = createClient();
 redisClient.connect().catch(console.error);
+
 let redisStore = new RedisStore({
   client: redisClient,
   prefix: "myapp:",
 });
+
 app.use(
-  session({
-    store: redisStore,
-    secret: process.env.EXPRESSJS_SECRET,
-    resave: false,
-    saveUninitialized: false,
-    cookie: { secure: true },
-  })
+    session({
+      store: redisStore,
+      secret: process.env.EXPRESSJS_SECRET,
+      resave: false,
+      saveUninitialized: false,
+      cookie: { secure: true },
+    })
 );
 
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 
+// In-memory API tracking buffer
+const apiStats = new Map();
+
 app.get("/uv/sw.js", (req, res) => {
   res.set("Service-Worker-Allowed", "/~/uv/");
-  res.sendFile(__dirname + "/static/uv/sw.js"); // Adjust path to your sw.js file
+  res.sendFile(__dirname + "/static/uv/sw.js");
 });
 
 app.get("/~/uv/uv/uv.bundle.js", (req, res) => {
-  res.sendFile(__dirname + "/static/uv/uv.bundle.js"); // Adjust path to your bundle file
+  res.sendFile(__dirname + "/static/uv/uv.bundle.js");
 });
 
 app.get("/~/uv/uv/uv.config.js", (req, res) => {
-  res.sendFile(__dirname + "/static/uv/uv.config.js"); // Adjust path to your config file
+  res.sendFile(__dirname + "/static/uv/uv.config.js");
 });
 
 app.get("/~/uv/uv/uv.handler.js", (req, res) => {
-  res.sendFile(__dirname + "/static/uv/uv.handler.js"); // Adjust path to your handler file
+  res.sendFile(__dirname + "/static/uv/uv.handler.js");
 });
 
 app.get("/validate-domain", (req, res) => {
@@ -91,7 +95,7 @@ app.get("/games", (req, res) => {
   let page = parseInt(req.query.page) || 1;
 
   const filteredGames = games.filter((game) =>
-    game.name.toLowerCase().includes(search)
+      game.name.toLowerCase().includes(search)
   );
 
   const total = filteredGames.length;
@@ -99,7 +103,6 @@ app.get("/games", (req, res) => {
   if (page < 1) page = 1;
   if (page > totalPages) page = totalPages;
 
-  // Sort games by name (alphabetical order)
   const sortedGames = filteredGames.sort((a, b) => a.name.localeCompare(b.name));
   const startIndex = (page - 1) * perPage;
   const paginatedGames = sortedGames.slice(startIndex, startIndex + perPage);
@@ -122,10 +125,8 @@ app.get("/d/:gameName.jpg", (req, res) => {
   }
 });
 
-// Route: Play page for a specific game by unique id
 app.get("/play/:id", (req, res) => {
   const gameName = req.params.id;
-  console.log(gameName);
   const game = games.find((g) => g.name === gameName);
   if (!game) {
     return res.status(404).send("Game not found");
@@ -145,10 +146,10 @@ app.get("/proxe", function (req, res) {
 
 app.use(function (req, res, next) {
   if (
-    req.path.endsWith(".png") ||
-    req.path.endsWith(".jpg") ||
-    req.path.endsWith(".jpeg") ||
-    req.path.endsWith(".gif")
+      req.path.endsWith(".png") ||
+      req.path.endsWith(".jpg") ||
+      req.path.endsWith(".jpeg") ||
+      req.path.endsWith(".gif")
   ) {
     res.set("Cache-Control", "public, max-age=31557600, immutable");
   } else {
@@ -157,15 +158,13 @@ app.use(function (req, res, next) {
   return next();
 });
 
-app.use("/api", apiRoutes); // Register API routes
-
+app.use("/api", apiRoutes);
 app.use(express.static(__dirname + "/dist"));
 app.use(express.static(__dirname + "/static"));
 
 const server = http.createServer();
 
 server.on("request", async (req, res) => {
-  // Listen for request abort events on the underlying request object
   req.on("aborted", () => {
     console.warn("Underlying request aborted:", req.url);
   });
@@ -176,9 +175,8 @@ server.on("request", async (req, res) => {
         const domain = headers.host;
         const date = moment().format("YYYY-MM-DD");
         const key = `api_requests:${domain}:${date}`;
-
-        await redisClient.incr(key);
-        await redisClient.sAdd("tracked_domains", domain); // Store unique domains
+        apiStats.set(key, (apiStats.get(key) || 0) + 1);
+        redisClient.sAdd("tracked_domains", domain).catch(console.error);
       } catch (e) {
         console.log(e);
       }
@@ -199,7 +197,6 @@ server.on("request", async (req, res) => {
 });
 
 server.on("upgrade", async (req, socket, head) => {
-  // Listen for request abort events on upgrade requests as well
   req.on("aborted", () => {
     console.warn("Upgrade request aborted:", req.url);
   });
@@ -210,9 +207,8 @@ server.on("upgrade", async (req, socket, head) => {
         const domain = headers.host;
         const date = moment().format("YYYY-MM-DD");
         const key = `api_requests:${domain}:${date}`;
-
-        await redisClient.incr(key);
-        await redisClient.sAdd("tracked_domains", domain); // Store unique domains
+        apiStats.set(key, (apiStats.get(key) || 0) + 1);
+        redisClient.sAdd("tracked_domains", domain).catch(console.error);
       } catch (error) {
         console.log(error);
       }
@@ -231,7 +227,26 @@ server.on("upgrade", async (req, socket, head) => {
   }
 });
 
-// Error-handling middleware (add after your routes)
+// Flush local API stats to Redis every 5 seconds
+setInterval(async () => {
+  if (apiStats.size === 0) return;
+
+  const pipeline = redisClient.multi();
+  for (const [key, count] of apiStats.entries()) {
+    pipeline.incrBy(key, count);
+    pipeline.expire(key, 60*60*24*31);
+  }
+
+  apiStats.clear();
+
+  try {
+    await pipeline.exec();
+    console.log(`Flushed API stats to Redis at ${new Date().toISOString()}`);
+  } catch (err) {
+    console.error('Redis flush error:', err);
+  }
+}, 5000);
+
 app.use((err, req, res, next) => {
   if (err && err.type === "request.aborted") {
     console.warn("Request was aborted by the client:", err);
@@ -240,7 +255,6 @@ app.use((err, req, res, next) => {
   next(err);
 });
 
-// Graceful shutdown
 process.on("SIGINT", shutdown);
 process.on("SIGTERM", shutdown);
 
@@ -254,7 +268,6 @@ server.listen(9091, () => {
   console.log("Main server http://localhost:9091");
 });
 
-// Secondary server for domain validation
 const verify = express();
 verify.get("/validate-domain", (req, res) => {
   try {
@@ -273,21 +286,16 @@ verify.listen(4000, () => {
   console.log("Domain validation server running on http://localhost:4000");
 });
 
-const url = 'https://adbpage.com/adblock?v=3&format=js'; // Replace with the URL you want to fetch
+const url = 'https://adbpage.com/adblock?v=3&format=js';
 const outputFile = path.join(__dirname, 'static/ads.js');
-const fetchInterval = 5 * 60 * 1000; // 5 minutes in milliseconds
+const fetchInterval = 5 * 60 * 1000;
 
-// Function to fetch the website content
 function fetchWebsite() {
   https.get(url, (res) => {
     let data = '';
-
-    // Collect chunks of data
     res.on('data', (chunk) => {
       data += chunk;
     });
-
-    // Write data to file once it's completely received
     res.on('end', () => {
       fs.writeFile(outputFile, data, (err) => {
         if (err) {
@@ -302,6 +310,5 @@ function fetchWebsite() {
   });
 }
 
-// Fetch the website every 5 minutes
-fetchWebsite(); // Initial fetch
+fetchWebsite();
 setInterval(fetchWebsite, fetchInterval);
