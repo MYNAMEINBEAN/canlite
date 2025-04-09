@@ -20,6 +20,7 @@
       left: 20px;
       width: 125px;
       z-index: 9999;
+      background: transparent;
     }
 
     #corner-ad iframe {
@@ -35,9 +36,26 @@
       text-align: right;
       font-size: 12px;
     }
+
+    #close-btn {
+      display: none;
+      margin-top: 4px;
+      width: 100%;
+      background: #111;
+      color: #fff;
+      border: none;
+      font-size: 12px;
+      cursor: pointer;
+      padding: 4px 0;
+    }
   </style>
 
   <script defer>
+    function closeCornerAd() {
+      const ad = document.getElementById('corner-ad');
+      if (ad) ad.style.display = 'none';
+    }
+
     window.addEventListener("DOMContentLoaded", () => {
       const canonical = document.querySelector("link[rel='canonical']");
       if (canonical) {
@@ -64,6 +82,21 @@
       if (!Array.from(document.scripts).some(s => s.src.includes('uv.bundle.js'))) {
         alert('Script not imported, proxy will not work. Please join the discord for other links.');
       }
+
+      // Countdown logic
+      let seconds = 20;
+      const btn = document.getElementById("close-btn");
+      btn.textContent = `Close in ${seconds}s`;
+      const interval = setInterval(() => {
+        seconds--;
+        if (seconds > 0) {
+          btn.textContent = `Close in ${seconds}s`;
+        } else {
+          clearInterval(interval);
+          btn.textContent = "Close Ad";
+          btn.style.display = "block";
+        }
+      }, 1000);
     });
 
     window.onload = () => {
@@ -77,11 +110,12 @@
   <div id="app"></div>
   <script type="module" src="/src/main.jsx"></script>
 
-  <!-- Bottom-Left Corner Ad -->
+  <!-- Bottom-Left Corner Ad with Timed Close Button -->
   <div id="corner-ad">
     <div id="frame">
       <iframe data-aa='2389192' src='//ad.a-ads.com/2389192?size=125x125'></iframe>
       <a id="frame-link" href="https://aads.com/campaigns/new/?source_id=2389192&source_type=ad_unit&partner=2389192">Advertise here</a>
+      <button id="close-btn" onclick="closeCornerAd()"></button>
     </div>
   </div>
 </body>
