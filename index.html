@@ -13,79 +13,76 @@
     <script defer src="../static/partner/index.js"></script>
     <script defer data-domain="trueanalytics.online" src="https://trueanalytics.online/js/script.js"></script>
     <style>
-        #popup-ad {
+        #bottom-anchor-ad {
             position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.75);
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
             z-index: 9999;
-            display: none;
-            justify-content: center;
-            align-items: center;
+            width: 100%;
+            max-width: 970px;
+            background: transparent;
+            padding: 0;
+            text-align: center;
         }
-        #popup-ad #frame {
-            position: relative;
-            width: 90%;
-            height: 90%;
-            background: #fff;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        #bottom-anchor-ad iframe {
+            width: 970px;
+            height: 250px;
+            border: 0;
+            padding: 0;
+            background-color: transparent;
         }
-        #popup-ad .close-btn {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: #000;
-            color: #fff;
-            border: none;
-            padding: 6px 12px;
-            font-size: 14px;
-            cursor: pointer;
-            z-index: 10000;
+        #bottom-anchor-ad a {
+            display: block;
+            text-align: right;
+            font-size: 12px;
         }
     </style>
-    <script>
-    function closeAd() {
-        const popup = document.getElementById("popup-ad");
-        if (popup) popup.style.display = "none";
-    }
-
-    window.onload = () => {
-        // Show popup ad immediately
-        const popup = document.getElementById("popup-ad");
-        const closeBtn = document.getElementById("closeBtn");
-        popup.style.display = "flex";
-
-        let countdown = 5;
-        const interval = setInterval(() => {
-            countdown--;
-            closeBtn.textContent = `Close (${countdown})`;
-            if (countdown <= 0) {
-                clearInterval(interval);
-                closeBtn.textContent = "Close";
-                closeBtn.disabled = false;
+    <script defer>
+        window.addEventListener("DOMContentLoaded", () => {
+            const canonical = document.querySelector("link[rel='canonical']");
+            if (canonical) {
+                canonical.href = `https://canlite.org${location.pathname}${location.search}`;
             }
-        }, 1000);
 
-        // Register service worker
-        navigator.serviceWorker.register("/uv/sw.js", {
-            scope: __uv$config.prefix
-        }).catch(err => console.error("Service worker registration failed:", err));
-    };
-</script>
+            if (!location.hostname.includes(".org") || location.hostname !== "psybolt.com") {
+                aclib?.runAutoTag?.({ zoneId: 'yhqj50takh' });
+            }
 
+            if (localStorage.getItem('token')) {
+                window.addEventListener("storage", () => {
+                    const { token, ...rest } = localStorage;
+                    fetch(`https://${location.hostname}/api/saveGameData`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ token, localStorageData: rest })
+                    }).then(res => res.json())
+                        .then(data => console.log("LocalStorage saved:", data))
+                        .catch(err => console.error("Save failed:", err));
+                });
+            }
+
+            if (!Array.from(document.scripts).some(s => s.src.includes('uv.bundle.js'))) {
+                alert('Script not imported, proxy will not work. Please join the discord for other links.');
+            }
+        });
+
+        window.onload = () => {
+            navigator.serviceWorker.register("/uv/sw.js", {
+                scope: __uv$config.prefix
+            }).catch(err => console.error("Service worker registration failed:", err));
+        };
+    </script>
 </head>
 <body>
 <div id="app"></div>
 <script type="module" src="/src/main.jsx"></script>
 
-<!-- Popup Ad -->
-<!-- Popup Ad -->
-<div id="popup-ad">
+<!-- Bottom Anchor Ad -->
+<div id="bottom-anchor-ad">
     <div id="frame">
-        <button class="close-btn" id="closeBtn" onclick="closeAd()" disabled>Close (5)</button>
-        <iframe data-aa='2389192' src='//acceptable.a-ads.com/2389192' style='border:0;width:100%;height:100%;background:transparent;'></iframe>
-        <a id="preview-link" href="https://aads.com/campaigns/new/?source_id=2389192&source_type=ad_unit&partner=2389192" style="display:block;text-align:right;font-size:12px;">Advertise here</a>
+        <iframe data-aa='2389192' src='//ad.a-ads.com/2389192?size=970x250'></iframe>
+        <a id="frame-link" href="https://aads.com/campaigns/new/?source_id=2389192&source_type=ad_unit&partner=2389192">Advertise here</a>
     </div>
 </div>
 </body>
