@@ -1,95 +1,88 @@
 <!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>nano.</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Access CanLite for a secure, free web unbl0cker and an extensive collection of unbl0cked gam3s for school! Enjoy fast, anonymous access to popular games and websites, bipassing restrictions safely on any network.">
-    <link rel="icon" href="/logo.svg">
-    <link rel="canonical" href="https://canlite.org">
-    <script defer src="/uv/uv.bundle.js"></script>
-    <script defer src="/uv/uv.config.js"></script>
-    <script defer src="/partner.js"></script>
-    <script defer src="../static/partner/index.js"></script>
-    <script defer data-domain="trueanalytics.online" src="https://trueanalytics.online/js/script.js"></script>
+  <meta charset="UTF-8">
+  <title>nano.</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Access CanLite for a secure, free web unbl0cker and an extensive collection of unbl0cked gam3s for school! Enjoy fast, anonymous access to popular games and websites, bipassing restrictions safely on any network.">
+  <link rel="icon" href="/logo.svg">
+  <link rel="canonical" href="https://canlite.org">
+  <script defer src="/uv/uv.bundle.js"></script>
+  <script defer src="/uv/uv.config.js"></script>
+  <script defer src="/partner.js"></script>
+  <script defer src="../static/partner/index.js"></script>
+  <script defer data-domain="trueanalytics.online" src="https://trueanalytics.online/js/script.js"></script>
 
-    <style>
-        #top-anchor-ad {
-            position: fixed;
-            top: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 9999;
-            width: 100%;
-            max-width: 970px;
-            background: transparent;
-            padding: 0;
-            text-align: center;
-        }
-        #top-anchor-ad iframe {
-            width: 970px;
-            height: 90px;
-            border: 0;
-            padding: 0;
-            background-color: transparent;
-        }
-        #top-anchor-ad a {
-            display: block;
-            text-align: right;
-            font-size: 12px;
-        }
+  <style>
+    #corner-ad {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      width: 125px;
+      z-index: 9999;
+    }
 
-        body {
-            margin-top: 100px; /* to prevent ad from covering the page content */
-        }
-    </style>
+    #corner-ad iframe {
+      width: 125px;
+      height: 125px;
+      border: 0;
+      padding: 0;
+      background-color: transparent;
+    }
 
-    <script defer>
-        window.addEventListener("DOMContentLoaded", () => {
-            const canonical = document.querySelector("link[rel='canonical']");
-            if (canonical) {
-                canonical.href = `https://canlite.org${location.pathname}${location.search}`;
-            }
+    #corner-ad a {
+      display: block;
+      text-align: right;
+      font-size: 12px;
+    }
+  </style>
 
-            if (!location.hostname.includes(".org") || location.hostname !== "psybolt.com") {
-                aclib?.runAutoTag?.({ zoneId: 'yhqj50takh' });
-            }
+  <script defer>
+    window.addEventListener("DOMContentLoaded", () => {
+      const canonical = document.querySelector("link[rel='canonical']");
+      if (canonical) {
+        canonical.href = `https://canlite.org${location.pathname}${location.search}`;
+      }
 
-            if (localStorage.getItem('token')) {
-                window.addEventListener("storage", () => {
-                    const { token, ...rest } = localStorage;
-                    fetch(`https://${location.hostname}/api/saveGameData`, {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ token, localStorageData: rest })
-                    }).then(res => res.json())
-                        .then(data => console.log("LocalStorage saved:", data))
-                        .catch(err => console.error("Save failed:", err));
-                });
-            }
+      if (!location.hostname.includes(".org") || location.hostname !== "psybolt.com") {
+        aclib?.runAutoTag?.({ zoneId: 'yhqj50takh' });
+      }
 
-            if (!Array.from(document.scripts).some(s => s.src.includes('uv.bundle.js'))) {
-                alert('Script not imported, proxy will not work. Please join the discord for other links.');
-            }
+      if (localStorage.getItem('token')) {
+        window.addEventListener("storage", () => {
+          const { token, ...rest } = localStorage;
+          fetch(`https://${location.hostname}/api/saveGameData`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ token, localStorageData: rest })
+          }).then(res => res.json())
+            .then(data => console.log("LocalStorage saved:", data))
+            .catch(err => console.error("Save failed:", err));
         });
+      }
 
-        window.onload = () => {
-            navigator.serviceWorker.register("/uv/sw.js", {
-                scope: __uv$config.prefix
-            }).catch(err => console.error("Service worker registration failed:", err));
-        };
-    </script>
+      if (!Array.from(document.scripts).some(s => s.src.includes('uv.bundle.js'))) {
+        alert('Script not imported, proxy will not work. Please join the discord for other links.');
+      }
+    });
+
+    window.onload = () => {
+      navigator.serviceWorker.register("/uv/sw.js", {
+        scope: __uv$config.prefix
+      }).catch(err => console.error("Service worker registration failed:", err));
+    };
+  </script>
 </head>
 <body>
-<div id="app"></div>
-<script type="module" src="/src/main.jsx"></script>
+  <div id="app"></div>
+  <script type="module" src="/src/main.jsx"></script>
 
-<!-- Top Anchor Ad -->
-<div id="top-anchor-ad">
+  <!-- Bottom-Left Corner Ad -->
+  <div id="corner-ad">
     <div id="frame">
-        <iframe data-aa='2389192' src='//ad.a-ads.com/2389192?size=970x90'></iframe>
-        <a id="frame-link" href="https://aads.com/campaigns/new/?source_id=2389192&source_type=ad_unit&partner=2389192">Advertise here</a>
+      <iframe data-aa='2389192' src='//ad.a-ads.com/2389192?size=125x125'></iframe>
+      <a id="frame-link" href="https://aads.com/campaigns/new/?source_id=2389192&source_type=ad_unit&partner=2389192">Advertise here</a>
     </div>
-</div>
+  </div>
 </body>
 </html>
