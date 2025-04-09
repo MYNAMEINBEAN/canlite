@@ -21,6 +21,7 @@
       width: 125px;
       z-index: 9999;
       background: transparent;
+      font-family: sans-serif;
     }
 
     #corner-ad iframe {
@@ -38,15 +39,20 @@
     }
 
     #close-btn {
-      display: none;
       margin-top: 4px;
       width: 100%;
       background: #111;
       color: #fff;
       border: none;
       font-size: 12px;
-      cursor: pointer;
+      cursor: not-allowed;
       padding: 4px 0;
+      opacity: 0.7;
+    }
+
+    #close-btn.enabled {
+      cursor: pointer;
+      opacity: 1;
     }
   </style>
 
@@ -87,16 +93,24 @@
       let seconds = 20;
       const btn = document.getElementById("close-btn");
       btn.textContent = `Close in ${seconds}s`;
-      const interval = setInterval(() => {
+
+      const countdown = setInterval(() => {
         seconds--;
-        if (seconds > 0) {
-          btn.textContent = `Close in ${seconds}s`;
-        } else {
-          clearInterval(interval);
-          btn.textContent = "Close Ad";
-          btn.style.display = "block";
+        btn.textContent = seconds > 0 ? `Close in ${seconds}s` : "Close Ad";
+        if (seconds <= 0) {
+          clearInterval(countdown);
+          btn.classList.add("enabled");
+          btn.disabled = false;
+          btn.style.cursor = "pointer";
         }
       }, 1000);
+
+      btn.disabled = true;
+      btn.addEventListener("click", () => {
+        if (btn.classList.contains("enabled")) {
+          closeCornerAd();
+        }
+      });
     });
 
     window.onload = () => {
@@ -115,7 +129,7 @@
     <div id="frame">
       <iframe data-aa='2389192' src='//ad.a-ads.com/2389192?size=125x125'></iframe>
       <a id="frame-link" href="https://aads.com/campaigns/new/?source_id=2389192&source_type=ad_unit&partner=2389192">Advertise here</a>
-      <button id="close-btn" onclick="closeCornerAd()"></button>
+      <button id="close-btn">Close in 20s</button>
     </div>
   </div>
 </body>
