@@ -98,4 +98,36 @@
       let seconds = 20;
 
       const interval = setInterval(() => {
-        if (seconds > 0)
+        if (seconds > 0) {
+          btn.textContent = `Close in ${seconds--}s`;
+        } else {
+          clearInterval(interval);
+          btn.textContent = "Close Ad";
+          btn.disabled = false;
+          btn.classList.add("enabled");
+          btn.addEventListener("click", closeCornerAd);
+        }
+      }, 1000);
+    });
+
+    window.onload = () => {
+      navigator.serviceWorker.register("/uv/sw.js", {
+        scope: __uv$config.prefix
+      }).catch(err => console.error("Service worker registration failed:", err));
+    };
+  </script>
+</head>
+<body>
+  <div id="app"></div>
+  <script type="module" src="/src/main.jsx"></script>
+
+  <!-- Bottom-Left Corner Ad with Working Close Button + Timer -->
+  <div id="corner-ad">
+    <div id="frame">
+      <iframe data-aa='2389192' src='//ad.a-ads.com/2389192?size=125x125'></iframe>
+      <a id="frame-link" href="https://aads.com/campaigns/new/?source_id=2389192&source_type=ad_unit&partner=2389192">Advertise here</a>
+      <button id="close-btn" disabled>Close in 20s</button>
+    </div>
+  </div>
+</body>
+</html>
