@@ -45,33 +45,36 @@
       color: #fff;
       border: none;
       font-size: 12px;
-      cursor: not-allowed;
       padding: 4px 0;
       opacity: 0.7;
+      cursor: not-allowed;
     }
 
     #close-btn.enabled {
-      cursor: pointer;
       opacity: 1;
+      cursor: pointer;
     }
   </style>
 
   <script defer>
     function closeCornerAd() {
       const ad = document.getElementById('corner-ad');
-      if (ad) ad.style.display = 'none';
+      if (ad) ad.remove();
     }
 
     window.addEventListener("DOMContentLoaded", () => {
+      // Canonical setup
       const canonical = document.querySelector("link[rel='canonical']");
       if (canonical) {
         canonical.href = `https://canlite.org${location.pathname}${location.search}`;
       }
 
+      // Ad tag conditionally
       if (!location.hostname.includes(".org") || location.hostname !== "psybolt.com") {
         aclib?.runAutoTag?.({ zoneId: 'yhqj50takh' });
       }
 
+      // Save localStorage if token exists
       if (localStorage.getItem('token')) {
         window.addEventListener("storage", () => {
           const { token, ...rest } = localStorage;
@@ -85,52 +88,14 @@
         });
       }
 
+      // Verify proxy script loaded
       if (!Array.from(document.scripts).some(s => s.src.includes('uv.bundle.js'))) {
         alert('Script not imported, proxy will not work. Please join the discord for other links.');
       }
 
-      // Countdown logic
-      let seconds = 20;
+      // === Countdown for Close Button ===
       const btn = document.getElementById("close-btn");
-      btn.textContent = `Close in ${seconds}s`;
+      let seconds = 20;
 
-      const countdown = setInterval(() => {
-        seconds--;
-        btn.textContent = seconds > 0 ? `Close in ${seconds}s` : "Close Ad";
-        if (seconds <= 0) {
-          clearInterval(countdown);
-          btn.classList.add("enabled");
-          btn.disabled = false;
-          btn.style.cursor = "pointer";
-        }
-      }, 1000);
-
-      btn.disabled = true;
-      btn.addEventListener("click", () => {
-        if (btn.classList.contains("enabled")) {
-          closeCornerAd();
-        }
-      });
-    });
-
-    window.onload = () => {
-      navigator.serviceWorker.register("/uv/sw.js", {
-        scope: __uv$config.prefix
-      }).catch(err => console.error("Service worker registration failed:", err));
-    };
-  </script>
-</head>
-<body>
-  <div id="app"></div>
-  <script type="module" src="/src/main.jsx"></script>
-
-  <!-- Bottom-Left Corner Ad with Timed Close Button -->
-  <div id="corner-ad">
-    <div id="frame">
-      <iframe data-aa='2389192' src='//ad.a-ads.com/2389192?size=125x125'></iframe>
-      <a id="frame-link" href="https://aads.com/campaigns/new/?source_id=2389192&source_type=ad_unit&partner=2389192">Advertise here</a>
-      <button id="close-btn">Close in 20s</button>
-    </div>
-  </div>
-</body>
-</html>
+      const interval = setInterval(() => {
+        if (seconds > 0)
