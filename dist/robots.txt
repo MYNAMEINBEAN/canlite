@@ -1,2 +1,8 @@
 User-agent: *
-Disallow: 
+Disallow: /games/embed
+Disallow: /cdn
+Disallow: /ext
+Disallow: /r
+Disallow: /e
+Disallow: /lib
+Disallow: /xr
