@@ -129,6 +129,29 @@
     if(!window.location.hostname.includes(".org") || window.location.hostname !== "psybolt.com") {
         aclib.runAutoTag({zoneId: 'yhqj50takh'});
     }
+</script>
+<script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+</script>
+<script>
+    if(localStorage.getItem('token')) {
+        window.addEventListener("storage", () => {
+            const localStorageData = { ...localStorage }; // Clone localStorage as an object
+            delete localStorageData.token;
+            let token = localStorage.getItem('token');
+            fetch("https://" + window.location.hostname + `/api/saveGameData`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ token, localStorageData }),
+            })
+                .then(response => response.json())
+                .then(data => console.log("LocalStorage data saved:", data))
+                .catch(error => console.error("Error saving localStorage data:", error));
+        });
+    }
+</script>
+<script>
+    console.log("SCRIPT LOADED");
 
     document.addEventListener("DOMContentLoaded", function () {
         console.log("DOM fully loaded");
@@ -143,6 +166,7 @@
 
         fullscreenBtn.addEventListener('click', function () {
             console.log("Fullscreen button clicked");
+
             const iframe = document.querySelector('#game-container iframe');
             if (!iframe) {
                 console.error("Iframe not found");
@@ -164,25 +188,8 @@
             }
         });
     });
-
-    document.getElementById('year').textContent = new Date().getFullYear();
-
-    if(localStorage.getItem('token')) {
-        window.addEventListener("storage", () => {
-            const localStorageData = { ...localStorage }; // Clone localStorage as an object
-            delete localStorageData.token;
-            let token = localStorage.getItem('token');
-            fetch("https://" + window.location.hostname + `/api/saveGameData`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ token, localStorageData }),
-            })
-                .then(response => response.json())
-                .then(data => console.log("LocalStorage data saved:", data))
-                .catch(error => console.error("Error saving localStorage data:", error));
-        });
-    }
 </script>
+
 <script src="../login/index.js"></script>
 <script src="/games/time.js"></script>
 </body>
