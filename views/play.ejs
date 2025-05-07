@@ -130,20 +130,27 @@
         aclib.runAutoTag({zoneId: 'yhqj50takh'});
     }
 
-    document.getElementById('fullscreen-btn').addEventListener('click', function() {
-        const iframe = document.querySelector('#game-container iframe');
-        alert()
-        console.log("clicked")
-        if (iframe.requestFullscreen) {
-            iframe.requestFullscreen();
-        } else if (iframe.mozRequestFullScreen) { // Firefox
-            iframe.mozRequestFullScreen();
-        } else if (iframe.webkitRequestFullscreen) { // Chrome, Safari and Opera
-            iframe.webkitRequestFullscreen();
-        } else if (iframe.msRequestFullscreen) { // IE/Edge
-            iframe.msRequestFullscreen();
-        }
+    document.addEventListener("DOMContentLoaded", function () {
+        document.getElementById('fullscreen-btn').addEventListener('click', function() {
+            const iframe = document.querySelector('#game-container iframe');
+            console.log("clicked");
+            if (iframe.requestFullscreen) {
+                iframe.requestFullscreen();
+            } else if (iframe.mozRequestFullScreen) {
+                iframe.mozRequestFullScreen();
+            } else if (iframe.webkitRequestFullscreen) {
+                iframe.webkitRequestFullscreen();
+            } else if (iframe.msRequestFullscreen) {
+                iframe.msRequestFullscreen();
+            }
+        });
+
+        document.getElementById('refresh-btn').addEventListener('click', function() {
+            const iframe = document.querySelector('#game-container iframe');
+            iframe.src = iframe.src;
+        });
     });
+
 
 
     document.getElementById('refresh-btn').addEventListener('click', function() {
