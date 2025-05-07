@@ -125,6 +125,15 @@ app.get("/d/:gameName.jpg", (req, res) => {
   }
 });
 
+app.get("/playGame/:id", (req, res) => {
+  const gameName = req.params.id;
+  const game = games.find((g) => g.name === gameName);
+  if (!game) {
+    return res.status(404).send("Game not found");
+  }
+  res.render("gameEmbed", { game });
+});
+
 app.get("/play/:id", (req, res) => {
   const gameName = req.params.id;
   const game = games.find((g) => g.name === gameName);

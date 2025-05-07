@@ -1,0 +1,47 @@
+<head>
+    <link rel="stylesheet" href="../games/styles.css">
+    <link rel="stylesheet" href="../games/gampage.css">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="embed-container">
+        <div id="game-container">
+            <% if (game.type === 'html5') { %>
+                <!-- For HTML5 games, embed via an iframe -->
+                <iframe src="<%= game.path %>" width="1024" height="768"></iframe>
+            <% } else { %>
+                <iframe src="/games/embed?content=<%= game.path %>&gameid=<%= game.type %>" width="1024" height="768"></iframe>
+            <% } %>
+        </div>
+        <div class="bottom-div">
+            <div class="buttons-container">
+                <img id="refresh-btn" src="../games/refresh.png" alt="Refresh">
+                <img id="fullscreen-btn" src="../games/fullscreen2.png" alt="Fullscreen">
+            </div>
+        </div>
+    </div>
+
+    <div class="ad1">
+        <div class="adTXT1">Advertisement</div>
+        <div class="script-container1">
+            <script src="../../ads/longad.js"></script>
+        </div>
+    </div>
+
+    <div class="desc">
+        <h1>Play <%= game.name %> Unblocked Free on CanLite</h1>
+        <h2 class="desc-title">Description</h2>
+        <p><%= game.desc %></p>
+        <h2 class="desc-title">Latest Update</h2>
+        <p><%= new Date(game.date).toLocaleDateString("en-US") %></p>
+    </div>
+    <script>
+        document.getElementById('fullscreen-btn').addEventListener('click', function () {
+            const iframe = document.querySelector('#game-container iframe');
+            iframe.requestFullscreen?.() ||
+            iframe.webkitRequestFullscreen?.() ||
+            iframe.mozRequestFullScreen?.() ||
+            iframe.msRequestFullscreen?.();
+        });
+    </script>
+</body>
