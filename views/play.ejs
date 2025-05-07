@@ -132,6 +132,8 @@
 
     document.getElementById('fullscreen-btn').addEventListener('click', function() {
         const iframe = document.querySelector('#game-container iframe');
+        alert()
+        console.log("clicked")
         if (iframe.requestFullscreen) {
             iframe.requestFullscreen();
         } else if (iframe.mozRequestFullScreen) { // Firefox
