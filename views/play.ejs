@@ -183,13 +183,20 @@
         });
     });
     <% if (game.type === 'html5') { %>
-        window.onload = () => {
-            navigator.serviceWorker.register("/uv/sw.js", {
-                scope: window.__uv$config?.prefix || "/uv/"
-            }).catch(err => alert("Service worker registration failed: " + err));
-            document.querySelector('#game-container iframe').src = window.location.origin + window.__uv$config.prefix + window.__uv$config.encodeUrl("<%= game.path %>")
-        };
+    window.onload = () => {
+        navigator.serviceWorker.register("/uv/sw.js", {
+            scope: window.__uv$config?.prefix || "/uv/"
+        }).catch(err => alert("Service worker registration failed: " + err));
+
+        const iframe = document.querySelector('#game-container iframe');
+        const isExternal = /^https?:\/\//.test("<%= game.path %>");
+
+        iframe.src = isExternal
+            ? window.location.origin + window.__uv$config.prefix + window.__uv$config.encodeUrl("<%= game.path %>")
+            : "<%= game.path %>";
+    };
     <% } %>
+
 </script>
 
 <script src="../login/index.js"></script>
