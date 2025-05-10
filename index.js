@@ -135,8 +135,6 @@ app.get("/play/:id", (req, res) => {
 });
 
 app.get("/", (req, res) => {
-  const origin = req.get("host");
-  console.log(origin);
   res.sendFile(path.join(__dirname + "/static/landing/index.html"));
 });
 
