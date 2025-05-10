@@ -170,16 +170,6 @@ server.on("request", async (req, res) => {
   });
   try {
     if (bareServer.shouldRoute(req)) {
-      try {
-        const { headers } = req;
-        const domain = headers.host;
-        const date = moment().format("YYYY-MM-DD");
-        const key = `api_requests:${domain}:${date}`;
-        apiStats.set(key, (apiStats.get(key) || 0) + 1);
-        redisClient.sAdd("tracked_domains", domain).catch(console.error);
-      } catch (e) {
-        console.log(e);
-      }
       bareServer.routeRequest(req, res);
     } else {
       app(req, res);
@@ -202,16 +192,6 @@ server.on("upgrade", async (req, socket, head) => {
   });
   try {
     if (bareServer.shouldRoute(req)) {
-      try {
-        const { headers } = req;
-        const domain = headers.host;
-        const date = moment().format("YYYY-MM-DD");
-        const key = `api_requests:${domain}:${date}`;
-        apiStats.set(key, (apiStats.get(key) || 0) + 1);
-        redisClient.sAdd("tracked_domains", domain).catch(console.error);
-      } catch (error) {
-        console.log(error);
-      }
       bareServer.routeUpgrade(req, socket, head);
     } else {
       socket.end();
@@ -226,26 +206,6 @@ server.on("upgrade", async (req, socket, head) => {
     socket.end();
   }
 });
-
-// Flush local API stats to Redis every 5 seconds
-setInterval(async () => {
-  if (apiStats.size === 0) return;
-
-  const pipeline = redisClient.multi();
-  for (const [key, count] of apiStats.entries()) {
-    pipeline.incrBy(key, count);
-    pipeline.expire(key, 60*60*24*31);
-  }
-
-  apiStats.clear();
-
-  try {
-    await pipeline.exec();
-  } catch (err) {
-    console.error('Redis flush error:', err);
-  }
-}, 5000);
-
 
 app.use((err, req, res, next) => {
   if (err && err.type === "request.aborted") {
