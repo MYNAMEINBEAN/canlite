@@ -12,9 +12,8 @@ Welcome to CanLite, the ultimate hub for seamless web access and gaming. Designe
 - **Built on Ultraviolet** – Utilizes [Ultraviolet](https://github.com/titaniumnetwork-dev/Ultraviolet) from Titanium Network for superior proxy performance.
 
 ### Massive Game Collection
-- **Curated by 3kh0** – Featuring an extensive game library from [3kh0's assets](https://gitlab.com/3kh0/3kh0-assets).
+- **Curated by 3kh0** – Featuring an extensive game library from [3kh0's assets](https://gitlab.com/3kh0/3kh0-assets) and [NettleWeb](https://github.com/nettleweb/nettleweb).
 - **Instant Load Times** – No waiting; just play.
-- **Smooth Animations & UI** – Enhanced with 3kh0's CSS for a polished look.
 - **Cloud Saves** – Pick up where you left off, no matter the device.
 - **Built with dreamland.js** – Uses [dreamland.js](https://github.com/MercuryWorkshop/dreamland.js) from MercuryWorkshop for game-related enhancements.
 
