@@ -97,10 +97,12 @@ encrypted.use(express.urlencoded({ extended: true, limit: "50mb" }));
 
 function getOrCreate(mapping, original, generator) {
     if (Object.prototype.hasOwnProperty.call(mapping, original)) {
+        console.log("Mapping for " + original + " exists as " + mapping[original])
         return mapping[original];
     } else {
         const obfuscated = generator(original);
         mapping[original] = obfuscated;
+        console.log("Mapping for " + original + " created as " + mapping[original])
         return obfuscated;
     }
 }
@@ -575,6 +577,9 @@ app.get(["/:folder(static|dist)/*"], async (req, res, next) => {
     }
 });
 
+app.use(express.static(__dirname + "/dist"));
+app.use(express.static(__dirname + "/static"));
+
 encrypted.use((req, res, next) => {
     if (
         req.path.endsWith(".png") ||
@@ -611,18 +616,24 @@ encrypted.use((req, res, next) => {
 // Encrypted wrapper middleware: decode incoming requests if needed,
 // and override res.send so that every response passes through the encoding functions.
 encrypted.use((req, res, next) => {
-    const fullToken = req.path.slice(1); // remove leading '/'
+    let fullToken = req.path.slice(1); // remove leading '/'
+    console.log("Got a request for " + fullToken);
     const dotIndex = fullToken.lastIndexOf(".");
     let tokenBase;
     if (dotIndex > -1) {
         tokenBase = fullToken.substring(0, dotIndex);
     } else {
-        tokenBase = fullToken;
+        if(fullToken.endsWith('/')) {
+            tokenBase = fullToken.slice(0, -1)
+        } else {
+            tokenBase = fullToken;
+        }
     }
     const mapping = req.session && req.session.obfuscationMapping && req.session.obfuscationMapping.links;
     for (const key in mapping) {
         if (mapping[key] === tokenBase) {
             req.url = key;
+            console.log("rewrote request for " + tokenBase + " as " + key);
             break;
         }
     }
