@@ -3,199 +3,57 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>About Us</title>
+  <title>About CanLite | Free Web Proxy & Online Games</title>
+  <meta name="description" content="Learn about CanLite, your go-to web proxy and online games site. Discover how our free web proxy, secure browsing, and extensive HTML5 gaming library help you unblock websites and enjoy online games without restrictions.">
+  <meta name="keywords" content="web proxy, unblock websites, online games, play games online, HTML5 games, Flash games, anonymous browsing, bypass firewall, secure proxy, free proxy, proxy gaming, CanLite">
   <link href="../landing/style.css" rel="stylesheet" type="text/css" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --primary-color: #FF5733;
-      --secondary-color: #c491f4;
-      --tertiary-color: #20B2AA;
-      --bg-color: #000;
-      --text-color: #FFFFFF;
-    }
-
-    body {
-      margin: 0;
-      padding: 0;
-      position: relative;
-      background-color: var(--bg-color);
-      font-family: 'Poppins', sans-serif;
-    }
-
-    .logo {
-      display: flex;
-      align-items: center;
-      cursor: pointer;
-    }
-
-    .logo img {
-      width: 50px;
-      border-radius: 50%;
-    }
-
-    .logo h3 {
-      font-family: 'Poppins', sans-serif;
-      font-size: 25px;
-      margin-left: 5px;
-      background: linear-gradient(to right, var(--primary-color), var(--secondary-color), var(--tertiary-color));
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .main {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      width: 80vh;
-      align-items: center;
-      padding: 55px 15px;
-      margin: 0 auto;
-      border-radius: 15px;
-      border: 1px solid var(--tertiary-color);
-      z-index: 1;
-      background-color: rgba(0, 0, 0, 0.8);
-      margin-top: 10vh;
-      text-align: center;
-      color: var(--text-color);
-    }
-
-    .main h1 {
-      font-size: 66px;
-      margin: 5px 0;
-      background: linear-gradient(to right, var(--primary-color), var(--secondary-color), var(--tertiary-color));
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-    }
-
-    .main p {
-      font-size: 20px;
-      color: var(--text-color);
-      margin: -20px 0;
-    }
-
-    .button {
-      display: inline-block;
-      margin-top: 5px;
-      padding: 7.5px 15px;
-      background-color: var(--tertiary-color);
-      color: black;
-      text-decoration: none;
-      font-family: 'Poppins', sans-serif;
-      font-size: 16px;
-      border-radius: 10px;
-      transition: all .5s ease;
-      cursor: pointer;
-    }
-
-    .button:hover {
-      border: 1px solid var(--secondary-color);
-      background-color: transparent;
-      color: var(--text-color);
-    }
-
-    footer {
-      background-color: rgba(0, 0, 0, 0.8);
-      padding: 20px;
-      text-align: center;
-      color: #FFFFFF;
-      box-shadow: 0 -2px 5px #FF5733;
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      z-index: 10;
-    }
-
-    footer a {
-      color: #c491f4;
-      text-decoration: none;
-      margin: 0 10px;
-      transition: color 0.4s;
-    }
-
-    footer a:hover {
-      color: var(--primary-color);
-    }
+    :root { --bg: #000; --fg: #fff; --accent: #FF5733; }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background:var(--bg); color:var(--fg); font-family:'Poppins',sans-serif; line-height:1.7; }
+    header, footer { background:rgba(0,0,0,0.85); width:100%; text-align:center; padding:15px 20px; }
+    header .logo, footer a { color:var(--fg); text-decoration:none; font-weight:600; }
+    nav a { margin:0 15px; color:var(--fg); text-decoration:none; }
+    nav a:hover { color:var(--accent); }
+    .content { max-width:800px; margin:100px auto 60px; padding:0 20px; }
+    .content h1 { font-size:42px; margin-bottom:20px; color:var(--accent); }
+    .content p { margin-bottom:20px; }
+    footer a { margin:0 10px; }
+    footer small { display:block; margin-top:10px; color:#aaa; }
   </style>
-  <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      // Construct the canonical URL dynamically
-      const baseUrl = "https://canlite.org";
-      const currentPath = window.location.pathname;
-      const currentSearch = window.location.search;
-      const canonicalUrl = baseUrl + currentPath + currentSearch;
-
-      // Check if a canonical link already exists
-      let link = document.querySelector("link[rel='canonical']");
-      if (!link) {
-        link = document.createElement("link");
-        link.setAttribute("rel", "canonical");
-        document.head.appendChild(link);
-      }
-      link.setAttribute("href", canonicalUrl);
-    });
-  </script>
 </head>
 <body>
-<div class="nav">
-  <div class="logo" onclick="window.open('/', '_self')">
-    <img alt="Logo" src="/imgs/logo.png">
-    <h3>CanLite</h3>
+  <header>
+    <a href="/" class="logo">CanLite</a>
+    <nav>
+      <a href="/">Home</a>
+      <a href="/games">Games</a>
+      <a href="/proxe">Proxy</a>
+      <a href="/blog">Blog</a>
+      <a href="/about">About Us</a>
+    </nav>
+  </header>
+  <div class="content">
+    <h1>About CanLite</h1>
+    <p>CanLite is a free web proxy and online gaming platform designed to help users unblock websites, bypass school or workplace firewalls, and enjoy a vast library of HTML5 games, Flash games, and multiplayer browser games. Our web proxy service allows you to anonymously browse blocked websites, stream videos, access social media sites, and play online games securely without revealing your IP address. Whether you need to unblock YouTube, Facebook, Twitter, or any other restricted site, CanLite delivers fast, encrypted connections for seamless and private browsing.</p>
+    <p>Our online games portal features hundreds of free games, including action games, puzzle games, strategy games, and more—all playable directly in your browser with no downloads or installations required. We carefully curate and host high-quality HTML5 and Flash games so you can enjoy smooth gameplay on desktop, tablet, and mobile devices. From classic retro titles to the latest casual games, CanLite offers an ad-light experience with minimal interruptions and optimized performance.</p>
+    <p>At CanLite, we prioritize user privacy and security. Our proxy servers use SSL/TLS encryption with 256-bit security to safeguard your data and mask your location. By routing your requests through our self-hosted infrastructure, we ensure maximum uptime, reliability, and speed. You can browse anonymously, bypass geographical restrictions, unblock school or office networks, and protect your online identity without any software installations or plugins.</p>
+    <p>In addition to our core proxy and gaming services, CanLite is committed to digital freedom and accessibility. We continuously update our proxy infrastructure and expand our gaming library to support the latest web standards and technologies. Our team of developers and community contributors work around the clock to ensure a reliable, user-friendly experience. Whether you are a student looking to access resources, a casual gamer seeking entertainment, or an internet user in a restrictive region, CanLite empowers you to reclaim control of your digital life.</p>
+    <p>Explore CanLite today to experience the ultimate combination of web proxy and free online gaming. Our intuitive interface, comprehensive FAQ, and helpful blog articles guide you through proxy setup, troubleshooting, and advanced tips on private browsing. Join our growing community of users who trust CanLite for secure, unrestricted internet access and endless gaming fun.</p>
+    <p>Join us on Discord, follow our blog, and subscribe to our newsletter for the latest updates on new games, proxy features, SEO tips for proxies, and internet freedom news. CanLite is your one-stop solution for unblocking websites, playing browser games, and browsing the web privately—all for free.</p>
+    <p>Our team at CanLite is continually researching the latest proxy techniques, emerging HTML5 gaming frameworks, and best practices for online security. We believe that keeping our platform up-to-date with cutting-edge technology is essential for delivering uninterrupted proxy connectivity and next-level gaming experiences. From optimizing server locations for minimal latency to integrating browser-based audio and graphic enhancements, CanLite strives to stay ahead of industry trends.</p>
+    <p>By choosing CanLite, you are not only gaining access to a robust proxy network but also supporting an open-source philosophy that encourages collaboration and transparency. We welcome feedback from our community, actively incorporate feature requests, and host regular code contributions on our public repositories. This collaborative approach ensures that CanLite evolves in line with user needs and the dynamic nature of web technologies.</p>
+    <p>Scalability and performance are at the heart of CanLite's engineering. Our proxy servers handle thousands of concurrent connections while maintaining high throughput and low response times. Leveraging modern containerization techniques and cloud-based load balancing, we deploy scalable microservices that grow with user demand, ensuring that our gaming servers remain fast even during peak usage.</p>
+    <p>From an SEO perspective, CanLite's About Us page is optimized with strategic keyword placement, natural language variations, and engaging content that resonates with both users and search engines. By weaving in keywords such as “unblock websites,” “proxy gaming,” “anonymous browsing,” “play games online,” and “secure proxy,” we enhance our visibility on Google, Bing, and other search engines, driving organic traffic and user engagement.</p>
+    <p>Finally, CanLite offers more than just basic proxy and gaming features. We provide advanced options such as custom proxy endpoints, session-based cookies management for authenticated browsing, and encrypted websocket support for real-time multiplayer games. Whether you are a power user requiring specialized proxy configurations or a casual gamer looking for the next addictive browser game, CanLite has you covered.</p>
   </div>
-  <div class="nav-items">
-    <li><a href="/"> Home</a></li>
-    <!--      <li><a href="/apps"> Apps</a></li>-->
-    <li><a href="/games"> Games</a></li>
-    <li><a href="/proxe"> Proxe</a></li>
-    <li><a href="/partners"> Partners</a></li>
-  </div>
-</div>
-
-<div class="main">
-  <h1>About Us</h1>
-  <p>Welcome to CanLite, a place where gaming meets proxy power. Our mission is to provide users with a reliable and secure proxy service while also offering a space for fun, gaming, and community.</p>
-  <br>
-  <br>
-  <p>Game credits go to 3kh0, with CSS inspired by Pizza Edition. Special thanks to Interstellar for providing the proxy code.</p>
-  <br>
-  <br>
-  <p>Whether you're here for the games or the proxy service, we're dedicated to making your experience both enjoyable and secure.</p>
-  <br>
-  <a href="https://discord.com/invite/46gkEU5kpP" class="button">Contact Us</a>
-</div>
-
-<br>
-  <footer style="
-  background-color: rgba(0, 0, 0, 0.8);
-  padding: 20px;
-  text-align: center;
-  color: #FFFFFF;
-  box-shadow: 0 -2px 5px #FF5733;
-  position: relative;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  z-index: 10;">
-    <div style="margin-bottom: 15px;">
-      <a href="/privacy" style="color: #c491f4; text-decoration: none; margin: 0 10px; transition: color 0.4s;">Privacy Policy</a>
-      <a href="mailto:canlite24@outlook.com" style="color: #c491f4; text-decoration: none; margin: 0 10px; transition: color 0.4s;">Email Us</a>
-      <a href="https://discord.com/invite/46gkEU5kpP" target="_blank" style="color: #c491f4; text-decoration: none; margin: 0 10px; transition: color 0.4s;">Join our Discord</a>
-      <a href="/about" style="color: #c491f4; text-decoration: none; margin: 0 10px; transition: color 0.4s;">About Us</a>
-    </div>
-    <div style="font-size: 14px; color: #FFFFFF;">
-      &copy; <span id="year"></span> CanLite. All rights reserved.
-    </div>
+  <footer>
+    <a href="/privacy">Privacy Policy</a> |
+    <a href="mailto:canlite24@outlook.com">Contact</a> |
+    <a href="https://discord.com/invite/46gkEU5kpP" target="_blank">Discord</a>
+    <small>&copy; <span id="year"></span> CanLite. All rights reserved.</small>
   </footer>
-  <script>
-    // Set the current year dynamically
-    document.getElementById('year').textContent = new Date().getFullYear();
-  </script>
-
-<script>
-  document.getElementById('year').textContent = new Date().getFullYear();
-</script>
+  <script>document.getElementById('year').textContent=new Date().getFullYear();</script>
 </body>
 </html>
