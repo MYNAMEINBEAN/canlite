@@ -34,6 +34,7 @@ app.disable("x-powered-by");
 app.set("trust proxy", 1);
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
+app.use(compression());
 
 app.use((req, res, next) => {
   req.on("aborted", () => {
