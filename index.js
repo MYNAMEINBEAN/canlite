@@ -11,6 +11,7 @@ import verifyUser from "./middleware/authAdmin.js";
 import { createBareServer } from "@tomphttp/bare-server-node";
 import http from "node:http";
 import https from "node:https";
+import dotenv from 'dotenv';
 import { fileURLToPath } from "url";
 
 dotenv.config();
