@@ -6,13 +6,14 @@ import fs from "node:fs/promises";
 import path from "path";
 import helmet from "helmet";
 import compression from "compression";
-import morgan from "morgan";
 import apiRoutes from "./api.js";
 import verifyUser from "./middleware/authAdmin.js";
 import { createBareServer } from "@tomphttp/bare-server-node";
 import http from "node:http";
 import https from "node:https";
 import { fileURLToPath } from "url";
+
+dotenv.config();
 
 // Constants
 const __filename = fileURLToPath(import.meta.url);
@@ -29,10 +30,8 @@ app.disable("x-powered-by");
 app.set("trust proxy", 1);
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
-
 app.use(helmet());
 app.use(compression());
-app.use(morgan("combined"));
 
 // Body parsers
 app.use(express.json({ limit: "50mb" }));
@@ -40,7 +39,7 @@ app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 
 // Session store
 const redisClient = createClient();
-redisClient.connect().catch(console.error);
+redisClient.connect().catch(() => {});
 const redisStore = new RedisStore({ client: redisClient, prefix: "myapp:" });
 app.use(
   session({
@@ -58,15 +57,14 @@ let games = [];
   try {
     const data = await fs.readFile(path.join(__dirname, "end.json"), "utf8");
     games = JSON.parse(data);
-    console.log(`Loaded ${games.length} games`);
-  } catch (err) {
-    console.error("Failed to load games data:", err);
+  } catch {
+    // silent failure
   }
 })();
 
 // Universal abort handler
 app.use((req, res, next) => {
-  req.on("aborted", () => console.warn("Client aborted request:", req.url));
+  req.on("aborted", () => {});
   next();
 });
 
@@ -80,7 +78,6 @@ app.use(
     }
   })
 );
-// UV static bundle
 app.use('/~/uv', express.static(path.join(__dirname, 'static/uv'), { maxAge: '1d' }));
 
 // Service Worker
@@ -102,15 +99,14 @@ app.get('/games', (req, res) => {
   const filtered = games.filter(g => g.name.toLowerCase().includes(search.toLowerCase()));
   const sorted = filtered.sort((a, b) => a.name.localeCompare(b.name));
   const perPage = 100;
-  const total = sorted.length;
-  const totalPages = Math.max(Math.ceil(total / perPage), 1);
+  const totalPages = Math.max(Math.ceil(sorted.length / perPage), 1);
   const currentPage = Math.min(Math.max(parseInt(page), 1), totalPages);
   const paginated = sorted.slice((currentPage - 1) * perPage, currentPage * perPage);
   res.render('games', { games: paginated, currentPage, totalPages });
 });
 app.get('/play/:id', (req, res) => {
   const game = games.find(g => g.name === req.params.id);
-  return game ? res.render('play', { game }) : res.status(404).send('Game not found');
+  return game ? res.render('play', { game }) : res.status(404).end();
 });
 app.get('/d/:gameName.jpg', (req, res) => {
   const file = path.join(__dirname, 'static/d', `${req.params.gameName}.jpg`);
@@ -127,7 +123,7 @@ verifyApp.get('/validate-domain', (req, res) => {
   const { domain } = req.query;
   return domain.includes('104.36.85.249') ? res.sendStatus(403) : res.sendStatus(200);
 });
-verifyApp.listen(VERIFY_PORT, () => console.log(`Domain validation server on :${VERIFY_PORT}`));
+verifyApp.listen(VERIFY_PORT, () => {});
 
 // HTTP server with bareServer
 const server = http.createServer((req, res) => {
@@ -138,7 +134,7 @@ server.on('upgrade', (req, socket, head) => {
   if (bareServer.shouldRoute(req)) bareServer.routeUpgrade(req, socket, head);
   else socket.end();
 });
-server.listen(PORT, () => console.log(`Server running http://localhost:${PORT}`));
+server.listen(PORT, () => {});
 
 // Ads fetcher
 const url = 'https://adbpage.com/adblock?v=3&format=js';
@@ -149,7 +145,7 @@ function fetchAds() {
     let data = '';
     res.on('data', chunk => (data += chunk));
     res.on('end', () => fs.writeFile(outputFile, data));
-  }).on('error', console.error);
+  }).on('error', () => {});
 }
 fetchAds();
 setInterval(fetchAds, fetchInterval);
@@ -157,7 +153,6 @@ setInterval(fetchAds, fetchInterval);
 // Graceful shutdown
 ['SIGINT', 'SIGTERM'].forEach(sig =>
   process.on(sig, async () => {
-    console.log(`Received ${sig}, shutting down...`);
     server.close(() => process.exit(0));
   })
 );
