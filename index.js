@@ -1,162 +1,274 @@
 import express from "express";
+import { execSync } from "node:child_process";
+import fs from "node:fs";
 import session from "express-session";
-import { createClient } from "redis";
-import { RedisStore } from "connect-redis";
-import fs from "node:fs/promises";
 import path from "path";
-import helmet from "helmet";
-import compression from "compression";
+import { dirname } from "path";
+import { createBareServer } from "@tomphttp/bare-server-node";
+import { fileURLToPath } from "url";
+import * as http from "node:http";
+import * as https from "node:https";
+import { createClient } from "redis";
 import apiRoutes from "./api.js";
 import verifyUser from "./middleware/authAdmin.js";
-import { createBareServer } from "@tomphttp/bare-server-node";
-import http from "node:http";
-import https from "node:https";
-import dotenv from 'dotenv';
-import { fileURLToPath } from "url";
+import moment from "moment";
+import { RedisStore } from "connect-redis";
+import helmet from "helmet";
+import compression from "compression";
 
-dotenv.config();
-
-// Constants
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const PORT = process.env.PORT || 6676;
-const VERIFY_PORT = process.env.VERIFY_PORT || 4000;
-
-// Initialize Express
+const __dirname = dirname(__filename);
 const app = express();
 const bareServer = createBareServer("/b/");
 
-// Middleware
+let games = [];
+const gamesFilePath = path.join(__dirname, "end.json");
+try {
+  const data = fs.readFileSync(gamesFilePath, "utf8");
+  games = JSON.parse(data);
+} catch (err) {
+  console.error("Failed to load games data:", err);
+}
+
 app.disable("x-powered-by");
 app.set("trust proxy", 1);
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
-app.use(helmet());
-app.use(compression());
 
-// Body parsers
-app.use(express.json({ limit: "50mb" }));
-app.use(express.urlencoded({ extended: true, limit: "50mb" }));
-
-// Session store
-const redisClient = createClient();
-redisClient.connect().catch(() => {});
-const redisStore = new RedisStore({ client: redisClient, prefix: "myapp:" });
-app.use(
-  session({
-    store: redisStore,
-    secret: process.env.EXPRESSJS_SECRET,
-    resave: false,
-    saveUninitialized: false,
-    cookie: { secure: process.env.NODE_ENV === 'production', maxAge: 3600000 },
-  })
-);
-
-// Load games data
-let games = [];
-(async () => {
-  try {
-    const data = await fs.readFile(path.join(__dirname, "end.json"), "utf8");
-    games = JSON.parse(data);
-  } catch {
-    // silent failure
-  }
-})();
-
-// Universal abort handler
 app.use((req, res, next) => {
-  req.on("aborted", () => {});
+  req.on("aborted", () => {
+    console.warn("Request aborted by client:", req.url);
+  });
   next();
 });
 
-// Static assets
+let redisClient = createClient();
+redisClient.connect().catch(console.error);
+
+let redisStore = new RedisStore({
+  client: redisClient,
+  prefix: "myapp:",
+});
+
 app.use(
-  ['/static', '/dist'],
-  express.static(path.join(__dirname), {
-    maxAge: '1d',
-    setHeaders: (res, file) => {
-      if (!file.endsWith('.html')) res.set('Cache-Control', 'public, max-age=31557600, immutable');
-    }
-  })
+    session({
+      store: redisStore,
+      secret: process.env.EXPRESSJS_SECRET,
+      resave: false,
+      saveUninitialized: false,
+      cookie: { secure: true },
+    })
 );
-app.use('/~/uv', express.static(path.join(__dirname, 'static/uv'), { maxAge: '1d' }));
 
-// Service Worker
-app.get('/uv/sw.js', (req, res) => {
-  res.set('Service-Worker-Allowed', '/~/uv/');
-  res.sendFile(path.join(__dirname, 'static/uv/sw.js'));
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ extended: true, limit: "50mb" }));
+
+// In-memory API tracking buffer
+const apiStats = new Map();
+
+app.get("/uv/sw.js", (req, res) => {
+  res.set("Service-Worker-Allowed", "/~/uv/");
+  res.sendFile(__dirname + "/static/uv/sw.js");
 });
 
-// Health check
-app.get('/validate-domain', (req, res) => res.sendStatus(200));
+app.get("/~/uv/uv/uv.bundle.js", (req, res) => {
+  res.sendFile(__dirname + "/static/uv/uv.bundle.js");
+});
 
-// API routes
-app.use('/api', apiRoutes);
+app.get("/~/uv/uv/uv.config.js", (req, res) => {
+  res.sendFile(__dirname + "/static/uv/uv.config.js");
+});
 
-// Web routes
-app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'static/landing/index.html')));
-app.get('/games', (req, res) => {
-  const { search = '', page = 1 } = req.query;
-  const filtered = games.filter(g => g.name.toLowerCase().includes(search.toLowerCase()));
-  const sorted = filtered.sort((a, b) => a.name.localeCompare(b.name));
+app.get("/~/uv/uv/uv.handler.js", (req, res) => {
+  res.sendFile(__dirname + "/static/uv/uv.handler.js");
+});
+
+app.get("/validate-domain", (req, res) => {
+  res.status(200).send("OK");
+});
+
+app.get("/stats", verifyUser, (req, res) => {
+  res.sendFile(path.join(__dirname, "/private/stats/index.html"));
+});
+
+app.get("/games", (req, res) => {
   const perPage = 100;
-  const totalPages = Math.max(Math.ceil(sorted.length / perPage), 1);
-  const currentPage = Math.min(Math.max(parseInt(page), 1), totalPages);
-  const paginated = sorted.slice((currentPage - 1) * perPage, currentPage * perPage);
-  res.render('games', { games: paginated, currentPage, totalPages });
-});
-app.get('/play/:id', (req, res) => {
-  const game = games.find(g => g.name === req.params.id);
-  return game ? res.render('play', { game }) : res.status(404).end();
-});
-app.get('/d/:gameName.jpg', (req, res) => {
-  const file = path.join(__dirname, 'static/d', `${req.params.gameName}.jpg`);
-  res.sendFile(file, err => {
-    if (err) res.sendFile(path.join(__dirname, 'static', 'logo.png'));
+  let search = req.query.search || "";
+  let page = parseInt(req.query.page) || 1;
+
+  const filteredGames = games.filter((game) =>
+      game.name.toLowerCase().includes(search)
+  );
+
+  const total = filteredGames.length;
+  const totalPages = Math.ceil(total / perPage);
+  if (page < 1) page = 1;
+  if (page > totalPages) page = totalPages;
+
+  const sortedGames = filteredGames.sort((a, b) => a.name.localeCompare(b.name));
+  const startIndex = (page - 1) * perPage;
+  const paginatedGames = sortedGames.slice(startIndex, startIndex + perPage);
+
+  res.render("games", {
+    games: paginatedGames,
+    currentPage: page,
+    totalPages: totalPages,
   });
 });
-app.get('/stats', verifyUser, (req, res) => res.sendFile(path.join(__dirname, 'private/stats/index.html')));
-app.get('/proxe', (req, res) => res.sendFile(path.join(__dirname, 'dist/index.html')));
 
+app.get("/d/:gameName.jpg", (req, res) => {
+  const gameName = req.params.gameName;
+  const filePath = path.join(__dirname, "static/d/", `${gameName}.jpg`);
+
+  if (fs.existsSync(filePath)) {
+    res.sendFile(filePath);
+  } else {
+    res.sendFile(path.join(__dirname, "static", "logo.png"));
+  }
+});
+
+app.get("/play/:id", (req, res) => {
+  const gameName = req.params.id;
+  const game = games.find((g) => g.name === gameName);
+  if (!game) {
+    return res.status(404).send("Game not found");
+  }
+  res.render("play", { game });
+});
+
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname + "/static/landing/index.html"));
+});
+
+app.get("/proxe", function (req, res) {
+  res.sendFile(path.join(__dirname + "/dist/index.html"));
+});
+
+app.use(function (req, res, next) {
+  if (
+      req.path.endsWith(".png") ||
+      req.path.endsWith(".jpg") ||
+      req.path.endsWith(".jpeg") ||
+      req.path.endsWith(".gif")
+  ) {
+    res.set("Cache-Control", "public, max-age=31557600, immutable");
+  } else {
+    res.set("Cache-Control", "max-age=600");
+  }
+  return next();
+});
+
+app.use("/api", apiRoutes);
 app.use(express.static(__dirname + "/dist"));
 app.use(express.static(__dirname + "/static"));
 
-// Domain validation microservice
-const verifyApp = express();
-verifyApp.get('/validate-domain', (req, res) => {
-  const { domain } = req.query;
-  return domain.includes('104.36.85.249') ? res.sendStatus(403) : res.sendStatus(200);
-});
-verifyApp.listen(VERIFY_PORT, () => {});
+const server = http.createServer();
 
-// HTTP server with bareServer
-const server = http.createServer((req, res) => {
-  if (bareServer.shouldRoute(req)) return bareServer.routeRequest(req, res);
-  app(req, res);
+server.on("request", async (req, res) => {
+  req.on("aborted", () => {
+    console.warn("Underlying request aborted:", req.url);
+  });
+  try {
+    if (bareServer.shouldRoute(req)) {
+      bareServer.routeRequest(req, res);
+    } else {
+      app(req, res);
+    }
+  } catch (error) {
+    if (error.message && error.message.includes("aborted")) {
+      console.warn("Request aborted by client during processing:", error);
+      return;
+    }
+    console.error("Request error:", error);
+    res.statusCode = 500;
+    res.write(String(error));
+    res.end();
+  }
 });
-server.on('upgrade', (req, socket, head) => {
-  if (bareServer.shouldRoute(req)) bareServer.routeUpgrade(req, socket, head);
-  else socket.end();
-});
-server.listen(PORT, () => {});
 
-// Ads fetcher
+server.on("upgrade", async (req, socket, head) => {
+  req.on("aborted", () => {
+    console.warn("Upgrade request aborted:", req.url);
+  });
+  try {
+    if (bareServer.shouldRoute(req)) {
+      bareServer.routeUpgrade(req, socket, head);
+    } else {
+      socket.end();
+    }
+  } catch (error) {
+    if (error.message && error.message.includes("aborted")) {
+      console.warn("Upgrade aborted by client:", error);
+      socket.end();
+      return;
+    }
+    console.error("Upgrade error:", error);
+    socket.end();
+  }
+});
+
+app.use((err, req, res, next) => {
+  if (err && err.type === "request.aborted") {
+    console.warn("Request was aborted by the client:", err);
+    return;
+  }
+  next(err);
+});
+
+process.on("SIGINT", shutdown);
+process.on("SIGTERM", shutdown);
+
+function shutdown() {
+  console.log("SIGTERM signal received: closing HTTP server");
+  server.close();
+  process.exit(0);
+}
+
+server.listen(6676, () => {
+  console.log("Main server http://localhost:9091");
+});
+
+const verify = express();
+verify.get("/validate-domain", (req, res) => {
+  try {
+    const requestedDomain = req.query.domain;
+    if (requestedDomain.includes("104.36.85.249")) {
+      res.status(403).send("Forbidden");
+    } else {
+      res.status(200).send("OK");
+    }
+  } catch (error) {
+    console.log("Verify error " + error);
+  }
+});
+
+verify.listen(4000, () => {
+  console.log("Domain validation server running on http://localhost:4000");
+});
+
 const url = 'https://adbpage.com/adblock?v=3&format=js';
 const outputFile = path.join(__dirname, 'static/ads.js');
 const fetchInterval = 5 * 60 * 1000;
-function fetchAds() {
-  https.get(url, res => {
-    let data = '';
-    res.on('data', chunk => (data += chunk));
-    res.on('end', () => fs.writeFile(outputFile, data));
-  }).on('error', () => {});
-}
-fetchAds();
-setInterval(fetchAds, fetchInterval);
 
-// Graceful shutdown
-['SIGINT', 'SIGTERM'].forEach(sig =>
-  process.on(sig, async () => {
-    server.close(() => process.exit(0));
-  })
-);
+function fetchWebsite() {
+  https.get(url, (res) => {
+    let data = '';
+    res.on('data', (chunk) => {
+      data += chunk;
+    });
+    res.on('end', () => {
+      fs.writeFile(outputFile, data, (err) => {
+        if (err) {
+          console.error('Error writing to file:', err);
+        } else {
+          console.log(`Content fetched and saved to ${outputFile} at ${new Date().toISOString()}`);
+        }
+      });
+    });
+  }).on('error', (err) => {
+    console.error('Error fetching the website:', err);
+  });
+}
+
+fetchWebsite();
+setInterval(fetchWebsite, fetchInterval);
