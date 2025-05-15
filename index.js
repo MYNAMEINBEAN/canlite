@@ -118,6 +118,9 @@ app.get('/d/:gameName.jpg', (req, res) => {
 app.get('/stats', verifyUser, (req, res) => res.sendFile(path.join(__dirname, 'private/stats/index.html')));
 app.get('/proxe', (req, res) => res.sendFile(path.join(__dirname, 'dist/index.html')));
 
+app.use(express.static(__dirname + "/dist"));
+app.use(express.static(__dirname + "/static"));
+
 // Domain validation microservice
 const verifyApp = express();
 verifyApp.get('/validate-domain', (req, res) => {
