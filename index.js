@@ -13,8 +13,6 @@ import apiRoutes from "./api.js";
 import verifyUser from "./middleware/authAdmin.js";
 import moment from "moment";
 import { RedisStore } from "connect-redis";
-import helmet from "helmet";
-import compression from "compression";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -34,7 +32,6 @@ app.disable("x-powered-by");
 app.set("trust proxy", 1);
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
-app.use(compression());
 
 app.use((req, res, next) => {
   req.on("aborted", () => {
