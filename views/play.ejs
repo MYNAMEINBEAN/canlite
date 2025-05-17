@@ -107,7 +107,11 @@
 <div class="ad1">
     <div class="adTXT1">Advertisement</div>
     <div class="script-container1">
-        <script src="../../ads/longad.js"></script>
+<!--        <script src="../../ads/longad.js"></script>-->
+        <iframe id="add1" src="https://canlite.org/test"></iframe>
+        <script>
+            document.getElementById("add1").src = window.location.origin + window.__uv$config.prefix + window.__uv$config.encodeUrl("https://canlite.org/test")
+        </script>
     </div>
 </div>
 
