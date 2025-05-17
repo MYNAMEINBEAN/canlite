@@ -108,9 +108,23 @@
     <div class="adTXT1">Advertisement</div>
     <div class="script-container1">
 <!--        <script src="../../ads/longad.js"></script>-->
-        <iframe id="add1" src="https://canlite.org/test"></iframe>
+        <iframe id="add1" src=""></iframe>
         <script>
-            document.getElementById("add1").src = window.location.origin + window.__uv$config.prefix + window.__uv$config.encodeUrl("https://canlite.org/test")
+            window.onload = () => {
+                navigator.serviceWorker.register("/uv/sw.js", {
+                    scope: window.__uv$config?.prefix || "/uv/"
+                }).catch(err => alert("Service worker registration failed: " + err));
+                document.getElementById("add1").src = window.location.origin + window.__uv$config.prefix + window.__uv$config.encodeUrl("https://canlite.org/test")
+                <% if (game.type === 'html5') { %>
+
+                const iframe = document.querySelector('#game-container iframe');
+                const isExternal = /^https?:\/\//.test("<%= game.path %>");
+
+                iframe.src = isExternal
+                    ? window.location.origin + window.__uv$config.prefix + window.__uv$config.encodeUrl("<%= game.path %>")
+                    : "<%= game.path %>";
+                <% } %>
+            }
         </script>
     </div>
 </div>
@@ -186,20 +200,6 @@
             }
         });
     });
-    <% if (game.type === 'html5') { %>
-    window.onload = () => {
-        navigator.serviceWorker.register("/uv/sw.js", {
-            scope: window.__uv$config?.prefix || "/uv/"
-        }).catch(err => alert("Service worker registration failed: " + err));
-
-        const iframe = document.querySelector('#game-container iframe');
-        const isExternal = /^https?:\/\//.test("<%= game.path %>");
-
-        iframe.src = isExternal
-            ? window.location.origin + window.__uv$config.prefix + window.__uv$config.encodeUrl("<%= game.path %>")
-            : "<%= game.path %>";
-    };
-    <% } %>
 
 </script>
 
