@@ -81,12 +81,25 @@ app.get("/~/uv/uv/uv.handler.js", (req, res) => {
   res.sendFile(__dirname + "/static/uv/uv.handler.js");
 });
 
-app.get("/validate-domain", (req, res) => {
-  res.status(200).send("OK");
+
+router.get('/sitemap.xml', async (req, res) => {
+  try {
+    const sitemapPath = path.join(__dirname, 'static', 'sitemap.xml');
+    const raw = await fs.readFile(sitemapPath, 'utf8');
+
+    const domain = req.hostname; // only the domain, no protocol or port
+    const modified = raw.replace(/canlite\.org/g, domain);
+
+    res.set('Content-Type', 'application/xml');
+    res.send(modified);
+  } catch (err) {
+    console.error('Error reading sitemap:', err);
+    res.status(500).send('Internal Server Error');
+  }
 });
 
-app.get("/stats", verifyUser, (req, res) => {
-  res.sendFile(path.join(__dirname, "/private/stats/index.html"));
+app.get("/validate-domain", (req, res) => {
+  res.status(200).send("OK");
 });
 
 app.get("/games", (req, res) => {
