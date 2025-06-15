@@ -82,7 +82,7 @@ app.get("/~/uv/uv/uv.handler.js", (req, res) => {
 });
 
 
-router.get('/sitemap.xml', async (req, res) => {
+app.get('/sitemap.xml', async (req, res) => {
   try {
     const sitemapPath = path.join(__dirname, 'static', 'sitemap.xml');
     const raw = await fs.readFile(sitemapPath, 'utf8');
