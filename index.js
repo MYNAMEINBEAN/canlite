@@ -84,10 +84,10 @@ app.get("/~/uv/uv/uv.handler.js", (req, res) => {
 
 app.get('/sitemap.xml', async (req, res) => {
   try {
-    const sitemapPath = path.join(__dirname, 'static', 'sitemap.xml');
-    const raw = await fs.readFile(sitemapPath, 'utf8');
+    const sitemapPath = path.join(process.cwd(), 'static', 'sitemap.xml');
+    const raw = await fs.promises.readFile(sitemapPath, 'utf8'); // ✅ using promises from fs
 
-    const domain = req.hostname; // only the domain, no protocol or port
+    const domain = req.hostname;
     const modified = raw.replace(/canlite\.org/g, domain);
 
     res.set('Content-Type', 'application/xml');
