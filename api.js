@@ -31,28 +31,6 @@ router.post('/check', async (req, res) => {
     }
 })
 
-router.get("/stats", verifyUser, async (req, res) => {
-    try {
-        const domains = await redisClientAPI.sMembers("tracked_domains");
-        const days = [...Array(30)].map((_, i) =>
-            moment().subtract(i, "days").format("YYYY-MM-DD")
-        );
-
-        let stats = {};
-        for (let domain of domains) {
-            stats[domain] = {};
-            for (let day of days) {
-                const key = `api_requests:${domain}:${day}`;
-                stats[domain][day] = (await redisClientAPI.get(key)) || 0;
-            }
-        }
-
-        res.json({ stats, days });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});
-
 // LOGIN Route
 router.post('/login', async (req, res) => {
     const { email, password } = req.body;

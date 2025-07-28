@@ -98,11 +98,11 @@ app.get('/sitemap.xml', async (req, res) => {
   }
 });
 
-app.get("/validate-domain", (req, res) => {
+app.get("/validate-domain", async (req, res) => {
   res.status(200).send("OK");
 });
 
-app.get("/games", (req, res) => {
+app.get("/games", async (req, res) => {
   const perPage = 100;
   let search = req.query.search || "";
   let page = parseInt(req.query.page) || 1;
@@ -127,6 +127,38 @@ app.get("/games", (req, res) => {
   });
 });
 
+app.get("/gamesnew", async (req, res) => {
+  try {
+    const topGames = await redisClient.zrevrange(
+        "game_leaderboard",
+        0,
+        7,
+        "WITHSCORES"
+    );
+
+    // Format results and get game objects
+    const result = [];
+    for (let i = 0; i < topGames.length; i += 2) {
+      const game = games.find((g) => g.name === topGames[i]);
+      if (game) {
+        result.push(game);
+      }
+    }
+
+    // Split into top 3 and next 5
+    const topGamesFirst = result.slice(0, 3);
+    const topGamesRest = result.slice(3, 8);
+
+    res.render("gamesRemake", {
+      topGamesFirst,
+      topGamesRest
+    });
+  } catch (err) {
+    console.error("Error fetching top games:", err);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
 app.get("/d/:gameName.jpg", (req, res) => {
   const gameName = req.params.gameName;
   const filePath = path.join(__dirname, "static/d/", `${gameName}.jpg`);
@@ -141,9 +173,20 @@ app.get("/d/:gameName.jpg", (req, res) => {
 app.get("/play/:id", (req, res) => {
   const gameName = req.params.id;
   const game = games.find((g) => g.name === gameName);
+
   if (!game) {
     return res.status(404).send("Game not found");
   }
+
+  // Increment both the counter and sorted set
+  const counterKey = `games:${gameName}:counter`;
+  const multi = redisClient.multi();
+  multi.incr(counterKey);
+  multi.zadd("game_leaderboard", "INCR", 1, gameName);
+  multi.exec((err) => {
+    if (err) console.error("Redis update error:", err);
+  });
+
   res.render("play", { game });
 });
 
@@ -230,9 +273,15 @@ function shutdown() {
   process.exit(0);
 }
 
-server.listen(9909, () => {
-  console.log("Main server http://localhost:9909");
-});
+if(process.env.environment === "testing") {
+  server.listen(9908, () => {
+    console.log("Main server http://localhost:9909");
+  });
+} else {
+  server.listen(9909, () => {
+    console.log("Main server http://localhost:9909");
+  });
+}
 
 const verify = express();
 verify.get("/validate-domain", (req, res) => {
@@ -248,9 +297,15 @@ verify.get("/validate-domain", (req, res) => {
   }
 });
 
-verify.listen(4000, () => {
-  console.log("Domain validation server running on http://localhost:4000");
-});
+if(process.env.environment === "testing") {
+  verify.listen(3999, () => {
+    console.log("Domain validation server running on http://localhost:4000");
+  });
+} else {
+  verify.listen(4000, () => {
+    console.log("Domain validation server running on http://localhost:4000");
+  });
+}
 
 const url = 'https://adbpage.com/adblock?v=3&format=js';
 const outputFile = path.join(__dirname, 'static/ads.js');
