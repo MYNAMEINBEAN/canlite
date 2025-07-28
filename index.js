@@ -35,7 +35,7 @@ app.set("views", path.join(__dirname, "views"));
 
 app.use((req, res, next) => {
   req.on("aborted", () => {
-    console.warn("Request aborted by client:", req.url);
+    let e = 1
   });
   next();
 });
@@ -177,7 +177,7 @@ const server = http.createServer();
 
 server.on("request", async (req, res) => {
   req.on("aborted", () => {
-    console.warn("Underlying request aborted:", req.url);
+    let e = 1;
   });
   try {
     if (bareServer.shouldRoute(req)) {
@@ -187,10 +187,8 @@ server.on("request", async (req, res) => {
     }
   } catch (error) {
     if (error.message && error.message.includes("aborted")) {
-      console.warn("Request aborted by client during processing:", error);
       return;
     }
-    console.error("Request error:", error);
     res.statusCode = 500;
     res.write(String(error));
     res.end();
@@ -199,7 +197,7 @@ server.on("request", async (req, res) => {
 
 server.on("upgrade", async (req, socket, head) => {
   req.on("aborted", () => {
-    console.warn("Upgrade request aborted:", req.url);
+    let e = 1;
   });
   try {
     if (bareServer.shouldRoute(req)) {
@@ -209,18 +207,15 @@ server.on("upgrade", async (req, socket, head) => {
     }
   } catch (error) {
     if (error.message && error.message.includes("aborted")) {
-      console.warn("Upgrade aborted by client:", error);
       socket.end();
       return;
     }
-    console.error("Upgrade error:", error);
     socket.end();
   }
 });
 
 app.use((err, req, res, next) => {
   if (err && err.type === "request.aborted") {
-    console.warn("Request was aborted by the client:", err);
     return;
   }
   next(err);
