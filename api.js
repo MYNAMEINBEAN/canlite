@@ -4,10 +4,21 @@ import pool from './db.js';
 import verifyUser from "./middleware/authAdmin.js";
 import {createClient} from "redis";
 import moment from "moment";
+import path from "path";
+import fs from "node:fs";
 
 let redisClientAPI = createClient();
 redisClientAPI.connect().catch(console.error)
 const router = express.Router();
+
+let games = [];
+const gamesFilePath = path.join(__dirname, "end.json");
+try {
+    const data = fs.readFileSync(gamesFilePath, "utf8");
+    games = JSON.parse(data);
+} catch (err) {
+    console.error("Failed to load games data:", err);
+}
 
 // Utility function to generate random strings
 const generateRandomString = (length) => {
@@ -150,5 +161,16 @@ router.post('/saveGameData', async (req, res) => {
         res.status(500).json({ error: 'Server Error' });
     }
 });
+
+router.get('/img/:id', (req, res) => {
+    const gameName = req.params.id;
+    const game = games.find((g) => g.name === gameName);
+
+    if(game.prev) {
+        res.sendFile(__dirname + "/static" + game.prev)
+    } else {
+        res.sendFile(__dirname + "/static/d/" + encodeURIComponent(game.name.replace(/\//g, '')) + '.jpg')
+    }
+})
 
 export default router;
