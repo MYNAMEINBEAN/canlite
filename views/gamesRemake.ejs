@@ -285,7 +285,7 @@
         </div>
 
         <!-- Next 5 Games - Small Cards -->
-        <div class="games-grid top-games-small">
+        <div class="games-grid top-games-small" id="favorites-grid">
             <% topGamesRest.forEach(function(game) { %>
                 <a href="/play/<%= game.name %>" class="game-card small" style="display: block; text-decoration: none; color: inherit;">
                     <% if (game.prev) { %>
@@ -304,7 +304,6 @@
         <h2>⭐ Your Favorites</h2>
         <div id="favorites-container">
             <div class="games-grid top-games-small">
-                <p id="no-favorites-msg">No favorited games yet. Click the heart icon on any game to add it to your favorites!</p>
                 <script>
                     function renderFavorites() {
                         const favorites = JSON.parse(localStorage.getItem('canlitefavorites') || []);
@@ -317,7 +316,7 @@
                         // Show message if no favorites
                         if (favorites.length === 0) {
                             if (!noFavoritesMsg) {
-                                favoritesGrid.innerHTML = '<p id="no-favorites-msg">No favorited games yet. Click the heart icon on any game to add it to your favorites!</p>';
+                                favoritesGrid.innerHTML = '';
                             } else {
                                 noFavoritesMsg.style.display = 'block';
                             }
