@@ -102,7 +102,7 @@ app.get("/validate-domain", async (req, res) => {
   res.status(200).send("OK");
 });
 
-app.get("/games", async (req, res) => {
+app.get("/allgames", async (req, res) => {
   const perPage = 100;
   let search = req.query.search || "";
   let page = parseInt(req.query.page) || 1;
@@ -127,7 +127,7 @@ app.get("/games", async (req, res) => {
   });
 });
 
-app.get("/gamesnew", async (req, res) => {
+app.get("/games", async (req, res) => {
   try {
     const topGames = await redisClient.zRange(
         "game_leaderboard",

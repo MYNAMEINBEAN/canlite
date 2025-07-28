@@ -240,18 +240,50 @@
     </style>
 </head>
 <body>
+
+<!-- Authentication Modal -->
+<div id="authModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <div class="modal-tabs">
+            <button id="loginTab" class="active">Login</button>
+            <button id="registerTab">Register</button>
+        </div>
+        <div id="loginForm" class="auth-form">
+            <h2>Login</h2>
+            <form>
+                <label for="loginEmail">Email</label>
+                <input type="email" id="loginEmail" placeholder="Enter your email" required>
+                <label for="loginPassword">Password</label>
+                <input type="password" id="loginPassword" placeholder="Enter your password" required>
+                <button type="submit">Login</button>
+            </form>
+        </div>
+        <div id="registerForm" class="auth-form" style="display: none;">
+            <h2>Register</h2>
+            <form>
+                <label for="registerEmail">Email</label>
+                <input type="email" id="registerEmail" placeholder="Enter your email" required>
+                <label for="registerPassword">Password</label>
+                <input type="password" id="registerPassword" placeholder="Enter your password" required>
+                <button type="submit">Register</button>
+            </form>
+        </div>
+    </div>
+</div>
+
 <!-- Navigation Bar -->
 <div class="nav">
-    <div class="logo">
-        <img src="https://via.placeholder.com/50/FF5733/FFFFFF?text=CL" alt="CanLite">
+    <div class="logo" onclick="window.open('/', '_self')">
+        <img src="/logo.png" alt="CanLite">
         <h3>CanLite</h3>
     </div>
     <div class="nav-items">
-        <li><a href="#"><span class="material-symbols-outlined">home</span> Home</a></li>
-        <li><a href="#"><span class="material-symbols-outlined">stadia_controller</span> Games</a></li>
-        <li><a href="#"><span class="material-symbols-outlined">language</span> Proxe</a></li>
-        <li><a href="#"><span class="material-symbols-outlined">person</span>Partners</a></li>
-        <li><a href="#"><span id="loginSpan" class="material-symbols-outlined">login</span>Login / Register</a></li>
+        <li><a href="/"><span class="material-symbols-outlined">home</span> Home</a></li>
+        <li><a href="/games"><span class="material-symbols-outlined">stadia_controller</span> Games</a></li>
+        <li><a href="/proxe"><span class="material-symbols-outlined">language</span> Proxe</a></li>
+        <li><a href="/partners"><span class="material-symbols-outlined">person</span>Partners</a></li>
+        <li><a id="loginModalBtn"><span id="loginSpan" class="material-symbols-outlined">login</span>Login / Register</a></li>
     </div>
     <div class="time" id="time-clock"></div>
 </div>
@@ -368,15 +400,6 @@
         },
         retina_detect: true
     });
-
-    // Update time
-    function updateTime() {
-        const now = new Date();
-        const timeString = now.toLocaleTimeString();
-        document.getElementById('time-clock').textContent = timeString;
-    }
-    setInterval(updateTime, 1000);
-    updateTime();
 </script>
 
 <footer style="
@@ -426,6 +449,10 @@
         &copy; <span id="year"></span> CanLite. All rights reserved.
     </div>
 </footer>
-
+<script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+</script>
+<script src="/login/index.js"></script></body>
+<script src="games/time.js"></script>
 </body>
 </html>
