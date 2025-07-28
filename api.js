@@ -173,7 +173,7 @@ router.get('/img/:id', (req, res) => {
     if(game.prev) {
         res.sendFile(__dirname + "/static" + game.prev)
     } else {
-        res.sendFile(__dirname + "/static/d/" + encodeURIComponent(game.name.replace(/\//g, '')) + '.jpg')
+        res.sendFile(__dirname + "/static/d/" + game.name.replace(/\//g, '') + '.jpg')
     }
 })
 
