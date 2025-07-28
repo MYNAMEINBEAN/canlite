@@ -129,49 +129,37 @@ app.get("/games", async (req, res) => {
 
 app.get("/gamesnew", async (req, res) => {
   try {
-    let topGames = await redisClient.zRange(
+    const topGames = await redisClient.zRange(
         "game_leaderboard",
         0,
         7,
         { REV: true, WITHSCORES: true }
     );
 
-    // Flatten if necessary (for some client versions)
-    if (Array.isArray(topGames[0])) {
-      topGames = topGames.flat();
-    }
+    console.log("Raw Redis data:", topGames); // DEBUG
+
 
     const result = [];
-    for (let i = 0; i < topGames.length; i += 2) {
-      if (i + 1 >= topGames.length) break;
-
+    for (let i = 0; i < topGames.length; i += 1) {
       const gameName = topGames[i];
       const score = topGames[i + 1];
 
-      // Find with normalization
-      const game = games.find(g =>
-          g.name.trim().toLowerCase() === gameName.trim().toLowerCase()
-      );
+      console.log(`Processing: ${gameName} (${score})`); // DEBUG
+
+      const game = games.find(g => g.name === gameName);
 
       if (game) {
         result.push({
           ...game,
-          count: parseInt(score)
         });
       } else {
-        console.warn(`Game not found: '${gameName}'`);
-        // Add placeholder to maintain count
-        result.push({
-          name: gameName,
-          count: parseInt(score),
-          // Add other necessary placeholder fields
-        });
+        console.warn(`Game not found in database: ${gameName}`);
       }
     }
 
-    // Sort by count descending (secondary sort)
-    result.sort((a, b) => b.count - a.count);
+    console.log(`Processed ${result.length} games`); // DEBUG
 
+    // Split into top 3 and next 5
     const topGamesFirst = result.slice(0, 3);
     const topGamesRest = result.slice(3, 8);
 
