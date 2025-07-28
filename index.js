@@ -129,7 +129,6 @@ app.get("/games", async (req, res) => {
 
 app.get("/gamesnew", async (req, res) => {
   try {
-    // Use zRange with REV option instead of zRevRange
     const topGames = await redisClient.zRange(
         "game_leaderboard",
         0,
@@ -151,12 +150,15 @@ app.get("/gamesnew", async (req, res) => {
         });
       }
     }
-    console.log(result)
-    // Split into top 3 and next 5
+
+    console.log("Total games found:", result.length); // Should be 8
+
+    // Correct slicing - positions 0-2 and 3-7
     const topGamesFirst = result.slice(0, 3);
-    console.log(topGamesFirst)
     const topGamesRest = result.slice(3, 8);
-    console.log(topGamesRest)
+
+    console.log("First row games:", topGamesFirst.length); // Should be 3
+    console.log("Second row games:", topGamesRest.length); // Should be 5
 
     res.render("gamesRemake", {
       topGamesFirst,
