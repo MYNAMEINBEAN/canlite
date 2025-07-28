@@ -129,19 +129,26 @@ app.get("/games", async (req, res) => {
 
 app.get("/gamesnew", async (req, res) => {
   try {
-    const topGames = await redisClient.zRevRange(
+    // Use zRange with REV option instead of zRevRange
+    const topGames = await redisClient.zRange(
         "game_leaderboard",
         0,
         7,
-        "WITHSCORES"
+        { REV: true, WITHSCORES: true }
     );
 
-    // Format results and get game objects
+    // Format results
     const result = [];
     for (let i = 0; i < topGames.length; i += 2) {
-      const game = games.find((g) => g.name === topGames[i]);
+      const gameName = topGames[i];
+      const score = topGames[i + 1];
+      const game = games.find((g) => g.name === gameName);
+
       if (game) {
-        result.push(game);
+        result.push({
+          ...game,
+          count: parseInt(score)
+        });
       }
     }
 
@@ -174,18 +181,17 @@ app.get("/play/:id", (req, res) => {
   const gameName = req.params.id;
   const game = games.find((g) => g.name === gameName);
 
-  if (!game) {
-    return res.status(404).send("Game not found");
-  }
+  if (!game) return res.status(404).send("Game not found");
 
-  // Increment both the counter and sorted set
   const counterKey = `games:${gameName}:counter`;
-  const multi = redisClient.multi();
-  multi.incr(counterKey);
-  multi.zadd("game_leaderboard", "INCR", 1, gameName);
-  multi.exec((err) => {
-    if (err) console.error("Redis update error:", err);
-  });
+
+  // Use pipeline with correct commands
+  const pipeline = redisClient.multi();
+  pipeline.incr(counterKey);
+  pipeline.zAdd('game_leaderboard', { score: 1, value: gameName }, { INCR: true });
+
+  pipeline.exec()
+      .catch((err) => console.error("Redis update error:", err));
 
   res.render("play", { game });
 });
