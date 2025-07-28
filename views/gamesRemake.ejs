@@ -285,7 +285,7 @@
         </div>
 
         <!-- Next 5 Games - Small Cards -->
-        <div class="games-grid top-games-small" id="favorites-grid">
+        <div class="games-grid top-games-small">
             <% topGamesRest.forEach(function(game) { %>
                 <a href="/play/<%= game.name %>" class="game-card small" style="display: block; text-decoration: none; color: inherit;">
                     <% if (game.prev) { %>
@@ -303,7 +303,7 @@
     <div class="section">
         <h2>⭐ Your Favorites</h2>
         <div id="favorites-container">
-            <div class="games-grid top-games-small">
+            <div class="games-grid top-games-small" id="favorites-grid">
                 <script>
                     function renderFavorites() {
                         const favorites = JSON.parse(localStorage.getItem('canlitefavorites') || []);
