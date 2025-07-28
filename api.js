@@ -4,12 +4,16 @@ import pool from './db.js';
 import verifyUser from "./middleware/authAdmin.js";
 import {createClient} from "redis";
 import moment from "moment";
-import path from "path";
+import path, { dirname } from "path";
 import fs from "node:fs";
+import { fileURLToPath } from "url";
 
 let redisClientAPI = createClient();
 redisClientAPI.connect().catch(console.error)
 const router = express.Router();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 let games = [];
 const gamesFilePath = path.join(__dirname, "end.json");
