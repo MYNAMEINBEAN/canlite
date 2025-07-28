@@ -129,28 +129,29 @@ app.get("/games", async (req, res) => {
 
 app.get("/gamesnew", async (req, res) => {
   try {
-    const topGames = await redisClient.zRange(
+    let topGames = await redisClient.zRange(
         "game_leaderboard",
         0,
         7,
         { REV: true, WITHSCORES: true }
     );
 
-    console.log("Raw Redis data:", topGames); // DEBUG
-
-    // Validate result structure
-    if (topGames.length % 2 !== 0) {
-      console.error("Invalid Redis response: Odd number of elements");
+    // Flatten if necessary (for some client versions)
+    if (Array.isArray(topGames[0])) {
+      topGames = topGames.flat();
     }
 
     const result = [];
     for (let i = 0; i < topGames.length; i += 2) {
+      if (i + 1 >= topGames.length) break;
+
       const gameName = topGames[i];
       const score = topGames[i + 1];
 
-      console.log(`Processing: ${gameName} (${score})`); // DEBUG
-
-      const game = games.find(g => g.name === gameName);
+      // Find with normalization
+      const game = games.find(g =>
+          g.name.trim().toLowerCase() === gameName.trim().toLowerCase()
+      );
 
       if (game) {
         result.push({
@@ -158,13 +159,19 @@ app.get("/gamesnew", async (req, res) => {
           count: parseInt(score)
         });
       } else {
-        console.warn(`Game not found in database: ${gameName}`);
+        console.warn(`Game not found: '${gameName}'`);
+        // Add placeholder to maintain count
+        result.push({
+          name: gameName,
+          count: parseInt(score),
+          // Add other necessary placeholder fields
+        });
       }
     }
 
-    console.log(`Processed ${result.length} games`); // DEBUG
+    // Sort by count descending (secondary sort)
+    result.sort((a, b) => b.count - a.count);
 
-    // Split into top 3 and next 5
     const topGamesFirst = result.slice(0, 3);
     const topGamesRest = result.slice(3, 8);
 
