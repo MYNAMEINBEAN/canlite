@@ -28,7 +28,7 @@ if (['canlite.online', 'everyonegetsnews.org'].includes(location.hostname)) {
     const lastAlertTime = parseInt(localStorage.getItem(storageKey) || '0');
     const hoursSinceLast = (currentTime - lastAlertTime) / (1000 * 60 * 60);
 
-    if (hoursSinceLast >= 24 || !lastAlertTime) {
+    if (hoursSinceLast >= 24 || lastAlertTime==='0') {
         alert(alertMessage);
         localStorage.setItem(storageKey, currentTime.toString());
     }
