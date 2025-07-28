@@ -21,6 +21,18 @@ if (localStorage.getItem('token')) {
         });
 }
 
+if (['canlite.online', 'everyonegetsnews.org'].includes(location.hostname)) {
+    const storageKey = 'lastAlertTime';
+    const alertMessage = "This link will expire soon, please join the discord for a new one";
+    const currentTime = new Date().getTime();
+    const lastAlertTime = parseInt(localStorage.getItem(storageKey) || '0');
+    const hoursSinceLast = (currentTime - lastAlertTime) / (1000 * 60 * 60);
+
+    if (hoursSinceLast >= 24 || !lastAlertTime) {
+        alert(alertMessage);
+        localStorage.setItem(storageKey, currentTime.toString());
+    }
+}
 
 const modal = document.getElementById("authModal");
 const btn = document.getElementById("loginModalBtn");
