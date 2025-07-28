@@ -154,7 +154,7 @@
             const favoritesJSON = localStorage.getItem('canlitefavorites');
             return favoritesJSON ? JSON.parse(favoritesJSON) : [];
         }
-        let game = <%=game.name.toString()%>
+        let game = '<%=game.name.toString()%>'
         const likeBtn = document.getElementById('like-btn');
         const favorites = getFavorites();
         const existingIndex = favorites.findIndex(game);
