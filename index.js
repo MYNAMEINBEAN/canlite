@@ -136,29 +136,37 @@ app.get("/gamesnew", async (req, res) => {
         { REV: true, WITHSCORES: true }
     );
 
-    // Format results
+    console.log("Raw Redis data:", topGames); // DEBUG
+
+    // Validate result structure
+    if (topGames.length % 2 !== 0) {
+      console.error("Invalid Redis response: Odd number of elements");
+    }
+
     const result = [];
     for (let i = 0; i < topGames.length; i += 2) {
       const gameName = topGames[i];
       const score = topGames[i + 1];
-      const game = games.find((g) => g.name === gameName);
+
+      console.log(`Processing: ${gameName} (${score})`); // DEBUG
+
+      const game = games.find(g => g.name === gameName);
 
       if (game) {
         result.push({
           ...game,
           count: parseInt(score)
         });
+      } else {
+        console.warn(`Game not found in database: ${gameName}`);
       }
     }
 
-    console.log("Total games found:", result.length); // Should be 8
+    console.log(`Processed ${result.length} games`); // DEBUG
 
-    // Correct slicing - positions 0-2 and 3-7
+    // Split into top 3 and next 5
     const topGamesFirst = result.slice(0, 3);
     const topGamesRest = result.slice(3, 8);
-
-    console.log("First row games:", topGamesFirst.length); // Should be 3
-    console.log("Second row games:", topGamesRest.length); // Should be 5
 
     res.render("gamesRemake", {
       topGamesFirst,
