@@ -136,15 +136,10 @@ app.get("/gamesnew", async (req, res) => {
         { REV: true, WITHSCORES: true }
     );
 
-    console.log("Raw Redis data:", topGames); // DEBUG
-
-
     const result = [];
     for (let i = 0; i < topGames.length; i += 1) {
       const gameName = topGames[i];
       const score = topGames[i + 1];
-
-      console.log(`Processing: ${gameName} (${score})`); // DEBUG
 
       const game = games.find(g => g.name === gameName);
 
@@ -156,8 +151,6 @@ app.get("/gamesnew", async (req, res) => {
         console.warn(`Game not found in database: ${gameName}`);
       }
     }
-
-    console.log(`Processed ${result.length} games`); // DEBUG
 
     // Split into top 3 and next 5
     const topGamesFirst = result.slice(0, 3);

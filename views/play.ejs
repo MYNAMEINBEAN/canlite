@@ -100,6 +100,7 @@
         <div class="buttons-container">
             <img id="refresh-btn" src="../games/refresh.png" alt="Refresh">
             <img id="fullscreen-btn" src="../games/fullscreen2.png" alt="Fullscreen">
+            <img id="like-btn" src="" alt="Favorite">
         </div>
     </div>
 </div>
@@ -149,6 +150,34 @@
     console.log("SCRIPT LOADED");
     document.addEventListener("DOMContentLoaded", function () {
         console.log("DOM fully loaded");
+        function getFavorites() {
+            const favoritesJSON = localStorage.getItem('canlitefavorites');
+            return favoritesJSON ? JSON.parse(favoritesJSON) : [];
+        }
+
+        const likeBtn = document.getElementById('like-btn');
+        const favorites = getFavorites();
+        const existingIndex = favorites.findIndex(<%=game%>);
+        if (existingIndex === -1) {
+            likeBtn.src = '../games/emptyheart.png'
+        } else {
+            likeBtn.src = '../games/fullheart.png'
+        }
+
+        likeBtn.addEventListener('click', function() {
+            const favorites = getFavorites();
+            const existingIndex = favorites.findIndex(<%=game%>);
+            if (existingIndex === -1) {
+                favorites.push(<%=game%>);
+                likeBtn.src = '../games/fullheart.png'
+            } else {
+                favorites.splice(existingIndex, 1);
+                likeBtn.src = '../games/emptyheart.png'
+            }
+
+            // Save to localStorage
+            localStorage.setItem('canlitefavorites', JSON.stringify(favorites));
+        })
 
         const fullscreenBtn = document.getElementById('fullscreen-btn');
         if (!fullscreenBtn) {
