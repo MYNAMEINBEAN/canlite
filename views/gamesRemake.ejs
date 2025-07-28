@@ -304,16 +304,48 @@
         <h2>⭐ Your Favorites</h2>
         <div id="favorites-container">
             <div class="games-grid top-games-small">
-                <% if (window.localStorage.getItem('canlitefavorites') == null || window.localStorage.getItem('canlitefavorites').length === 0) { %>
-                    <p>No favorited games yet. Click the heart icon on any game to add it to your favorites!</p>
-                <% } else { %>
-                    <% window.localStorage.getItem('canlitefavorites').forEach(function(game) { %>
-                        <a href="/play/<%= game %>" class="game-card small" style="display: block; text-decoration: none; color: inherit;">
-                            <img src="/api/img/<%= game %>" alt="<%= game %>">
-                            <h3><%= game + " Unblocked"%></h3>
-                        </a>
-                    <% }); %>
-                <% } %>
+                <p id="no-favorites-msg">No favorited games yet. Click the heart icon on any game to add it to your favorites!</p>
+                <script>
+                    function renderFavorites() {
+                        const favorites = JSON.parse(localStorage.getItem('canlitefavorites') || []);
+                        const favoritesGrid = document.getElementById('favorites-grid');
+                        const noFavoritesMsg = document.getElementById('no-favorites-msg');
+
+                        // Clear existing content
+                        favoritesGrid.innerHTML = '';
+
+                        // Show message if no favorites
+                        if (favorites.length === 0) {
+                            if (!noFavoritesMsg) {
+                                favoritesGrid.innerHTML = '<p id="no-favorites-msg">No favorited games yet. Click the heart icon on any game to add it to your favorites!</p>';
+                            } else {
+                                noFavoritesMsg.style.display = 'block';
+                            }
+                            return;
+                        }
+
+                        // Hide "no favorites" message
+                        if (noFavoritesMsg) noFavoritesMsg.style.display = 'none';
+
+                        // Create favorite items
+                        favorites.forEach(gameSlug => {
+                            const gameCard = document.createElement('a');
+                            gameCard.className = 'game-card small';
+                            gameCard.href = `/play/${gameSlug}`;
+                            gameCard.style.display = 'block';
+                            gameCard.style.textDecoration = 'none';
+                            gameCard.style.color = 'inherit';
+
+                            gameCard.innerHTML = `
+            <img src="/api/img/${gameSlug}" alt="${gameSlug}">
+            <h3>${gameSlug} Unblocked</h3>
+        `;
+
+                            favoritesGrid.appendChild(gameCard);
+                        });
+                    }
+                    renderFavorites()
+                </script>
             </div>
         </div>
     </div>
