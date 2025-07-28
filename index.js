@@ -129,7 +129,7 @@ app.get("/games", async (req, res) => {
 
 app.get("/gamesnew", async (req, res) => {
   try {
-    const topGames = await redisClient.zrevrange(
+    const topGames = await redisClient.zRevRange(
         "game_leaderboard",
         0,
         7,
