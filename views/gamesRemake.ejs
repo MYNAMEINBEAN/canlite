@@ -304,10 +304,10 @@
         <h2>⭐ Your Favorites</h2>
         <div id="favorites-container">
             <div class="games-grid top-games-small">
-                <% if (localStorage.getItem('canlitefavorites') == null || localStorage.getItem('canlitefavorites').length === 0) { %>
+                <% if (window.localStorage.getItem('canlitefavorites') == null || window.localStorage.getItem('canlitefavorites').length === 0) { %>
                     <p>No favorited games yet. Click the heart icon on any game to add it to your favorites!</p>
                 <% } else { %>
-                    <% localStorage.getItem('canlitefavorites').forEach(function(game) { %>
+                    <% window.localStorage.getItem('canlitefavorites').forEach(function(game) { %>
                         <a href="/play/<%= game %>" class="game-card small" style="display: block; text-decoration: none; color: inherit;">
                             <img src="/api/img/<%= game %>" alt="<%= game %>">
                             <h3><%= game + " Unblocked"%></h3>
