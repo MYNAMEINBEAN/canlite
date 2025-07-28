@@ -157,7 +157,7 @@
         let game = '<%=game.name.toString()%>'
         const likeBtn = document.getElementById('like-btn');
         const favorites = getFavorites();
-        const existingIndex = favorites.findIndex(game);
+        const existingIndex = favorites.indexOf(game);
         if (existingIndex === -1) {
             likeBtn.src = '../games/emptyheart.png'
         } else {
@@ -166,7 +166,7 @@
 
         likeBtn.addEventListener('click', function() {
             const favorites = getFavorites();
-            const existingIndex = favorites.findIndex(game);
+            const existingIndex = favorites.indexOf(game);
             if (existingIndex === -1) {
                 favorites.push(game);
                 likeBtn.src = '../games/fullheart.png'
