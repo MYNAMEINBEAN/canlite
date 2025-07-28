@@ -154,7 +154,9 @@ app.get("/gamesnew", async (req, res) => {
 
     // Split into top 3 and next 5
     const topGamesFirst = result.slice(0, 3);
+    console.log(topGamesFirst)
     const topGamesRest = result.slice(3, 8);
+    console.log(topGamesRest)
 
     res.render("gamesRemake", {
       topGamesFirst,
