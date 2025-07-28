@@ -154,10 +154,10 @@
             const favoritesJSON = localStorage.getItem('canlitefavorites');
             return favoritesJSON ? JSON.parse(favoritesJSON) : [];
         }
-
+        let game = JSON.parse(<%=game%>)
         const likeBtn = document.getElementById('like-btn');
         const favorites = getFavorites();
-        const existingIndex = favorites.findIndex(<%=game%>);
+        const existingIndex = favorites.findIndex(game);
         if (existingIndex === -1) {
             likeBtn.src = '../games/emptyheart.png'
         } else {
@@ -166,9 +166,9 @@
 
         likeBtn.addEventListener('click', function() {
             const favorites = getFavorites();
-            const existingIndex = favorites.findIndex(<%=game%>);
+            const existingIndex = favorites.findIndex(game);
             if (existingIndex === -1) {
-                favorites.push(<%=game%>);
+                favorites.push(game);
                 likeBtn.src = '../games/fullheart.png'
             } else {
                 favorites.splice(existingIndex, 1);
