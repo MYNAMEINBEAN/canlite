@@ -10,6 +10,8 @@ import * as http from "node:http";
 import * as https from "node:https";
 import { createClient } from "redis";
 import apiRoutes from "./api.js";
+const requestIp = require('request-ip');
+const geoip = require('geoip-lite');
 import verifyUser from "./middleware/authAdmin.js";
 import moment from "moment";
 import { RedisStore } from "connect-redis";
@@ -63,6 +65,30 @@ app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 
 // In-memory API tracking buffer
 const apiStats = new Map();
+
+app.use((req, res, next) => {
+  try {
+    const clientIp = requestIp.getClientIp(req);
+
+    // Skip local/internal IPs
+    if (!clientIp || /(^127\.)|(^10\.)|(^172\.1[6-9]\.)|(^172\.2[0-9]\.)|(^172\.3[0-1]\.)|(^192\.168\.)/.test(clientIp)) {
+      return next();
+    }
+
+    // Get geo info from IP
+    const geo = geoip.lookup(clientIp);
+
+    // Redirect if IP is from Israel
+    if (geo && geo.country === 'IL') {
+      return res.redirect('https://en.wikipedia.org/wiki/Gaza_genocide');
+    }
+
+    next(); // Continue for non-Israeli IPs
+  } catch (e) {
+    console.error('Geolocation error:', e);
+    next(); // Fail open on errors
+  }
+});
 
 app.get("/uv/sw.js", (req, res) => {
   res.set("Service-Worker-Allowed", "/~/uv/");
