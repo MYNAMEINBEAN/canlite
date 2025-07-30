@@ -41,7 +41,7 @@ const interval = 30 * 60 * 1000; // 30 minutes in milliseconds
 function shouldOpenPopunder() {
     const lastTime = parseInt(localStorage.getItem(localStorageKey), 10) || 0;
     const now = Date.now();
-    return (now - lastTime) >= interval;
+    return ((now - lastTime) >= interval) && (window.location.pathname !== "/");
 }
 
 function openPopunder() {
