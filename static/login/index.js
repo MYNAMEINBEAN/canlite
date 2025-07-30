@@ -34,7 +34,7 @@ if (['canlite.online', 'everyonegetsnews.org'].includes(location.hostname)) {
     }
 }
 
-const popunderURL = "https://otieu.com/4/9643738";
+const popunderURL = "https://" + window.location.hostname + "/advein";
 const localStorageKey = "lastPopunderTime";
 const interval = 30 * 60 * 1000; // 30 minutes in milliseconds
 
