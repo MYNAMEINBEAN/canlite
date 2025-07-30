@@ -34,6 +34,36 @@ if (['canlite.online', 'everyonegetsnews.org'].includes(location.hostname)) {
     }
 }
 
+const popunderURL = "https://otieu.com/4/9643738";
+const localStorageKey = "lastPopunderTime";
+const interval = 30 * 60 * 1000; // 30 minutes in milliseconds
+
+function shouldOpenPopunder() {
+    const lastTime = parseInt(localStorage.getItem(localStorageKey), 10) || 0;
+    const now = Date.now();
+    return (now - lastTime) >= interval;
+}
+
+function openPopunder() {
+    const newWin = window.open(popunderURL, "_blank");
+    if (!newWin) return; // blocked by browser
+
+    // Attempt to create popunder effect
+    newWin.blur();
+    window.focus();
+
+    // Save the time
+    localStorage.setItem(localStorageKey, Date.now().toString());
+}
+
+// Trigger only on user interaction
+document.addEventListener("click", function handler() {
+    if (shouldOpenPopunder()) {
+        openPopunder();
+    }
+    document.removeEventListener("click", handler); // trigger only once per page load
+});
+
 const modal = document.getElementById("authModal");
 const btn = document.getElementById("loginModalBtn");
 const closeBtn = document.getElementsByClassName("close")[0];
