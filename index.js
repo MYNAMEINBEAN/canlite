@@ -150,6 +150,7 @@ app.get("/allgames", async (req, res) => {
     games: paginatedGames,
     currentPage: page,
     totalPages: totalPages,
+    hostname: req.hostname,
   });
 });
 
@@ -181,10 +182,12 @@ app.get("/games", async (req, res) => {
     // Split into top 3 and next 5
     const topGamesFirst = result.slice(0, 3);
     const topGamesRest = result.slice(3, 8);
+    const hostname = req.hostname
 
     res.render("gamesRemake", {
       topGamesFirst,
-      topGamesRest
+      topGamesRest,
+      hostname
     });
   } catch (err) {
     console.error("Error fetching top games:", err);
@@ -218,8 +221,11 @@ app.get("/play/:id", (req, res) => {
 
   pipeline.exec()
       .catch((err) => console.error("Redis update error:", err));
-
-  res.render("play", { game });
+  const hostname = req.hostname
+  res.render("play", {
+    game,
+    hostname
+  });
 });
 
 app.get("/", (req, res) => {
