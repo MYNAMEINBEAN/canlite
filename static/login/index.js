@@ -142,7 +142,7 @@ document.querySelector("#loginForm form").addEventListener("submit", async funct
                 .then(response => response.json())
                 .then(data => {
                     if (data.gameData) {
-                        const storageData = JSON.parse(data.gameData);
+                        const storageData = data.gameData;
                         localStorage.clear()
                         for (const key in storageData) {
                             localStorage.setItem(key, storageData[key]);
