@@ -117,16 +117,26 @@ router.post('/register', async (req, res) => {
 });
 
 router.post('/loadGameData', async (req, res) => {
-    const { result } = req.body;
+    const { result: token } = req.body;
 
     try {
-        const user = await pool.query('SELECT data FROM users WHERE token = $1', [result]);
-
+        const user = await pool.query('SELECT id FROM users WHERE token = $1', [token]);
         if (user.rowCount === 0) {
             return res.status(403).json({ error: 'Invalid token' });
         }
 
-        res.json({ gameData: user.rows[0].data || '{}' }); // Return stored game data or empty object
+        const userId = user.rows[0].id;
+        const filePath = path.join(__dirname, 'private', 'data', `${userId}.json`);
+
+        let data = '{}';
+        try {
+            data = await fs.readFile(filePath, 'utf-8');
+        } catch (readErr) {
+            // If file doesn't exist, return empty object
+            if (readErr.code !== 'ENOENT') throw readErr;
+        }
+
+        res.json({ gameData: JSON.parse(data) });
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: 'Server Error' });
@@ -151,13 +161,15 @@ router.post('/saveGameData', async (req, res) => {
     const { token, localStorageData } = req.body;
 
     try {
-        const user = await pool.query('SELECT email FROM users WHERE token = $1', [token]);
-
+        const user = await pool.query('SELECT id FROM users WHERE token = $1', [token]);
         if (user.rowCount === 0) {
             return res.status(403).json({ error: 'Invalid token' });
         }
 
-        await pool.query('UPDATE users SET data = $1 WHERE token = $2', [localStorageData, token]);
+        const userId = user.rows[0].id;
+        const filePath = path.join(__dirname, 'private', 'data', `${userId}.json`);
+
+        await fs.writeFile(filePath, JSON.stringify(localStorageData, null, 2), 'utf-8');
 
         res.json({ success: true });
     } catch (err) {
