@@ -133,7 +133,7 @@ document.querySelector("#loginForm form").addEventListener("submit", async funct
             alert("Incorrect password");
         } else {
             // Optionally store the token for subsequent authenticated requests
-            document.getElementById('loginModalBtn').innerHTML = `<span id="loginSpan" class="material-symbols-outlined">logout</span>Logout`;
+            document.getElementById('loginStatus').innerHTML = `<p>Logged in. Loading game data.</p>`;
             fetch(`https://${window.location.host}/api/loadGameData`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -147,13 +147,14 @@ document.querySelector("#loginForm form").addEventListener("submit", async funct
                         for (const key in storageData) {
                             localStorage.setItem(key, storageData[key]);
                         }
+                        document.getElementById('loginModalBtn').innerHTML = `<span id="loginSpan" class="material-symbols-outlined">logout</span>Logout`;
                         console.log("LocalStorage data loaded:", storageData);
                         localStorage.setItem("token", result);
                         modal.style.display = "none";
                         window.location.reload();
                     }
                 })
-                .catch(error => console.error("Error loading localStorage data:", error));
+                .catch(error => alert("Error loading game data."));
         }
     } catch (error) {
         console.error("Login error:", error);
