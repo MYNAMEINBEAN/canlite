@@ -5,7 +5,7 @@ import verifyUser from "./middleware/authAdmin.js";
 import {createClient} from "redis";
 import moment from "moment";
 import path, { dirname } from "path";
-import fs from "node:fs";
+import fs from 'node:fs/promises';
 import { fileURLToPath } from "url";
 
 let redisClientAPI = createClient();
@@ -18,7 +18,7 @@ const __dirname = dirname(__filename);
 let games = [];
 const gamesFilePath = path.join(__dirname, "end.json");
 try {
-    const data = fs.readFileSync(gamesFilePath, "utf8");
+    const data = await fs.readFile(gamesFilePath, "utf8");
     games = JSON.parse(data);
 } catch (err) {
     console.error("Failed to load games data:", err);
