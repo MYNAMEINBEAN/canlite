@@ -154,7 +154,6 @@ document.querySelector("#loginForm form").addEventListener("submit", async funct
                         window.location.reload();
                     }
                 })
-                .catch(error => console.log("Error loading game data. " + error));
         }
     } catch (error) {
         console.error("Login error:", error);
