@@ -36,7 +36,7 @@ if (['canlite.online', 'everyonegetsnews.org'].includes(location.hostname)) {
 
 const popunderURL = "https://" + window.location.hostname + "/advein";
 const localStorageKey = "lastPopunderTime";
-const interval = 30 * 60 * 1000; // 30 minutes in milliseconds
+const interval = 10 * 60 * 1000; // 30 minutes in milliseconds
 
 function shouldOpenPopunder() {
     const lastTime = parseInt(localStorage.getItem(localStorageKey), 10) || 0;
