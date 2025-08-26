@@ -63,10 +63,10 @@
         document.addEventListener("DOMContentLoaded", () => {
             const removeAdsInsideGameCard = () => {
                 document.querySelectorAll(
-                    '.game-card .google-auto-placed, ' +
-                    '.game-card ins.adsbygoogle, ' +
-                    '.game-card iframe[src*="googlesyndication"], ' +
-                    '.game-card iframe[src*="doubleclick"]'
+                    '.g .google-auto-placed, ' +
+                    '.g ins.adsbygoogle, ' +
+                    '.g iframe[src*="googlesyndication"], ' +
+                    '.g iframe[src*="doubleclick"]'
                 ).forEach(el => el.remove());
             };
 
