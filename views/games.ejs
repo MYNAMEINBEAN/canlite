@@ -74,7 +74,7 @@
 
 <body>
 <!-- Authentication Modal -->
-<div id="authModal" class="modal">
+<div id="authModal" class="modal" data-nosnippet>
     <div class="modal-content">
         <span class="close">&times;</span>
         <div class="modal-tabs">
@@ -164,7 +164,7 @@
 <!-- Game Library -->
 <div class="g-container">
     <% games.forEach(game => { %>
-        <a class="g" href="/play/<%= game.name %>">
+        <a class="g" data-nosnippet href="/play/<%= game.name %>">
             <% if (game.prev) { %>
                 <img src="<%= game.prev %>" alt="<%= game.name %>">
             <% } else { %>
