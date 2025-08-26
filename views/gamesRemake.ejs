@@ -245,7 +245,7 @@
 <body>
 
 <!-- Authentication Modal -->
-<div id="authModal" class="modal" data-ad-format="none" data-ad-slot="none" data-adbreak="off">
+<div id="authModal" class="modal" data-ad-container="ignore">
     <div class="modal-content">
         <span class="close">&times;</span>
         <div class="modal-tabs">
@@ -311,7 +311,7 @@
         <!-- Top 3 Games - Large Cards -->
         <div class="games-grid top-games-grid">
             <% topGamesFirst.forEach(function(game) { %>
-                <a href="/play/<%= game.name %>" class="game-card large" data-ad-format="none" data-ad-slot="none" data-adbreak="off" style="display: block; text-decoration: none; color: inherit;">
+                <a href="/play/<%= game.name %>" class="game-card large" data-ad-container="ignore" style="display: block; text-decoration: none; color: inherit;">
                     <% if (game.prev) { %>
                         <img src="<%= game.prev %>" alt="<%= game.name %>">
                     <% } else { %>
@@ -325,7 +325,7 @@
         <!-- Next 5 Games - Small Cards -->
         <div class="games-grid top-games-small">
             <% topGamesRest.forEach(function(game) { %>
-                <a href="/play/<%= game.name %>" class="game-card small" data-ad-format="none" data-ad-slot="none" data-adbreak="off" style="display: block; text-decoration: none; color: inherit;">
+                <a href="/play/<%= game.name %>" class="game-card small" data-ad-container="ignore" style="display: block; text-decoration: none; color: inherit;">
                     <% if (game.prev) { %>
                         <img src="<%= game.prev %>" alt="<%= game.name %>">
                     <% } else { %>
