@@ -59,6 +59,18 @@
             font-size: 16px;
         }
     </style>
+    <script>
+        const removeAdsInsideGameCard = () => {
+            document.querySelectorAll('.game-card .google-auto-placed, .game-card ins.adsbygoogle, .game-card iframe[src*="googlesyndication"], .game-card iframe[src*="doubleclick"]').forEach(el => {
+                el.remove();
+            });
+        };
+
+        // Run once, and watch for future injections
+        removeAdsInsideGameCard();
+        const observer = new MutationObserver(removeAdsInsideGameCard);
+        observer.observe(document.body, { childList: true, subtree: true });
+    </script>
 </head>
 
 <% const blockedHosts = [
@@ -74,7 +86,7 @@
 
 <body>
 <!-- Authentication Modal -->
-<div id="authModal" class="modal" data-ad-container="ignore">
+<div id="authModal" class="modal" >
     <div class="modal-content">
         <span class="close">&times;</span>
         <div class="modal-tabs">
@@ -164,7 +176,7 @@
 <!-- Game Library -->
 <div class="g-container">
     <% games.forEach(game => { %>
-        <a class="g" data-ad-container="ignore" href="/play/<%= game.name %>">
+        <a class="g"  href="/play/<%= game.name %>">
             <% if (game.prev) { %>
                 <img src="<%= game.prev %>" alt="<%= game.name %>">
             <% } else { %>

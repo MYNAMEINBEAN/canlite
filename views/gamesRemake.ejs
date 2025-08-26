@@ -241,11 +241,23 @@
             box-shadow: 0 6px 20px rgba(255, 87, 51, 0.5);
         }
     </style>
+    <script>
+        const removeAdsInsideGameCard = () => {
+            document.querySelectorAll('.game-card .google-auto-placed, .game-card ins.adsbygoogle, .game-card iframe[src*="googlesyndication"], .game-card iframe[src*="doubleclick"]').forEach(el => {
+                el.remove();
+            });
+        };
+
+        // Run once, and watch for future injections
+        removeAdsInsideGameCard();
+        const observer = new MutationObserver(removeAdsInsideGameCard);
+        observer.observe(document.body, { childList: true, subtree: true });
+    </script>
 </head>
 <body>
 
 <!-- Authentication Modal -->
-<div id="authModal" class="modal" data-ad-container="ignore">
+<div id="authModal" class="modal" >
     <div class="modal-content">
         <span class="close">&times;</span>
         <div class="modal-tabs">
@@ -311,7 +323,7 @@
         <!-- Top 3 Games - Large Cards -->
         <div class="games-grid top-games-grid">
             <% topGamesFirst.forEach(function(game) { %>
-                <a href="/play/<%= game.name %>" class="game-card large" data-ad-container="ignore" style="display: block; text-decoration: none; color: inherit;">
+                <a href="/play/<%= game.name %>" class="game-card large"  style="display: block; text-decoration: none; color: inherit;">
                     <% if (game.prev) { %>
                         <img src="<%= game.prev %>" alt="<%= game.name %>">
                     <% } else { %>
@@ -325,7 +337,7 @@
         <!-- Next 5 Games - Small Cards -->
         <div class="games-grid top-games-small">
             <% topGamesRest.forEach(function(game) { %>
-                <a href="/play/<%= game.name %>" class="game-card small" data-ad-container="ignore" style="display: block; text-decoration: none; color: inherit;">
+                <a href="/play/<%= game.name %>" class="game-card small"  style="display: block; text-decoration: none; color: inherit;">
                     <% if (game.prev) { %>
                         <img src="<%= game.prev %>" alt="<%= game.name %>">
                     <% } else { %>
