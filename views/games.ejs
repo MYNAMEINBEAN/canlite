@@ -64,16 +64,17 @@
             const removeAdsInsideGameCard = () => {
                 document.querySelectorAll(
                     '.g .google-auto-placed, ' +
-                    '.g ins.adsbygoogle, ' +
-                    '.g iframe[src*="googlesyndication"], ' +
-                    '.g iframe[src*="doubleclick"]'
+                    // only remove ins.adsbygoogle if it’s NOT marked manual
+                    '.g ins.adsbygoogle:not(.manual-ad), ' +
+                    '.g iframe[src*="googlesyndication"]:not(.manual-ad), ' +
+                    '.g iframe[src*="doubleclick"]:not(.manual-ad)'
                 ).forEach(el => el.remove());
             };
 
             // Run once right away
             removeAdsInsideGameCard();
 
-            // Only create observer if body exists
+            // Observe DOM changes
             if (document.body) {
                 const observer = new MutationObserver(removeAdsInsideGameCard);
                 observer.observe(document.body, { childList: true, subtree: true });
@@ -206,8 +207,8 @@
                         <!-- Adsense ad -->
                         <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1655414789495559"
                                 crossorigin="anonymous"></script>
-                        <ins class="adsbygoogle"
-                             style="display:block;width:100%;height:100%;"
+                        <ins class="adsbygoogle manual-ad"
+                             style="display:block; width:100%; height:100%; position:absolute; top:0; left:0;"
                              data-ad-client="ca-pub-1655414789495559"
                              data-ad-slot="9861293472"
                              data-ad-format="auto"
@@ -215,7 +216,7 @@
                         <script>
                             (adsbygoogle = window.adsbygoogle || []).push({});
                         </script>
-                    <% } else { %>
+                <% } else { %>
                         <!-- Iframe ad -->
                         <iframe src="https://<%= hostname %>/advein"
                                 style="width:100%;height:100%;border:none;"></iframe>
