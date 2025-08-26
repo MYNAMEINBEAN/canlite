@@ -60,17 +60,27 @@
         }
     </style>
     <script>
-        const removeAdsInsideGameCard = () => {
-            document.querySelectorAll('.game-card .google-auto-placed, .game-card ins.adsbygoogle, .game-card iframe[src*="googlesyndication"], .game-card iframe[src*="doubleclick"]').forEach(el => {
-                el.remove();
-            });
-        };
+        document.addEventListener("DOMContentLoaded", () => {
+            const removeAdsInsideGameCard = () => {
+                document.querySelectorAll(
+                    '.game-card .google-auto-placed, ' +
+                    '.game-card ins.adsbygoogle, ' +
+                    '.game-card iframe[src*="googlesyndication"], ' +
+                    '.game-card iframe[src*="doubleclick"]'
+                ).forEach(el => el.remove());
+            };
 
-        // Run once, and watch for future injections
-        removeAdsInsideGameCard();
-        const observer = new MutationObserver(removeAdsInsideGameCard);
-        observer.observe(document.body, { childList: true, subtree: true });
+            // Run once right away
+            removeAdsInsideGameCard();
+
+            // Only create observer if body exists
+            if (document.body) {
+                const observer = new MutationObserver(removeAdsInsideGameCard);
+                observer.observe(document.body, { childList: true, subtree: true });
+            }
+        });
     </script>
+
 </head>
 
 <% const blockedHosts = [
