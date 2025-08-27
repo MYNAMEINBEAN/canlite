@@ -195,34 +195,6 @@
             <% } %>
             <h3><%= game.name + " Unblocked" %></h3>
         </a>
-
-        <% if ((i + 1) % 8 === 0) { %>
-            <div class="g ad-tile">
-                <div style="position:relative; width:100%; background:#f4f4f4; border-radius:8px; overflow:hidden;">
-                    <span style="position:absolute; top:5px; left:5px; background:#000; color:#fff; font-size:12px; padding:2px 6px; border-radius:4px; opacity:0.8; z-index:2;">
-                        Sponsored
-                    </span>
-
-                    <% if (["everyonegetsnews.org","canlite.org","psybolt.com","free-web-proxy.org"].includes(hostname)) { %>
-                        <!-- Adsense ad -->
-                        <ins class="adsbygoogle manual-ad"
-                             style="display:block; width:100%; min-height:250px; background:#f4f4f4;"
-                             data-ad-client="ca-pub-1655414789495559"
-                             data-ad-slot="1234567890"
-                             data-ad-format="auto"
-                             data-full-width-responsive="true"></ins>
-                        <script>
-                            (adsbygoogle = window.adsbygoogle || []).push({});
-                        </script>
-                    <% } else { %>
-                        <!-- Iframe fallback ad -->
-                        <iframe src="https://otieu.com/4/9643738"
-                                style="width:100%; border:none; display:block; background:#f4f4f4;"></iframe>
-                    <% } %>
-                </div>
-                <h3>Advertisement</h3>
-            </div>
-        <% } %>
     <% }); %>
 </div>
 
