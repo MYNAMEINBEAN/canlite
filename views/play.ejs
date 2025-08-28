@@ -31,26 +31,24 @@
             }
             link.setAttribute("href", canonicalUrl);
         });
-        document.addEventListener("DOMContentLoaded", async () => {
-            const path = window.location.pathname;
+        const path = window.location.pathname;
 
-            const match = path.match(/^\/play\/([^\/]+)/);
-            if (match) {
-                const game = match[1];
+        const match = path.match(/^\/play\/([^\/]+)/);
+        if (match) {
+            const game = match[1];
 
-                try {
-                    await fetch(`/api/hit/${game}`, {
-                        method: "GET",
-                        headers: {
-                            "Content-Type": "application/json",
-                        }
-                    });
-                    // optional: console.log("Hit registered for:", game);
-                } catch (err) {
-                    console.error("Failed to send hit:", err);
-                }
+            try {
+                await fetch(`/api/hit/${game}`, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                    }
+                });
+                // optional: console.log("Hit registered for:", game);
+            } catch (err) {
+                console.error("Failed to send hit:", err);
             }
-        });
+        }
     </script>
     <script defer src="/uv/uv.bundle.js"></script>
     <script defer src="/uv/uv.config.js"></script>
