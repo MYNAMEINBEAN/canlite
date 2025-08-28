@@ -2,18 +2,25 @@ import express from "express";
 import crypto from 'crypto';
 import pool from './db.js';
 import verifyUser from "./middleware/authAdmin.js";
-import {createClient} from "redis";
 import moment from "moment";
 import path, { dirname } from "path";
 import fs from 'node:fs/promises';
 import { fileURLToPath } from "url";
+import { RedisStore } from "connect-redis";
+import { createClient } from "redis";
 
-let redisClientAPI = createClient();
-redisClientAPI.connect().catch(console.error)
 const router = express.Router();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+
+let redisClient = createClient();
+redisClient.connect().catch(console.error);
+
+let redisStore = new RedisStore({
+    client: redisClient,
+    prefix: "myapp:",
+});
 
 let games = [];
 const gamesFilePath = path.join(__dirname, "end.json");
@@ -28,6 +35,16 @@ try {
 const generateRandomString = (length) => {
     return crypto.randomBytes(length).toString('hex').slice(0, length);
 };
+
+router.get('/hit/:game', async (req, res) => {
+    const pipeline = redisClient.multi();
+    pipeline.zAdd('game_leaderboard', { score: 1, value: req.params.game }, { INCR: true });
+
+    pipeline.exec()
+        .catch((err) => console.error("Redis update error:", err));
+
+    return res.status(200).send("Updated");
+})
 
 router.post('/check', async (req, res) => {
     const { token } = req.body;

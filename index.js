@@ -213,15 +213,8 @@ app.get("/play/:id", (req, res) => {
 
   if (!game) return res.status(404).send("Game not found");
 
-  const counterKey = `games:${gameName}:counter`;
 
   // Use pipeline with correct commands
-  const pipeline = redisClient.multi();
-  pipeline.incr(counterKey);
-  pipeline.zAdd('game_leaderboard', { score: 1, value: gameName }, { INCR: true });
-
-  pipeline.exec()
-      .catch((err) => console.error("Redis update error:", err));
   const hostname = req.hostname
   res.render("play", {
     game,
