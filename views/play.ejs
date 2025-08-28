@@ -38,7 +38,7 @@
             const game = match[1];
 
             try {
-                await fetch(`/api/hit/${game}`, {
+                 fetch(`/api/hit/${game}`, {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
