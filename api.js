@@ -1,6 +1,7 @@
 import express from "express";
 import crypto from 'crypto';
 import pool from './db.js';
+const { WebSocketServer } = require("ws");
 import verifyUser from "./middleware/authAdmin.js";
 import moment from "moment";
 import path, { dirname } from "path";
