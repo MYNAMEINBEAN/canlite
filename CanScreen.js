@@ -1,9 +1,13 @@
-const express = require("express");
-const path = require("path");
-const fs = require("node:fs");
-const crypto = require("crypto");
+import express from "express";
+import path from "path";
+import { dirname } from "path";
+import fs from "node:fs";
+import crypto from "node:crypto";
+import { fileURLToPath } from "url";
 require("dotenv").config();
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 const router = express.Router();
 
 router.use(express.json());
