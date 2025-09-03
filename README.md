@@ -54,7 +54,8 @@ CanLite is deployed at **[canlite.org](https://canlite.org)** on a **CrunchBits 
 ## Credits
 - **Titanium Network** – For the *Nano* proxy technology.
 - **Titanium Network** – For [Ultraviolet](https://github.com/titaniumnetwork-dev/Ultraviolet).
-- **3kh0** – For the game assets and game page CSS.
+- **3kh0** – For the game assets.
+- **Pizza edition** – For the game page css.
 - **MercuryWorkshop** – For [dreamland.js](https://github.com/MercuryWorkshop/dreamland.js).
 - **Tailwind Labs** – For [Tailwind CSS](https://tailwindcss.com/).
 - **Feather Icons & Material Symbols** – For icons.
