@@ -15,6 +15,7 @@ import geoip from 'geoip-lite';
 import verifyUser from "./middleware/authAdmin.js";
 import moment from "moment";
 import { RedisStore } from "connect-redis";
+import { setupCanScreen } from "./CanScreen.js"
 
 
 const __filename = fileURLToPath(import.meta.url);
@@ -63,6 +64,7 @@ app.use(
 
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));
+setupCanScreen(app);
 
 // In-memory API tracking buffer
 const apiStats = new Map();
