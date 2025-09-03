@@ -12,11 +12,33 @@ async function solvePoW(challenge, difficulty) {
         const msgBuffer = new TextEncoder().encode(challenge + nonce.toString());
         const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
         const hashArray = Array.from(new Uint8Array(hashBuffer));
-        const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        const hashHex = hashArray.map(b => b.toString(16)).join('');
 
         // Check if the hash meets the difficulty requirement
         if (hashHex.startsWith(prefix)) {
-            return nonce;
+            // Submit the solution to the server
+            const response = await fetch('/cnscrn/verify', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ solution: nonce.toString() }),
+                credentials: 'include' // This is crucial for sending cookies
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                console.log("Verification successful, redirecting...");
+
+                // Use a more reliable method to ensure the session is saved
+                // Redirect after a short delay to allow the session to be saved
+                setTimeout(() => {
+                    window.location.href = '/';
+                }, 500);
+            } else {
+                throw new Error('Server rejected solution: ' + (result.error || 'Unknown error'));
+            }
         }
 
         nonce++;
@@ -36,31 +58,7 @@ async function runVerification() {
         const challenge = "INSERTCHALLENGE";
         const difficulty = "INSERTDIFFICULTY";
 
-        const solution = await solvePoW(challenge, difficulty);
-
-        // Submit the solution to the server
-        const response = await fetch('/cnscrn/verify', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ solution: solution.toString() }),
-            credentials: 'include' // This is crucial for sending cookies
-        });
-
-        const result = await response.json();
-
-        if (result.success) {
-            console.log("Verification successful, redirecting...");
-
-            // Use a more reliable method to ensure the session is saved
-            // Redirect after a short delay to allow the session to be saved
-            setTimeout(() => {
-                window.location.href = '/';
-            }, 500);
-        } else {
-            throw new Error('Server rejected solution: ' + (result.error || 'Unknown error'));
-        }
+        await solvePoW(challenge, difficulty);
     } catch (error) {
         console.error('Verification failed:', error);
         // Reload the page to get a new challenge
