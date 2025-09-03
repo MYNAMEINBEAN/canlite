@@ -65,6 +65,7 @@ function generateChallenge(difficulty = 4) {
 function verifySolution(challenge, solution, difficulty) {
     const prefix = '0'.repeat(difficulty);
     const hash = crypto.createHash('sha256').update(challenge + solution).digest('hex');
+    console.log("" + challenge + " " + solution + " " + hash + " " + hash.startsWith(prefix));
     return hash.startsWith(prefix);
 }
 
