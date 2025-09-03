@@ -4,7 +4,6 @@ import { dirname } from "path";
 import fs from "node:fs";
 import crypto from "node:crypto";
 import { fileURLToPath } from "url";
-require("dotenv").config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
