@@ -56,7 +56,7 @@ function screen(req, res, next) {
 }
 
 // Generate a PoW challenge
-function generateChallenge(difficulty = 4) {
+function generateChallenge(difficulty = 3) {
     const randomString = crypto.randomBytes(16).toString('hex');
     return { challenge: randomString, difficulty};
 }
