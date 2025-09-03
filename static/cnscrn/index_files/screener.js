@@ -9,7 +9,7 @@ async function solvePoW(challenge, difficulty) {
     let nonce = 0;
     while (nonce < 10000000) { // Safety limit
         // Create a hash of challenge + nonce
-        const msgBuffer = new TextEncoder().encode(challenge + nonce);
+        const msgBuffer = new TextEncoder().encode(challenge + nonce.toString());
         const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
         const hashArray = Array.from(new Uint8Array(hashBuffer));
         const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
