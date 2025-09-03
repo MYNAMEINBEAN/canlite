@@ -22,7 +22,7 @@ async function solvePoW(challenge, difficulty) {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ solution: nonce.toString() }),
+                body: JSON.stringify({ solution: nonce.toString(), challenge: challenge  }),
                 credentials: 'include' // This is crucial for sending cookies
             });
 

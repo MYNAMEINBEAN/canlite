@@ -72,7 +72,6 @@ function verifySolution(challenge, solution, difficulty) {
 // Screening page route
 router.get("/", (req, res) => {
     const { challenge, difficulty} = generateChallenge();
-    req.session.challenge = challenge;
     req.session.difficulty = difficulty;
 
     // Save session explicitly
@@ -109,8 +108,8 @@ router.get("/static_files/screener.js", (req, res) => {
 
 // Verification route
 router.post("/verify", (req, res) => {
-    const { solution } = req.body;
-    const { challenge, difficulty } = req.session;
+    const { solution, challenge } = req.body;
+    let difficulty = req.session.difficulty;
 
     if (!challenge || !difficulty) {
         return res.status(400).json({ error: "No active challenge" });
