@@ -56,15 +56,15 @@ function screen(req, res, next) {
 }
 
 // Generate a PoW challenge
-function generateChallenge(difficulty = 3) {
+function generateChallenge(difficulty = 2) {
     const randomString = crypto.randomBytes(16).toString('hex');
     return { challenge: randomString, difficulty};
 }
 
 // Verify PoW solution
-function verifySolution(challenge, solution, difficulty) {
-    const prefix = '0'.repeat(difficulty);
-    const hash = crypto.createHash('sha256').update(challenge + solution).digest('hex');
+function verifySolution(challenge, solution) {
+    const prefix = '00';
+    const hash = crypto.createHash('sha256').update(challenge + solution.toString()).digest('hex');
     console.log("" + challenge + " " + solution + " " + hash + " " + hash.startsWith(prefix));
     return hash.startsWith(prefix);
 }

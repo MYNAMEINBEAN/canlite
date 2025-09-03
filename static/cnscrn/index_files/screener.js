@@ -1,9 +1,8 @@
-async function solvePoW(challenge, difficulty) {
+async function solvePoW(challenge) {
     // Convert difficulty to number
-    difficulty = parseInt(difficulty);
 
     // Create a prefix of zeros to match
-    const prefix = '0'.repeat(difficulty);
+    const prefix = '00';
 
     // Solve the PoW challenge
     let nonce = 0;
