@@ -128,7 +128,7 @@ router.post("/verify", (req, res) => {
 
 router.use("/static_files", express.static(path.join(__dirname, "/static/cnscrn/index_files")));
 
-exports.setupCanScreen = function(app) {
+export function setupCanScreen(app) {
     app.use(screen);
     app.use("/cnscrn", router);
-};
+}
