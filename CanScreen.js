@@ -110,13 +110,12 @@ router.get("/static_files/screener.js", (req, res) => {
 // Verification route
 router.post("/verify", (req, res) => {
     const { solution, challenge } = req.body;
-    let difficulty = req.session.difficulty;
 
-    if (!challenge || !difficulty) {
+    if (!challenge) {
         return res.status(400).json({ error: "No active challenge" });
     }
 
-    if (verifySolution(challenge, solution, difficulty)) {
+    if (verifySolution(challenge, solution)) {
         req.session.passed = true;
         req.session.save((err) => {
             if (err) {
