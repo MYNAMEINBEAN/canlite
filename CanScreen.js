@@ -73,6 +73,7 @@ function verifySolution(challenge, solution, difficulty) {
 router.get("/", (req, res) => {
     const { challenge, difficulty} = generateChallenge();
     req.session.difficulty = difficulty;
+    req.session.challenge = challenge;
 
     // Save session explicitly
     req.session.save((err) => {
@@ -98,7 +99,7 @@ router.get("/static_files/screener.js", (req, res) => {
                 console.error('Error reading file:', err);
                 return;
             }
-            return res.send(data.replace("INSERTCHALLENGE", req.session.challenge).replace("INSERTDIFFICULTY", 4));
+            return res.send(data.replace("INSERTCHALLENGE", req.session.challenge).replace("INSERTDIFFICULTY", 3));
         });
     } catch (error) {
         console.log(error);
