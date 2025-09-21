@@ -21,17 +21,13 @@ if (localStorage.getItem('token')) {
         });
 }
 
-if (['canlite.online', 'everyonegetsnews.org'].includes(location.hostname)) {
-    const storageKey = 'lastAlertTime';
-    const alertMessage = "This link will expire soon, please join the discord for a new one";
-    const currentTime = new Date().getTime();
-    const lastAlertTime = parseInt(localStorage.getItem(storageKey) || '0');
-    const hoursSinceLast = (currentTime - lastAlertTime) / (1000 * 60 * 60);
+const storageKey = 'firsttime';
+const alertMessage = "If this is your first time using canlite and you get a 'Cannot GET' error on any page, wait a few seconds and refresh the page.";
+const exists = parseInt(localStorage.getItem(storageKey) || '1');
 
-    if (hoursSinceLast >= 24 || lastAlertTime==='0') {
-        alert(alertMessage);
-        localStorage.setItem(storageKey, currentTime.toString());
-    }
+if (exists.toString() === '1') {
+    alert(alertMessage);
+    localStorage.setItem(storageKey, "0");
 }
 
 const popunderURL = "https://otieu.com/4/9643322";
