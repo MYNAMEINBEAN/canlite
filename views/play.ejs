@@ -132,6 +132,7 @@
             <img id="refresh-btn" src="../games/refresh.png" alt="Refresh">
             <img id="fullscreen-btn" src="../games/fullscreen2.png" alt="Fullscreen">
             <img id="like-btn" src="" alt="Favorite">
+            <img id="newtab-btn" src="../games/new.png" alt="Open in new tab">
         </div>
     </div>
 </div>
@@ -216,7 +217,9 @@
             return;
         }
 
-        console.log("Fullscreen button found");
+        document.getElementById("fullscreen-btn").addEventListener('click', function () {
+            window.open(document.querySelector('#game-container iframe').src, "_blank")
+        })
 
         fullscreenBtn.addEventListener('click', function () {
             console.log("Fullscreen button clicked");
