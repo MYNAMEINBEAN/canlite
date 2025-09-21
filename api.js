@@ -37,6 +37,9 @@ const generateRandomString = (length) => {
 };
 
 router.get('/hit/:game', async (req, res) => {
+    if(req.params.game === "bludclart" || req.params.game === "Blooket") {
+        return res.status(403).send("Not Found");
+    }
     const pipeline = redisClient.multi();
     pipeline.zAdd('game_leaderboard', { score: 1, value: req.params.game }, { INCR: true });
 
