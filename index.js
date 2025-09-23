@@ -101,8 +101,9 @@ app.use((req, res, next) => {
   }
   if(!override) {
     next()
+  } else {
+    proxy.web(req, res, { target: override });
   }
-  proxy.web(req, res, { target: override });
 })
 
 app.get("/uv/sw.js", (req, res) => {
@@ -353,7 +354,7 @@ function shutdown() {
 
 if(process.env.environment === "testing") {
   server.listen(9908, () => {
-    console.log("Main server http://localhost:9909");
+    console.log("Testing server http://localhost:9908");
   });
 } else {
   server.listen(9909, () => {
@@ -377,7 +378,7 @@ verify.get("/validate-domain", (req, res) => {
 
 if(process.env.environment === "testing") {
   verify.listen(3999, () => {
-    console.log("Domain validation server running on http://localhost:4000");
+    console.log("Test domain validation server running on http://localhost:3999");
   });
 } else {
   verify.listen(4000, () => {
