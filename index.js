@@ -97,7 +97,7 @@ app.use((req, res, next) => {
   let override = req.session.siteOveride || null
   if(req.path === "/reset" && override) {
     delete req.session.siteOverride;
-    next()
+    return res.redirect("/");
   }
   if(!override) {
     next()
