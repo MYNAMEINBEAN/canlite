@@ -12,16 +12,18 @@ import { createClient } from "redis";
 import apiRoutes from "./api.js";
 import requestIp from'request-ip';
 import geoip from 'geoip-lite';
+import httpProxy from "http-proxy"
 import verifyUser from "./middleware/authAdmin.js";
 import moment from "moment";
 import { RedisStore } from "connect-redis";
 import { setupCanScreen } from "./CanScreen.js"
-
+import pool from "./db.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const app = express();
 const bareServer = createBareServer("/b/");
+const proxy = httpProxy.createProxyServer({ ws: true, changeOrigin: true });
 
 let games = [];
 const gamesFilePath = path.join(__dirname, "end.json");
@@ -52,21 +54,20 @@ let redisStore = new RedisStore({
   prefix: "myapp:",
 });
 
+const sessionMiddleware = session({
+  store: redisStore,
+  secret: process.env.EXPRESSJS_SECRET,
+  resave: false,
+  saveUninitialized: false,
+  cookie: { secure: true },
+})
+
 app.use(
-    session({
-      store: redisStore,
-      secret: process.env.EXPRESSJS_SECRET,
-      resave: false,
-      saveUninitialized: false,
-      cookie: { secure: true },
-    })
+    sessionMiddleware
 );
 
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));
-
-// In-memory API tracking buffer
-const apiStats = new Map();
 
 app.use((req, res, next) => {
   try {
@@ -91,6 +92,18 @@ app.use((req, res, next) => {
     next(); // Fail open on errors
   }
 });
+
+app.use((req, res, next) => {
+  let override = req.session.siteOveride || null
+  if(req.path === "/reset" && override) {
+    delete req.session.siteOverride;
+    next()
+  }
+  if(!override) {
+    next()
+  }
+  proxy.web(req, res, { target: override });
+})
 
 app.get("/uv/sw.js", (req, res) => {
   res.set("Service-Worker-Allowed", "/~/uv/");
@@ -129,6 +142,19 @@ app.get('/sitemap.xml', async (req, res) => {
 app.get("/validate-domain", async (req, res) => {
   res.status(200).send("OK");
 });
+
+app.get("/account", async (req, res) => {
+  if (req.session.token) {
+    const tokenResult = await pool.query('SELECT token, admin FROM users WHERE token = $1', [req.session.token]);
+    if (tokenResult.rowCount === 0) {
+      return res.status(400).json(false); // Account does not exist
+    } else {
+      res.render("account");
+    }
+  } else {
+    return res.status(400).json(false);
+  }
+})
 
 app.get("/allgames", async (req, res) => {
   const perPage = 100;
@@ -271,23 +297,42 @@ server.on("request", async (req, res) => {
   }
 });
 
-server.on("upgrade", async (req, socket, head) => {
-  req.on("aborted", () => {
-    let e = 1;
-  });
-  try {
-    if (bareServer.shouldRoute(req)) {
-      bareServer.routeUpgrade(req, socket, head);
+function runSessionMiddleware(req, socket, callback) {
+  // Express normally calls (req, res, next), but in upgrade there is no res.
+  // So we pass an empty object for res and a manual callback for next.
+  sessionMiddleware(req, {}, (err) => {
+    if (err) {
+      callback(err);
     } else {
-      socket.end();
+      callback();
     }
-  } catch (error) {
-    if (error.message && error.message.includes("aborted")) {
+  });
+}
+
+server.on("upgrade", async (req, socket, head) => {
+  runSessionMiddleware(req, socket, (err) => {
+    if (err) {
       socket.end();
       return;
     }
-    socket.end();
-  }
+
+    try {
+      const override = req.session?.siteOverride;
+      if (override) {
+        proxy.ws(req, socket, head, { target: override, changeOrigin: true });
+      } else if (bareServer.shouldRoute(req)) {
+        bareServer.routeUpgrade(req, socket, head);
+      } else {
+        socket.end();
+      }
+    } catch (error) {
+      if (error.message && error.message.includes("aborted")) {
+        socket.end();
+        return;
+      }
+      socket.end();
+    }
+  });
 });
 
 app.use((err, req, res, next) => {
@@ -339,30 +384,3 @@ if(process.env.environment === "testing") {
     console.log("Domain validation server running on http://localhost:4000");
   });
 }
-
-const url = 'https://adbpage.com/adblock?v=3&format=js';
-const outputFile = path.join(__dirname, 'static/ads.js');
-const fetchInterval = 5 * 60 * 1000;
-
-function fetchWebsite() {
-  https.get(url, (res) => {
-    let data = '';
-    res.on('data', (chunk) => {
-      data += chunk;
-    });
-    res.on('end', () => {
-      fs.writeFile(outputFile, data, (err) => {
-        if (err) {
-          console.error('Error writing to file:', err);
-        } else {
-          console.log(`Content fetched and saved to ${outputFile} at ${new Date().toISOString()}`);
-        }
-      });
-    });
-  }).on('error', (err) => {
-    console.error('Error fetching the website:', err);
-  });
-}
-
-fetchWebsite();
-setInterval(fetchWebsite, fetchInterval);

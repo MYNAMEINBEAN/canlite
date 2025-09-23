@@ -9,7 +9,7 @@ if (localStorage.getItem('token')) {
         .then(response => {
             if (response.status === 200) {
                 document.getElementById('loginModalBtn').innerHTML =
-                    `<span id="loginSpan" class="material-symbols-outlined">logout</span>Logout`;
+                    `<span id="loginSpan" class="material-symbols-outlined">account_circle</span>My Account`;
             } else {
                 localStorage.removeItem('token');
                 alert("Session expired");
@@ -71,13 +71,7 @@ const registerForm = document.getElementById("registerForm");
 // Open the modal when the button is clicked
 btn.onclick = function() {
     if(localStorage.getItem('token')) {
-        localStorage.removeItem('token');
-        fetch("/api/logout", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" }
-        })
-            .then(response => response.json())
-        location.reload();
+        window.location = "/account/"
     } else {
         modal.style.display = "block";
     }

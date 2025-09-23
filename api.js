@@ -176,6 +176,15 @@ router.post('/logout', async (req, res) => {
     }
 });
 
+router.post('/switch', async (req, res) => {
+    const { site } = req.body;
+    if (!["https://us4-ubg.github.io", "https://gr4ys0n.github.io", "https://sites.google.com/view/ultimate-arcade", "https://securedweb.xyz", "https://flamepass.com", "https://watch.bludclart.com"].includes(site)) {
+        return res.status(400).send("Invalid site");
+    }
+    req.session.siteOveride = site;
+    res.redirect('/')
+})
+
 // Save Game Data
 router.post('/saveGameData', async (req, res) => {
     const { token, localStorageData } = req.body;
