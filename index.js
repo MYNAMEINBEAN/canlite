@@ -102,7 +102,7 @@ app.use((req, res, next) => {
   if(!override) {
     next()
   } else {
-    proxy.web(req, res, { target: override });
+    proxy.web(req, res, { target: override, changeOrigin: true });
   }
 })
 
