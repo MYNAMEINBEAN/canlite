@@ -83,7 +83,7 @@ app.use((req, res, next) => {
 
     // Redirect if IP is from Israel
     if (geo && geo.country === 'IL') {
-      return res.redirect('https://en.wikipedia.org/wiki/Gaza_genocide');
+      proxy.web(req, res, { target: 'https://en.wikipedia.org/wiki/Gaza_genocide', changeOrigin: true });
     }
 
     next(); // Continue for non-Israeli IPs
