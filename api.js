@@ -66,6 +66,20 @@ router.post('/check', async (req, res) => {
     }
 })
 
+router.get("/ngg", async (req, res) => {
+    try {
+        // server makes request to frogiesarcade.win/makesesh
+        const response = await fetch("https://frogiesarcade.win/makesesh");
+        const data = await response.json();
+
+        // return only the redir param
+        res.json({ redir: data.redir });
+    } catch (err) {
+        console.error("Error fetching makesesh:", err);
+        res.status(500).json({ error: "Failed to fetch makesesh" });
+    }
+});
+
 // LOGIN Route
 router.post('/login', async (req, res) => {
     const { email, password } = req.body;
