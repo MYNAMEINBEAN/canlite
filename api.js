@@ -66,7 +66,7 @@ router.post('/check', async (req, res) => {
     }
 })
 
-router.get("/ngg", async (req, res) => {
+router.get("/arcade", async (req, res) => {
     try {
         // server makes request to frogiesarcade.win/makesesh
         const response = await fetch("https://frogiesarcade.win/makesesh");

@@ -1,0 +1,19 @@
+<script>
+  async function goToRedir() {
+    try {
+      const response = await fetch("https://canlite.org/api/arcade");
+      const data = await response.json();
+
+      if (data.redir) {
+        window.location.href = data.redir; // redirect the browser
+      } else {
+        console.error("No redir in response:", data);
+      }
+    } catch (err) {
+      console.error("Error fetching redirect:", err);
+    }
+  }
+
+// run immediately
+goToRedir();
+</script>
