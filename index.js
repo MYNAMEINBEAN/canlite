@@ -18,6 +18,7 @@ import moment from "moment";
 import { RedisStore } from "connect-redis";
 import { setupCanScreen } from "./CanScreen.js"
 import pool from "./db.js";
+import cors from "cors";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -45,6 +46,10 @@ app.use((req, res, next) => {
   });
   next();
 });
+
+app.use(cors({
+  origin: "*"
+}));
 
 let redisClient = createClient();
 redisClient.connect().catch(console.error);
